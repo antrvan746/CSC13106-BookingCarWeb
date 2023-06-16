@@ -7,7 +7,15 @@ import HeaderLogo from '../../assets/grab.png'
 const StyledContainer = styled.div`
     flex-direction: row;
     background-color: #f9f9f9;
-    padding: 0.5rem 0rem 0.5rem 2rem;
+    position: sticky;
+    top: 0;
+    padding: 0.5rem 2rem 0.5rem 2rem;
+    transition: background-color 0.5s;
+
+
+    @media (min-height: 500px) {
+      background-color: #f9f9f9b6;
+    }
 `
 
 const Header = () => {
