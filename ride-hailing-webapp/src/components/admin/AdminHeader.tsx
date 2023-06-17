@@ -4,8 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import HeaderLogo from "../../../assets/grab.png";
 import { IconButton } from "@mui/material";
-
-
+import MenuIcon from "@mui/icons-material/Menu";
 
 const StyledContainer = styled.div`
 	display: flex;
@@ -23,16 +22,36 @@ const StyledContainer = styled.div`
 	}
 `;
 
-const AdminHeader = (isLoggedIn: boolean) => {
+interface AdminHeaderProps {
+	isLoggedIn?: boolean;
+}
+
+const AdminHeader: React.FC<AdminHeaderProps> = ({ isLoggedIn = true }) => {
+
+	const MenuButton : React.FC<AdminHeaderProps> = ({isLoggedIn}) => {
+		if (isLoggedIn) {
+			return (
+				<IconButton style={{
+					margin: '0rem 1rem 0rem 0rem'
+				}}>
+					<MenuIcon style={{
+						color: '#ffffff'
+					}} />
+				</IconButton>
+			)
+		} 
+		return (
+			<></>
+		)
+	}
+
 
 	return (
 		<StyledContainer>
+			<MenuButton isLoggedIn={isLoggedIn} />
 			<Link href="/admin/">
 				<Image src={HeaderLogo} alt="Logo" height={40} />
 			</Link>
-
-			
-
 		</StyledContainer>
 	);
 };
