@@ -12,23 +12,22 @@ import GrabHiringGraphic from "../../assets/grab-driver-graphic.png";
 import CHPlayStoreIcon from "../../assets/google-play-logo.svg";
 import AppStoreIcon from "../../assets/app-store-logo.svg";
 import Footer from "@/components/Footer";
-import ChatIcon from "@mui/icons-material/Chat";
+import ChatBtn from "@/components/ChatBtn";
 
 const StyledPageContainer = styled.div`
-	height: 300vh;
+	min-height: 300vh;
 `;
 
 const StyledContentWrapper = styled.div`
 	padding-left: 2rem;
 	padding-right: 2rem;
-	display: flex;
-	flex-direction: column;
+	display: grid;
 	margin-top: 3rem;
 	margin-bottom: 2rem;
 `;
 
-const StyledTitle = styled.span`
-	font-size: larger;
+const StyledTitle = styled.h2`
+	font-size: x-large;
 	font-weight: bold;
 	margin-bottom: 2rem;
 `;
@@ -48,7 +47,7 @@ const StyledDownloadAppComponent = styled.div`
 `;
 
 const StyledStoreNameText = styled.span`
-	font-size: x-large;
+	font-size: larger;
 	padding-left: 2rem;
 `;
 
@@ -58,7 +57,7 @@ const Home: NextPage = () => {
 	return (
 		<>
 			<Head>
-				<title>Mai Grab</title>
+				<title>Mai Đón - Home</title>
 				<meta name="description" content="Created by NextJs" />
 			</Head>
 
@@ -74,6 +73,8 @@ const Home: NextPage = () => {
 					}}
 				/>
 
+				<ChatBtn />
+
 				<Navigator text="Hỗ trợ khách hàng" backgroundColor="#0a7362" />
 				<Navigator text="Tải ứng dụng" backgroundColor="#5ab38b" />
 
@@ -83,7 +84,7 @@ const Home: NextPage = () => {
 					</StyledTitle>
 
 					<StyledGraphicContainer>
-						<Link href="#">
+						<Link href="/">
 							<Image
 								src={GrabHiringGraphic}
 								alt="Grab hiring graphic"
@@ -102,7 +103,7 @@ const Home: NextPage = () => {
 					<StyledDownloadAppSection>
 						<StyledDownloadAppComponent>
 							<StyledGraphicContainer>
-								<Link href="#">
+								<Link href="/">
 									<Image
 										src={CHPlayStoreIcon}
 										alt="CHPlay store logo"
@@ -118,7 +119,7 @@ const Home: NextPage = () => {
 
 						<StyledDownloadAppComponent>
 							<StyledGraphicContainer>
-								<Link href="#">
+								<Link href="/">
 									<Image
 										src={AppStoreIcon}
 										alt="Appstore logo"
@@ -132,6 +133,8 @@ const Home: NextPage = () => {
 							</StyledStoreNameText>
 						</StyledDownloadAppComponent>
 					</StyledDownloadAppSection>
+
+
 				</StyledContentWrapper>
 
 				<Footer />

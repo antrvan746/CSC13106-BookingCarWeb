@@ -2,32 +2,39 @@ import React from "react";
 import styled from "styled-components";
 import Image from "next/image";
 import Link from "next/link";
-import HeaderLogo from "../../assets/grab.png";
+import HeaderLogo from "../../../assets/grab.png";
+import { IconButton } from "@mui/material";
+
+
 
 const StyledContainer = styled.div`
-  display: flex;
+	display: flex;
 	flex-direction: row;
-  align-items: center;
-	background-color: #f9f9f9;
+	background-color: #1e1e1e;
+	align-items: center;
 	position: sticky;
 	top: 0;
 	padding: 0.5rem 2rem 0.5rem 2rem;
 	transition: background-color 0.5s;
-  min-height: 50px;
+	min-height: 50px;
 
 	@media (min-height: 110vh) {
-		background-color: #f9f9f9b6;
+		background-color: #1e1e1eb6;
 	}
 `;
 
-const Header = () => {
+const AdminHeader = (isLoggedIn: boolean) => {
+
 	return (
 		<StyledContainer>
-			<Link href="/">
+			<Link href="/admin/">
 				<Image src={HeaderLogo} alt="Logo" height={40} />
 			</Link>
+
+			
+
 		</StyledContainer>
 	);
 };
 
-export default Header;
+export default AdminHeader;

@@ -4,7 +4,7 @@ import Home from ".";
 
 
 function MyApp({ Component, pageProps }: AppProps) {
-	return <Home/>;
+	return <Component {...pageProps}/>;
 }
 
 export default MyApp;

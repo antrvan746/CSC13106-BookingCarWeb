@@ -21,7 +21,7 @@ const Footer = () => {
     <StyledContainer>
         <StyledText> Điều khoản và Chính sách </StyledText>
 
-        <StyledText> @MaiGrab </StyledText>
+        <StyledText> @MaiDon </StyledText>
 
         <StyledText> Hotline: 024 7108 7108</StyledText>
 
