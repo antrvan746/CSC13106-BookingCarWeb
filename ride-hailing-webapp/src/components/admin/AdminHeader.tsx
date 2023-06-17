@@ -22,8 +22,10 @@ const StyledContainer = styled.div`
 		background-color: #1e1e1eb6;
 	}
 `;
-
-const AdminHeader = (isLoggedIn: boolean) => {
+interface AdminHeaderProp{
+	isLoggedIn: boolean
+}
+const AdminHeader = ({isLoggedIn}: boolean) => {
 
 	return (
 		<StyledContainer>
@@ -38,3 +40,4 @@ const AdminHeader = (isLoggedIn: boolean) => {
 };
 
 export default AdminHeader;
+export type {AdminHeaderProp}
