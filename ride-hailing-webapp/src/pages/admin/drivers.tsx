@@ -2,11 +2,9 @@ import AdminHeader from "@/components/admin/AdminHeader";
 import React from "react";
 import styled from "styled-components";
 
-const StyledPageContainer = styled.div`
-	min-height: 300vh;
-`;
+const StyledPageContainer = styled.div``;
 
-const AdminHome = () => {
+const Drivers = () => {
 	return (
 		<StyledPageContainer>
 			<AdminHeader />
@@ -14,4 +12,4 @@ const AdminHome = () => {
 	);
 };
 
-export default AdminHome;
+export default Drivers;
