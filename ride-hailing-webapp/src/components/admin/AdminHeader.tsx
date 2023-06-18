@@ -12,6 +12,7 @@ import HeaderLogo from "../../../assets/grab.png";
 import MenuIcon from "@mui/icons-material/Menu";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import HomeIcon from "@mui/icons-material/Home";
+import zIndex from "@mui/material/styles/zIndex";
 
 const WhiteHomeIcon = styled(HomeIcon)`
 	color: #ffffff;
@@ -63,9 +64,9 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ isLoggedIn = true }) => {
 			style={{
 				width: 250,
 				backgroundColor: "#1e1e1e",
-				height: '100vh',
-				position: 'fixed'
-				
+				height: '300vh',
+				position: 'absolute',
+				zIndex: 1,				
 			}}
 			onClick={() => setOpen(false)}
 		>

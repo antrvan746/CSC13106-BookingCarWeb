@@ -1,4 +1,5 @@
 import AdminHeader from "@/components/admin/AdminHeader";
+import UserView from "@/components/admin/UserView";
 import React from "react";
 import styled from "styled-components";
 
@@ -10,6 +11,9 @@ const AdminHome = () => {
 	return (
 		<StyledPageContainer>
 			<AdminHeader />
+
+			<UserView/>
+
 		</StyledPageContainer>
 	);
 };
