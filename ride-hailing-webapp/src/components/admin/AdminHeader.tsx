@@ -6,7 +6,7 @@ import {
 	ListItem,
 	ListItemIcon,
 	ListItemText,
-	IconButton,
+	IconButton
 } from "@mui/material";
 import HeaderLogo from "../../../assets/grab.png";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -117,7 +117,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ isLoggedIn = true }) => {
 		} else return <></>;
 	};
 
-	const Drawer: React.FC<AdminHeaderProps> = ({}) => {
+	const Sidebar: React.FC<AdminHeaderProps> = ({}) => {
 		if (isOpen) {
 			return getList();
 		}
@@ -131,7 +131,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ isLoggedIn = true }) => {
 					<Image src={HeaderLogo} alt="Logo" height={40} />
 				</Link>
 			</StyledContainer>
-			<Drawer />
+			<Sidebar />
 		</div>
 	);
 };

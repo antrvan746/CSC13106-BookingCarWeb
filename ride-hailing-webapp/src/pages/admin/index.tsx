@@ -1,18 +1,22 @@
 import AdminHeader from "@/components/admin/AdminHeader";
 import UserView from "@/components/admin/UserView";
+import Head from "next/head";
 import React from "react";
 import styled from "styled-components";
 
 const StyledPageContainer = styled.div`
-	min-height: 300vh;
 `;
 
 const AdminHome = () => {
 	return (
 		<StyledPageContainer>
+			<Head>
+				<title>Mai Đón Admin - Trang chủ </title>
+				<meta name="description" content="Created by NextJs" />
+			</Head>
+
 			<AdminHeader />
 
-			<UserView/>
 
 		</StyledPageContainer>
 	);
