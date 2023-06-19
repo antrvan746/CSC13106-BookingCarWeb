@@ -29,7 +29,7 @@ const UserView = () => {
 
 			<Avatar sx={{ width: 100, height: 100, margin: "1rem" }} />
 
-			<StyledUserName> Ten khach hang </StyledUserName>
+			<StyledUserName> Tên tài khoản </StyledUserName>
 		</StyledContainer>
 	);
 };
