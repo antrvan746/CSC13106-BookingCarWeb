@@ -17,7 +17,6 @@ const AdminHome = () => {
 
 			<AdminHeader />
 
-
 		</StyledPageContainer>
 	);
 };

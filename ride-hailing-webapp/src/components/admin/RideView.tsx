@@ -1,17 +1,31 @@
-import styled from '@emotion/styled/types'
-import React from 'react'
+import styled from "styled-components";
+import React from "react";
+import { Divider } from "@mui/material";
+
+
+const StyledText = styled.span`
+  color: #000000;
+`
+
 
 const StyledContainer = styled.div`
-    background-color: '#d9d9d9';
+  width: 100%;
+  height: 5rem;
+  background-color: #efefef;
+  border-radius: 10px;
+  margin-top: 1rem;
+  margin-bottom: 1rem;  
 `
 
 
 const RideView = () => {
-  return (
-    <StyledContainer>
+	return (
+		<StyledContainer>
+      <StyledText> Điểm đi </StyledText>
+      <Divider />
+      <StyledText> Điểm đến </StyledText>
+		</StyledContainer>
+	);
+};
 
-    </StyledContainer>
-  )
-}
-
-export default RideView
+export default RideView;
