@@ -15,7 +15,6 @@ import Footer from "@/components/Footer";
 import ChatBtn from "@/components/ChatBtn";
 
 const StyledPageContainer = styled.div`
-	min-height: 300vh;
 `;
 
 const StyledContentWrapper = styled.div`
@@ -89,6 +88,7 @@ const Home: NextPage = () => {
 								src={GrabHiringGraphic}
 								alt="Grab hiring graphic"
 								style={{
+									height: "auto",
 									width: "100%",
 									borderRadius: "0.5rem",
 								}}
