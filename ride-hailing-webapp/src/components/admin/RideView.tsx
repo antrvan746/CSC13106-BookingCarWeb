@@ -3,12 +3,15 @@ import React from "react";
 import { Divider } from "@mui/material";
 
 
-const StyledText = styled.span`
-  color: #000000;
+const StyledText = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `
 
-
 const StyledContainer = styled.div`
+  display: grid;
+  grid-template-rows: 1fr 0.01rem 1fr;
   width: 100%;
   height: 5rem;
   background-color: #efefef;
@@ -17,13 +20,12 @@ const StyledContainer = styled.div`
   margin-bottom: 1rem;  
 `
 
-
 const RideView = () => {
 	return (
 		<StyledContainer>
-      <StyledText> Điểm đi </StyledText>
+      <StyledText> <span> Điểm đi </span> </StyledText>
       <Divider />
-      <StyledText> Điểm đến </StyledText>
+      <StyledText> <span> Điểm đến </span> </StyledText>
 		</StyledContainer>
 	);
 };
