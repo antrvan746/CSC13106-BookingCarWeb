@@ -8,6 +8,7 @@ const StyledContainer = styled.div`
 	display: flex;
 	flex-direction: row;
 	align-items: center;
+	width: 100%;
 	background-color: #f9f9f9;
 	position: sticky;
 	top: 0;

@@ -15,6 +15,7 @@ import Footer from "@/components/Footer";
 import ChatBtn from "@/components/ChatBtn";
 
 const StyledPageContainer = styled.div`
+	width: 100%;
 `;
 
 const StyledContentWrapper = styled.div`
