@@ -5,7 +5,9 @@ import React from "react";
 import styled from "styled-components";
 import Head from "next/head";
 
-const StyledPageContainer = styled.div``;
+const StyledPageContainer = styled.div`
+	max-heigth: 100vh;
+`;
 
 const StyledMainView = styled.div`
 	display: grid;

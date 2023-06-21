@@ -35,7 +35,7 @@ const StyledDownloadAppSection = styled.div`
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
-	height: 300px;
+	height: 230px;
 	margin: 3rem;
 `;
 
@@ -74,8 +74,8 @@ const Home: NextPage = () => {
 
 				<ChatBtn />
 
-				<Navigator text="Hỗ trợ khách hàng" backgroundColor="#0a7362" />
-				<Navigator text="Tải ứng dụng" backgroundColor="#5ab38b" />
+				<Navigator text="Về chúng tôi" backgroundColor="#0a7362" url="/about"/>
+				<Navigator text="Tải ứng dụng" backgroundColor="#5ab38b" url="#download" />
 
 				<StyledContentWrapper>
 					<StyledTitle>
@@ -101,7 +101,7 @@ const Home: NextPage = () => {
 					<StyledTitle>Cài đặt ứng dụng</StyledTitle>
 
 					<StyledDownloadAppSection>
-						<StyledDownloadAppComponent>
+						<StyledDownloadAppComponent id="download">
 							<StyledGraphicContainer>
 								<Link href="/">
 									<Image
