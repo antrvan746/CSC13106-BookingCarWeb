@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { Avatar } from "@mui/material";
-import RideView from "./RideView";
+import RideHistoryView from "./RideHistoryView";
 
 const StyledContainer = styled.div`
 	display: flex;
@@ -89,8 +89,9 @@ const UserView = () => {
 			<StyledRecentRidesContainer>
 				<StyledRecentRidesText> Các chuyến đi gần đây </StyledRecentRidesText>
 
-				<RideView />
-
+				<RideHistoryView />
+				<RideHistoryView />
+				<RideHistoryView />
 
 			</StyledRecentRidesContainer>
 

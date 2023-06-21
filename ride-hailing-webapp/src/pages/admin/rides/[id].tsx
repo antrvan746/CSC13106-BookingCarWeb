@@ -5,10 +5,10 @@ const StyledContainer = styled.div`
     
 `
 
-const RideDetail = () => {
+const RideDetailView = () => {
   return (
     <div>RideDetail</div>
   )
 }
 
-export default RideDetail
+export default RideDetailView
