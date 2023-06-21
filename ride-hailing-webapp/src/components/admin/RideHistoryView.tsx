@@ -33,15 +33,15 @@ const RideHistoryView = () => {
       </StyledGridItemContainer>
 
       <StyledGridItemContainer>
-        <span style={{  fontSize:"small" }}>
-          Chuyến đi đến Ga Quốc Nội (B3) - Sân bay Nội Bài, Sóc Sơn, Việt Nam
-        </span>
+        <div style={{ maxHeight: "10px", display: "flex", alignItems: "center", justifyContent: "flex-start"}}>
+          <span style={{ fontSize: "small", textAlign: "left" }}>
+            Chuyến đi đến Ga Quốc Nội (B3) - Sân bay Quốc Tế Nội Bài.
+          </span>
+        </div>
       </StyledGridItemContainer>
 
       <StyledGridItemContainer>
-        <span style={{ fontSize: "small", fontWeight: "bold" }}>
-          175.000d
-        </span>
+        <span style={{ fontSize: "small", fontWeight: "bold" }}>175.000d</span>
       </StyledGridItemContainer>
     </StyledContainer>
   );
