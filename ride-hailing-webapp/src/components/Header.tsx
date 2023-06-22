@@ -8,7 +8,6 @@ const StyledContainer = styled.div`
 	display: flex;
 	flex-direction: row;
 	align-items: center;
-	width: 100%;
 	background-color: #f9f9f9;
 	position: sticky;
 	top: 0;
@@ -16,7 +15,7 @@ const StyledContainer = styled.div`
 	transition: background-color 0.5s;
 	min-height: 50px;
 
-	@media (min-height: 110vh) {
+	@media (min-height: 100vh) {
 		background-color: #f9f9f9b6;
 	}
 `;

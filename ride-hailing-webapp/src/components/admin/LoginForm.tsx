@@ -43,6 +43,7 @@ const LoginForm = () => {
 					>
 						<TextField
 							margin="normal"
+							size="small"
 							required
 							fullWidth
 							id="email"
@@ -53,6 +54,7 @@ const LoginForm = () => {
 						/>
 						<TextField
 							margin="normal"
+							size="small"
 							required
 							fullWidth
 							name="password"
