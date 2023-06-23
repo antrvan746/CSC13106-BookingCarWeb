@@ -1,10 +1,11 @@
 import AdminHeader from "@/components/admin/AdminHeader";
 import BookingForm from "@/components/admin/BookingForm";
 import MapComponent from "@/components/admin/MapComponent";
+import Head from "next/head";
 import React from "react";
 import styled from "styled-components";
 
-const StyledContainer = styled.div`
+const StyledPageContainer = styled.div`
 `;
 
 const StyledContentContainer = styled.div`
@@ -19,7 +20,11 @@ const StyledDividedContainer = styled.div`
 
 const BookingRideView = () => {
   return (
-    <StyledContainer>
+    <StyledPageContainer>
+      <Head> 
+        <title> Mai Đón Admin - Đặt xe cho khách hàng </title>
+        <meta name="description" content="Created by NextJs" />
+      </Head>
       <AdminHeader />
       <StyledContentContainer>
         <MapComponent />
@@ -28,7 +33,7 @@ const BookingRideView = () => {
           <BookingForm />
         </StyledDividedContainer>
       </StyledContentContainer>
-    </StyledContainer>
+    </StyledPageContainer>
   );
 };
 
