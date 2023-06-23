@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { ChangeEvent, useState } from "react";
 import dayjsFunc, { Dayjs } from "dayjs";
 import styled from "styled-components";
 import {
@@ -55,11 +55,13 @@ const StyleInforInput = styled.div`
 
 const BookingForm = () => {
   const [age, setAge] = React.useState("");
+  const [selectedVehicle, setSelectedVehicle] = React.useState("motorcycle");
 
   const [value, setValue] = React.useState<Dayjs | null>(dayjsFunc());
 
-  const handleChange = (event: SelectChangeEvent) => {
-    setAge(event.target.value);
+  const handleVehicleChange = (event: any) => {
+    console.log(event.target.value);
+    setSelectedVehicle(event.target.value);
   };
 
   return (
@@ -173,77 +175,105 @@ const BookingForm = () => {
             Loại xe cần đặt
           </FormLabel>
           <RadioGroup
+            onChange={handleVehicleChange}
             style={{
               display: "flex",
               flexDirection: "row",
               paddingLeft: "2rem",
             }}
           >
-            <Radio
-              icon={
-                <Image
-                  src={MotorcycleIcon}
-                  alt="Motorcycle Icon"
-                  height={50}
-                  style={{
-                    margin: "0.2rem",
-                  }}
+            <FormControlLabel
+              value="motorcycle"
+              control={
+                <Radio
+                  checked={selectedVehicle === "motorcycle"}
+                  icon={
+                    <Image
+                      src={MotorcycleIcon}
+                      alt="Motorcycle Icon"
+                      height={50}
+                      style={{
+                        margin: "0.2rem",
+                      }}
+                    />
+                  }
+                  checkedIcon={
+                    <Image
+                      src={MotorcycleIcon}
+                      alt="Motorcycle Icon"
+                      height={50}
+                      style={{
+                        margin: "0.2rem",
+                      }}
+                    />
+                  }
                 />
               }
-              checkedIcon={
-                <Image
-                  src={MotorcycleIcon}
-                  alt="Motorcycle Icon"
-                  height={50}
-                  style={{
-                    margin: "0.2rem",
-                  }}
-                />
-              }
+              label="Xe máy"
+              labelPlacement="bottom"
             />
-            <Radio
-              icon={
-                <Image
-                  src={SedanIcon}
-                  alt="Sedan Icon"
-                  height={50}
-                  style={{
-                    margin: "0.2rem",
-                  }}
+
+            <FormControlLabel
+              value="4seats"
+              control={
+                <Radio
+                  checked={selectedVehicle === "4seats"}
+                  icon={
+                    <Image
+                      src={SedanIcon}
+                      alt="Sedan Icon"
+                      height={50}
+                      style={{
+                        margin: "0.2rem",
+                      }}
+                    />
+                  }
+                  checkedIcon={
+                    <Image
+                      src={SedanIcon}
+                      alt="Sedan Icon"
+                      height={50}
+                      style={{
+                        margin: "0.2rem",
+                      }}
+                    />
+                  }
                 />
               }
-              checkedIcon={
-                <Image
-                  src={SedanIcon}
-                  alt="Sedan Icon"
-                  height={50}
-                  style={{
-                    margin: "0.2rem",
-                  }}
-                />
-              }
+              label="Xe 4 chỗ"
+              labelPlacement="bottom"
             />
-            <Radio
-              icon={
-                <Image
-                  src={ShuttleBusIcon}
-                  alt="Shuttle bus icon"
-                  height={50}
-                  style={{
-                    margin: "0.2rem",
-                  }}
+
+            <FormControlLabel
+              value="7seats"
+              control={
+                <Radio
+                  checked={selectedVehicle === "7seats"}
+                  icon={
+                    <Image
+                      src={ShuttleBusIcon}
+                      alt="Shuttle bus Icon"
+                      height={50}
+                      style={{
+                        margin: "0.2rem",
+                      }}
+                    />
+                  }
+                  checkedIcon={
+                    <Image
+                      src={ShuttleBusIcon}
+                      alt="Shuttle bus Icon"
+                      height={50}
+                      style={{
+                        margin: "0.2rem",
+                        color: "#000000",
+                      }}
+                    />
+                  }
                 />
               }
-              checkedIcon={
-                <Image
-                  src={ShuttleBusIcon}
-                  alt="Shuttle bus icon"
-                  height={50}
-                  style={{
-                    margin: "0.2rem",
-                  }}
-                />
-              }
+              label="Xe 7 chỗ"
+              labelPlacement="bottom"
             />
           </RadioGroup>
         </FormGroup>
