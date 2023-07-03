@@ -1,18 +1,18 @@
-import Header from "@/components/Header";
+import Header from "../components/Header";
 import { NextPage } from "next";
 import Image from "next/image";
 import React from "react";
-import Navigator from "@/components/Navigator";
+import Navigator from "../components/Navigator";
 import Head from "next/head";
 import Link from "next/link";
 import styled from "styled-components";
 
-import GrabBackground from "../../assets/grab_background.jpg";
-import GrabHiringGraphic from "../../assets/grab-driver-graphic.png";
-import CHPlayStoreIcon from "../../assets/google-play-logo.svg";
-import AppStoreIcon from "../../assets/app-store-logo.svg";
-import Footer from "@/components/Footer";
-import ChatBtn from "@/components/ChatBtn";
+import GrabBackground from "../assets/grab_background.jpg";
+import GrabHiringGraphic from "../assets/grab-driver-graphic.png";
+import CHPlayStoreIcon from "../assets/google-play-logo.svg";
+import AppStoreIcon from "../assets/app-store-logo.svg";
+import Footer from "../components/Footer";
+import ChatBtn from "../components/ChatBtn";
 
 const StyledPageContainer = styled.div`
 `;

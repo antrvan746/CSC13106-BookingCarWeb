@@ -16,9 +16,9 @@ import {
   Button,
 } from "@mui/material";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import MotorcycleIcon from "../../../assets/motorcycle.png";
-import SedanIcon from "../../../assets/sedan.png";
-import ShuttleBusIcon from "../../../assets/shuttlebus.png";
+import MotorcycleIcon from "../../assets/motorcycle.png";
+import SedanIcon from "../../assets/sedan.png";
+import ShuttleBusIcon from "../../assets/shuttlebus.png";
 import Image from "next/image";
 import PlaceIcon from "@mui/icons-material/Place";
 import ContactPhoneIcon from "@mui/icons-material/ContactPhone";

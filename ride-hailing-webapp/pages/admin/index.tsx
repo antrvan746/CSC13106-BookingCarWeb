@@ -1,5 +1,5 @@
-import AdminHeader from "@/components/admin/AdminHeader";
-import UserView from "@/components/admin/UserView";
+import AdminHeader from "../../components/admin/AdminHeader";
+import UserView from "../../components/admin/UserView";
 import Head from "next/head";
 import React from "react";
 import styled from "styled-components";

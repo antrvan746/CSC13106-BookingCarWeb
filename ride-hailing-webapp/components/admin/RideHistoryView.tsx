@@ -2,7 +2,7 @@ import styled from "styled-components";
 import React from "react";
 import { Divider } from "@mui/material";
 import Image from "next/image";
-import SedanIcon from "../../../assets/sedan.png";
+import SedanIcon from "../../assets/sedan.png";
 
 const StyledContainer = styled.div`
   display: inline-grid;

@@ -8,7 +8,7 @@ import {
 	ListItemText,
 	IconButton
 } from "@mui/material";
-import HeaderLogo from "../../../assets/grab.png";
+import HeaderLogo from "../../assets/grab.png";
 import MenuIcon from "@mui/icons-material/Menu";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import HomeIcon from "@mui/icons-material/Home";

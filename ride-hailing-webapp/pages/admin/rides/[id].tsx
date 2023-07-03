@@ -1,9 +1,9 @@
-import AdminHeader from "@/components/admin/AdminHeader";
-import BookingForm from "@/components/admin/BookingForm";
-import MapComponent from "@/components/admin/MapComponent";
-import Head from "next/head";
-import React from "react";
-import styled from "styled-components";
+import AdminHeader from '../../../components/admin/AdminHeader';
+import BookingForm from '../../../components/admin/BookingForm';
+import MapComponent from '../../../components/admin/MapComponent';
+import Head from 'next/head';
+import React from 'react'
+import styled from 'styled-components'
 
 const StyledPageContainer = styled.div`
 `;
@@ -18,7 +18,7 @@ const StyledDividedContainer = styled.div`
   width: 100%;
 `;
 
-const BookingRideView = () => {
+const RideDetailView = () => {
   return (
     <StyledPageContainer>
       <Head> 
@@ -34,7 +34,7 @@ const BookingRideView = () => {
         </StyledDividedContainer>
       </StyledContentContainer>
     </StyledPageContainer>
-  );
-};
+  )
+}
 
-export default BookingRideView;
+export default RideDetailView
