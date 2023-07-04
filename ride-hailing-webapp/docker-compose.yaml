@@ -1,4 +1,4 @@
-version: '3.9'
+version: '3'
 
 services:
   postgres:
@@ -6,11 +6,11 @@ services:
     container_name: postgres
     hostname: postgres
     ports:
-      - 3064:3064
+      - 5432:5432
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: rail_hailing_db
+      POSTGRES_DB: ride_hailing_db
     volumes:
       - postgres-data:/var/lib/postgresql/data
     restart: unless-stopped
@@ -25,8 +25,6 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
       PGADMIN_DEFAULT_PASSWORD: admin
-    expose:
-      - 5555
     volumes:
       - pgadmin-data:/var/lib/pgadmin
     restart: unless-stopped
