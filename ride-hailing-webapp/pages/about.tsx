@@ -1,12 +1,12 @@
-import Footer from "@/components/Footer";
-import Header from "@/components/Header";
+import Footer from "../components/Footer";
+import Header from "../components/Header";
 import { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
 import React from "react";
 import styled from "styled-components";
 
-import GrabBackground from "../../assets/about-background.png";
+import GrabBackground from "../assets/about-background.png";
 
 const StyledPageContainer = styled.div``;
 
