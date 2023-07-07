@@ -12,7 +12,11 @@ interface RideGetRespond{
   limit_per_page:number
 }
 
-
+const RideGetQuery = z.object({
+  userId: z.string().optional(),
+  driverId: z.string().optional(),
+  page: z.coerce.number().default(0)
+}).refine(val => !!val.driverId || !!val.userId,"At least 1 id is needed");
 
 const RidePostRequestBody = z.object({
   user_id: z.string(),
@@ -45,27 +49,23 @@ const handler:NextApiHandler = function(req,res){
 
 
 const GET:NextApiHandler<RideGetRespond | ErrorRespond> = async function(req,res){
-  const {userId,driverId,page} = req.query;
-  if(typeof userId !== "string" && typeof driverId !== "string"){
-    res.status(400).json({error: "Missing id"});
+  const query = RideGetQuery.safeParse(req.query);
+  if(query.success == false){
+    res.status(400).json({
+      error: query.error.message
+    });
     return;
   }
 
-  if(Array.isArray(page)){
-    res.status(400).json({error: "Invalid page"});
-    return;
-  }
-
-  const pageNum = page ? parseInt(page) : 0;
-  const userIdQuery = !(typeof userId === "string") ? {} : {user_id: {equals: userId}};
-  const driverIdQuery = !(typeof driverId === "string") ? {} : {driver_id: {equals: driverId}}
+  const userIdQuery = !(query.data.userId) ? {} : {user_id: {equals: query.data.userId}};
+  const driverIdQuery = !(query.data.driverId) ? {} : {driver_id: {equals: query.data.driverId}}
 
   const queryResult = await prismaClient.ride.findMany({
     where:{
       ...userIdQuery,
       ...driverIdQuery
     },
-    skip: (isNaN(pageNum) ? 0 : pageNum)*query_limit,
+    skip: query.data.page*query_limit,
     take:query_limit
   });
 
