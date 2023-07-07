@@ -8,13 +8,13 @@ datasource db {
 }
 
 model user {
-  id       String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email    String?
-  phone    String  @db.VarChar(20)
+  id     String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email  String  @unique
+  phone  String  @unique @db.VarChar(20)
   // password String  @db.VarChar(30)
-  name     String
-  is_vip   Boolean @default(false)
-  rating   Float   @default(5) @db.Real
+  name   String
+  is_vip Boolean @default(false)
+  rating Float   @default(5) @db.Real
 
   rides        ride[]             @relation("ride_client")
   saved_places user_saved_place[] @relation("saved_place_belong_to")
@@ -23,6 +23,7 @@ model user {
 model user_saved_place {
   id              String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   user_id         String @db.Uuid
+  // avatar          String
   saved_name      String
   google_place_id String
   place_name      String
@@ -31,11 +32,12 @@ model user_saved_place {
 }
 
 model driver {
-  id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  phone    String @db.VarChar(20)
+  id     String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  phone  String @unique @db.VarChar(20)
   // password String @db.VarChar(30)
-  name     String
-  rating   Float  @default(5) @db.Real
+  // avatar   String
+  name   String
+  rating Float  @default(5) @db.Real
 
   vehicles vehicle[] @relation("vehicle_belong_to")
   rides    ride[]    @relation("ride_driver")
@@ -47,10 +49,12 @@ enum StaffRole {
 }
 
 model staff {
-  id       String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email    String
+  id    String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email String    @unique
+  name  String
+  // visa  String    @db.Char(5)
   // password String
-  role     StaffRole
+  role  StaffRole
 }
 
 model vehicle {
@@ -78,10 +82,10 @@ enum PaymentType {
 }
 
 model ride {
-  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  user_id      String    @db.Uuid
-  driver_id    String    @db.Uuid
-  vehicle_id   String    @db.Uuid
+  id           String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id      String      @db.Uuid
+  driver_id    String      @db.Uuid
+  vehicle_id   String      @db.Uuid
   fee          Decimal
   payment_type PaymentType
 

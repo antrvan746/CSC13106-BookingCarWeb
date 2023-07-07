@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { Prisma, PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient, StaffRole } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -10,19 +10,19 @@ export default async function handler(
   switch (req.method) {
     case "GET":
       try {
-        const users = await prisma.user.findMany();
-        res.status(200).json(users);
+        const staffs = await prisma.staff.findMany();
+        res.status(200).json(staffs);
       } catch (error) {
         res.status(500).json({ message: error });
       }
       break;
     case "POST":
       try {
-        const user: Prisma.userCreateInput = req.body;
-        const createdUser = await prisma.user.create({
-          data: user
+        const staff: Prisma.staffCreateInput = req.body;
+        const createdStaff = await prisma.staff.create({
+          data: staff
         });
-        res.status(200).json(createdUser);
+        res.status(200).json(createdStaff);
       } catch (error) {
         res.status(500).json({ message: error });
       }
