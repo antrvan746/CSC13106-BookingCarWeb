@@ -1,6 +1,7 @@
 import { NextApiRequest,NextApiResponse,NextApiHandler } from "next";
-import {ride} from "@prisma/client"
+import {PaymentType, ride} from "@prisma/client"
 import { prismaClient } from "../../../libs/prisma";
+import { z } from "zod";
 
 interface ErrorRespond{
   error:string
@@ -10,6 +11,23 @@ interface RideGetRespond{
   data: ride[]
   limit_per_page:number
 }
+
+
+
+const RidePostRequestBody = z.object({
+  user_id: z.string(),
+  driver_id: z.string(),
+  vehicle_id: z.string(),
+  fee: z.number(),
+  payment_type: z.union([
+    z.literal("CASH"),
+    z.literal("CARD"),
+    z.literal("E_WALLET")
+  ]),
+  start_google_place_id: z.string(),
+  end_google_place_id: z.string(),
+  book_time: z.coerce.date()
+})
 
 const query_limit = 41;
 
@@ -60,8 +78,21 @@ const GET:NextApiHandler<RideGetRespond | ErrorRespond> = async function(req,res
 }
 
 
-const POST:NextApiHandler = async function name(req,res) {
-  
+const POST:NextApiHandler<ErrorRespond> = async function name(req,res) {
+  const body = RidePostRequestBody.safeParse(req.body);
+  if(!body.success){
+    res.status(400).json({
+      error: body.error.message
+    });
+    return;
+  }
+
+  await prismaClient.ride.create({
+    data:{
+      ...body.data,
+      status: "BOOKED"
+    }
+  })
 }
 
 

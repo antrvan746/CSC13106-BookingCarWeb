@@ -88,9 +88,9 @@ model ride {
   payment_type PaymentType
 
   start_google_place_id String
-  start_place_name      String
+  start_place_name      String?
   end_google_place_id   String
-  end_place_name        String
+  end_place_name        String?
 
   book_time   DateTime  @default(now())
   arrive_time DateTime?
