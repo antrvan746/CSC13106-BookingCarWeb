@@ -30,7 +30,6 @@ export default async function handler(
         res.status(500).json({ message: error });
       }
       break;
-
     case "PUT":
       try {
         const userId = z.string().parse(req.query.id);
@@ -52,7 +51,18 @@ export default async function handler(
         res.status(500).json({ message: error });
       }
       break;
-
+    case "DELETE":
+      try {
+        const userId = z.string().uuid().parse(req.query.id);
+        const deletedUser = await prisma.user.delete({
+          where: {
+            id: userId,
+          },
+        });
+        res.status(200).json({ deletedUser });
+      } catch (error) {
+        res.status(500).json({ message: error });
+      }
     default:
       res.status(400).json({ message: "Invalid request method" });
       break;
