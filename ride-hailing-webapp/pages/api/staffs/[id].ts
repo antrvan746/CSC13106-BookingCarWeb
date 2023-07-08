@@ -1,7 +1,14 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
+import { z } from "zod";
 
 const prisma = new PrismaClient();
+
+const StaffUpdateRequest = z.object({
+  email: z.string().email().optional(),
+  name: z.string().optional(),
+  role: z.enum(["ADMIN", "EMPLOYEE"]).optional(),
+});
 
 export default async function handler(
   req: NextApiRequest,
@@ -9,11 +16,8 @@ export default async function handler(
 ) {
   switch (req.method) {
     case "GET":
-      const staffId = req.query.id;
+      const staffId = z.string().uuid().parse(req.query.id);
       try {
-        if (typeof staffId != "string") {
-          throw new Error("Invalid staff id");
-        }
         const staff = await prisma.staff.findFirstOrThrow({
           where: {
             id: staffId,
@@ -26,19 +30,23 @@ export default async function handler(
       break;
     case "PUT":
       try {
-        const staff: Prisma.staffCreateInput = req.body;
+        const staffId = z.string().parse(req.query.id);
+        const staff = StaffUpdateRequest.parse(req.body);
         const updatedStaff = await prisma.staff.update({
           where: {
-            email: staff.email
+            id: staffId,
           },
           data: {
-            role: staff.role
+            role: staff.role,
+            email: staff.email,
+            name: staff.name,
           },
         });
         res.status(200).json(updatedStaff);
       } catch (error) {
         res.status(500).json({ message: error });
       }
+      break;
 
     default:
       res.status(400).json({ message: "Invalid request method" });

@@ -15,6 +15,7 @@ model user {
   name   String
   is_vip Boolean @default(false)
   rating Float   @default(5) @db.Real
+  // createAt DateTime
 
   rides        ride[]             @relation("ride_client")
   saved_places user_saved_place[] @relation("saved_place_belong_to")
@@ -38,6 +39,7 @@ model driver {
   // avatar   String
   name   String
   rating Float  @default(5) @db.Real
+  // createAt DateTime
 
   vehicles vehicle[] @relation("vehicle_belong_to")
   rides    ride[]    @relation("ride_driver")
