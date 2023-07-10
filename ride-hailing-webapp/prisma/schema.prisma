@@ -12,6 +12,7 @@ datasource db {
 model user {
   id       String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   email    String? @unique
+
   phone    String  @db.VarChar(20)
   password String  @db.VarChar(30)
   name     String
@@ -34,6 +35,7 @@ model user_saved_place {
 
 model driver {
   id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
   phone    String @db.VarChar(11)
   password String @db.VarChar(30)
   name     String
@@ -51,6 +53,7 @@ enum StaffRole {
 model staff {
   id       String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   email    String    @unique
+
   password String
   role     StaffRole
 }
@@ -59,7 +62,6 @@ model vehicle {
   id           String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   driver_id    String  @db.Uuid
   plate_number String  @db.VarChar(10)
-
   model        String
   color        String?
   type         String?
@@ -108,8 +110,8 @@ model rating {
   id      String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   ride_id String @db.Uuid @unique
 
-  score Int @default(1) 
-  comment String?
+  user_rating Int @default(1) // user rate driver 
+  driver_rating Int @default(1) // driver rate user
 
-  ride ride @relation("rated_ride", fields: [ride_id], references: [id],onDelete: Cascade)
+  ride ride @relation("rated_ride", fields: [ride_id], references: [id])
 }
