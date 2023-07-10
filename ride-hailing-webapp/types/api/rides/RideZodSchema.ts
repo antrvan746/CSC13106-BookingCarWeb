@@ -8,7 +8,7 @@ const RideGetQuery = z.object({
   page: z.coerce.number().default(0)
 }).refine(val => !!val.driverId || !!val.userId || !!val.rideId, "At least 1 id is needed");
 
-const RidePostRequestBody = z.object({
+const RidePostBody = z.object({
   user_id: z.string(),
   driver_id: z.string(),
   vehicle_id: z.string(),
@@ -23,7 +23,7 @@ const RidePostRequestBody = z.object({
   book_time: z.coerce.date()
 });
 
-const RidePutRequestBody = z.object({
+const RidePutBody = z.object({
   rideId: z.string(),
   fee: z.number().optional(),
   start_place_name: z.string().optional(),
@@ -36,4 +36,4 @@ const RidePutRequestBody = z.object({
   ]).optional()
 });
 
-export {RideGetQuery,RidePostRequestBody,RidePutRequestBody}
+export {RideGetQuery,RidePostBody,RidePutBody}
