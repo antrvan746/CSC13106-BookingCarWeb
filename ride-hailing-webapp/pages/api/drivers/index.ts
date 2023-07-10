@@ -54,6 +54,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       console.error(error);
       res.status(400).json({ error: 'Invalid request payload' });
     }
+  } else if (req.method === 'DELETE') {
+    // Delete a driver by ID
+    try {
+      const { id } = req.body;
+      await prismaClient.driver.delete({
+        where: { id },
+      });
+      res.status(200).json({ message: 'Driver deleted successfully' });
+    } catch (error) {
+      console.error(error);
+      res.status(400).json({ error: 'Invalid request payload' });
+    }
   } else {
     res.setHeader('Allow', ['GET', 'POST', 'PUT', 'DELETE']);
     res.status(405).json({ error: `Method ${req.method} Not Allowed` });
