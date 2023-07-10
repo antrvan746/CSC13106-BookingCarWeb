@@ -4,7 +4,6 @@ import z from "zod";
 
 const driverSchema = z.object({
   phone: z.string().max(11),
-  password: z.string().max(30),
   name: z.string(),
   rating: z.number().default(5),
 });
@@ -22,11 +21,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   } else if (req.method === 'POST') {
     // Create a new driver
     try {
-      const { phone, password, name, rating } = driverSchema.parse(req.body);
+      const { phone, name, rating } = driverSchema.parse(req.body);
       const driver = await prismaClient.driver.create({
         data: {
           phone,
-          password,
           name,
           rating,
         },
@@ -39,12 +37,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   } else if (req.method === 'PUT') {
     // Update a driver by ID
     try {
-      const { id, phone, password, name, rating } = req.body;
+      const { id, phone, name, rating } = req.body;
       const updatedDriver = await prismaClient.driver.update({
         where: { id },
         data: {
           phone,
-          password,
           name,
           rating,
         },

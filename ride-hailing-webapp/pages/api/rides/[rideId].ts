@@ -2,7 +2,7 @@ import { NextApiHandler } from "next";
 import { ride } from "@prisma/client"
 import { prismaClient } from "../../../libs/prisma";
 import { z } from "zod";
-import { RideGetQuery, RidePutRequestBody } from "../../../types/api/rides/RideZodSchema";
+import { RideGetQuery, RidePutBody } from "../../../types/api/rides/RideZodSchema";
 
 export const config = {
   api: {
@@ -54,7 +54,7 @@ const PUT:NextApiHandler = async function (req,res) {
     return;
   }
 
-  const body = RidePutRequestBody.safeParse({...req.body,rideId:query.data.rideId});
+  const body = RidePutBody.safeParse({...req.body,rideId:query.data.rideId});
   if(!body.success){
     res.status(404).json({error: body.error.message});
     return;
