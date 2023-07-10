@@ -11,11 +11,9 @@ model user {
   id     String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   email  String  @unique
   phone  String  @unique @db.VarChar(20)
-  // password String  @db.VarChar(30)
   name   String
   is_vip Boolean @default(false)
-  rating Float   @default(5) @db.Real
-  // createAt DateTime
+  // rating Float   @default(5) @db.Real
 
   rides        ride[]             @relation("ride_client")
   saved_places user_saved_place[] @relation("saved_place_belong_to")
@@ -24,22 +22,19 @@ model user {
 model user_saved_place {
   id              String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   user_id         String @db.Uuid
-  // avatar          String
   saved_name      String
   google_place_id String
   place_name      String
 
-  user user @relation("saved_place_belong_to", fields: [user_id], references: [id], onDelete: Cascade)
+  user user @relation("saved_place_belong_to", fields: [user_id], references: [id])
 }
 
 model driver {
   id     String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  phone  String @unique @db.VarChar(20)
-  // password String @db.VarChar(30)
-  // avatar   String
+  phone  String @unique @db.VarChar(11)
   name   String
-  rating Float  @default(5) @db.Real
-  // createAt DateTime
+  // rating Float  @default(5) @db.Real
+
 
   vehicles vehicle[] @relation("vehicle_belong_to")
   rides    ride[]    @relation("ride_driver")
@@ -54,20 +49,18 @@ model staff {
   id    String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   email String    @unique
   name  String
-  // visa  String    @db.Char(5)
-  // password String
   role  StaffRole
 }
 
 model vehicle {
   id           String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   driver_id    String  @db.Uuid
-  plate_number String  @db.VarChar(20)
+  plate_number String  @db.VarChar(10)
   model        String
   color        String?
   type         String?
 
-  driver driver @relation("vehicle_belong_to", fields: [driver_id], references: [id], onDelete: Cascade)
+  driver driver @relation("vehicle_belong_to", fields: [driver_id], references: [id])
   ride   ride[] @relation("ride_vehicle")
 }
 
@@ -100,7 +93,7 @@ model ride {
   arrive_time DateTime?
 
   status  RideStatus
-  client  user       @relation("ride_client", fields: [user_id], references: [id], onDelete: Cascade)
-  driver  driver     @relation("ride_driver", fields: [driver_id], references: [id], onDelete: Cascade)
-  vehicle vehicle    @relation("ride_vehicle", fields: [vehicle_id], references: [id], onDelete: Cascade)
+  client  user       @relation("ride_client", fields: [user_id], references: [id])
+  driver  driver     @relation("ride_driver", fields: [driver_id], references: [id])
+  vehicle vehicle    @relation("ride_vehicle", fields: [vehicle_id], references: [id])
 }
