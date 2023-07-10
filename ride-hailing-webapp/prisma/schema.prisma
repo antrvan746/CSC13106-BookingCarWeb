@@ -11,7 +11,7 @@ datasource db {
 
 model user {
   id       String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email    String?
+  email    String? @unique
   phone    String  @db.VarChar(20)
   password String  @db.VarChar(30)
   name     String
@@ -29,7 +29,7 @@ model user_saved_place {
   google_place_id String
   place_name      String
 
-  user user @relation("saved_place_belong_to", fields: [user_id], references: [id], onDelete: Cascade)
+  user user @relation("saved_place_belong_to", fields: [user_id], references: [id])
 }
 
 model driver {
@@ -50,7 +50,7 @@ enum StaffRole {
 
 model staff {
   id       String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email    String
+  email    String    @unique
   password String
   role     StaffRole
 }
@@ -58,12 +58,13 @@ model staff {
 model vehicle {
   id           String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   driver_id    String  @db.Uuid
-  plate_number String  @db.VarChar(20)
+  plate_number String  @db.VarChar(10)
+
   model        String
   color        String?
   type         String?
 
-  driver driver @relation("vehicle_belong_to", fields: [driver_id], references: [id], onDelete: Cascade)
+  driver driver @relation("vehicle_belong_to", fields: [driver_id], references: [id])
   ride   ride[] @relation("ride_vehicle")
 }
 
@@ -96,9 +97,10 @@ model ride {
   arrive_time DateTime?
 
   status  RideStatus
-  client  user       @relation("ride_client", fields: [user_id], references: [id], onDelete: Cascade)
-  driver  driver     @relation("ride_driver", fields: [driver_id], references: [id], onDelete: Cascade)
-  vehicle vehicle    @relation("ride_vehicle", fields: [vehicle_id], references: [id], onDelete: Cascade)
+
+  client  user       @relation("ride_client", fields: [user_id], references: [id])
+  driver  driver     @relation("ride_driver", fields: [driver_id], references: [id])
+  vehicle vehicle    @relation("ride_vehicle", fields: [vehicle_id], references: [id])
   rating  rating?     @relation("rated_ride")
 }
 
