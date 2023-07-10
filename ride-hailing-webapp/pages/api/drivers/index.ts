@@ -36,6 +36,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       console.error(error);
       res.status(400).json({ error: 'Invalid request payload' });
     }
+  } else if (req.method === 'PUT') {
+    // Update a driver by ID
+    try {
+      const { id, phone, password, name, rating } = req.body;
+      const updatedDriver = await prismaClient.driver.update({
+        where: { id },
+        data: {
+          phone,
+          password,
+          name,
+          rating,
+        },
+      });
+      res.status(200).json(updatedDriver);
+    } catch (error) {
+      console.error(error);
+      res.status(400).json({ error: 'Invalid request payload' });
+    }
   } else {
     res.setHeader('Allow', ['GET', 'POST', 'PUT', 'DELETE']);
     res.status(405).json({ error: `Method ${req.method} Not Allowed` });
