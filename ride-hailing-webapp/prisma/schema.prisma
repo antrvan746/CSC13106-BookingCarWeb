@@ -106,8 +106,8 @@ model rating {
   id      String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   ride_id String @db.Uuid @unique
 
-  score Int @default(1) 
-  comment String?
+  user_rating Int @default(1) // user rate driver 
+  driver_rating Int @default(1) // driver rate user
 
-  ride ride @relation("rated_ride", fields: [ride_id], references: [id],onDelete: Cascade)
+  ride ride @relation("rated_ride", fields: [ride_id], references: [id])
 }
