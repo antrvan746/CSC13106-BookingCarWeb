@@ -1,13 +1,13 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { Prisma, PrismaClient, StaffRole } from "@prisma/client";
-import {z} from 'zod';
+import { PrismaClient } from "@prisma/client";
+import { z } from "zod";
 
 const prisma = new PrismaClient();
 
 const StaffCreateInput = z.object({
   email: z.string().email(),
   name: z.string().nonempty(),
-  role: z.enum(['ADMIN', 'EMPLOYEE']),
+  role: z.enum(["ADMIN", "EMPLOYEE"]),
 });
 
 export default async function handler(
@@ -17,21 +17,14 @@ export default async function handler(
   switch (req.method) {
     case "GET":
       try {
-        let skip;
-        let take;
-        if (typeof req.query.skip === 'string') {
-          skip = parseInt(req.query.skip) 
-        } 
-        if (typeof req.query.take === 'string') {
-          take = parseInt(req.query.take) 
-        }
-        if (Number.isNaN(skip) || Number.isNaN(take)) {
-          skip = undefined
-          take = undefined
-        }
+        const NumberQueryType = z.number().optional();
+
+        let skip = NumberQueryType.parse(req.query.skip);
+        let take = NumberQueryType.parse(req.query.take);
+
         const staffs = await prisma.staff.findMany({
           skip: skip,
-          take: take
+          take: take,
         });
         res.status(200).json(staffs);
       } catch (error) {
@@ -40,13 +33,13 @@ export default async function handler(
       break;
     case "POST":
       try {
-        let staff = StaffCreateInput.parse(req.body)
+        let staff = StaffCreateInput.parse(req.body);
         const createdStaff = await prisma.staff.create({
           data: {
             email: staff.email,
             role: staff.role,
-            name: staff.name
-          }
+            name: staff.name,
+          },
         });
         res.status(200).json(createdStaff);
       } catch (error) {
