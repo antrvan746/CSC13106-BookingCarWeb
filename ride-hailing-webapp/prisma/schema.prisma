@@ -10,14 +10,13 @@ datasource db {
 }
 
 model user {
-  id       String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email    String? @unique
+  id    String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email String? @unique
 
-  phone    String  @db.VarChar(20)
-  password String  @db.VarChar(30)
-  name     String
-  is_vip   Boolean @default(false)
-  rating   Float   @default(5) @db.Real
+  phone  String  @db.VarChar(20)
+  name   String
+  is_vip Boolean @default(false)
+  rating Float   @default(5) @db.Real
 
   rides        ride[]             @relation("ride_client")
   saved_places user_saved_place[] @relation("saved_place_belong_to")
@@ -34,12 +33,12 @@ model user_saved_place {
 }
 
 model driver {
-  id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
 
-  phone    String @db.VarChar(11)
-  password String @db.VarChar(30)
-  name     String
-  rating   Float  @default(5) @db.Real
+  phone  String  @db.VarChar(11)
+  email  String? @unique
+  name   String
+  rating Float   @default(5) @db.Real
 
   vehicles vehicle[] @relation("vehicle_belong_to")
   rides    ride[]    @relation("ride_driver")
@@ -51,8 +50,8 @@ enum StaffRole {
 }
 
 model staff {
-  id       String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email    String    @unique
+  id    String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email String? @unique
 
   password String
   role     StaffRole
@@ -98,20 +97,20 @@ model ride {
   book_time   DateTime  @default(now())
   arrive_time DateTime?
 
-  status  RideStatus
+  status RideStatus
 
-  client  user       @relation("ride_client", fields: [user_id], references: [id])
-  driver  driver     @relation("ride_driver", fields: [driver_id], references: [id])
-  vehicle vehicle    @relation("ride_vehicle", fields: [vehicle_id], references: [id])
-  rating  rating?     @relation("rated_ride")
+  client  user    @relation("ride_client", fields: [user_id], references: [id])
+  driver  driver  @relation("ride_driver", fields: [driver_id], references: [id])
+  vehicle vehicle @relation("ride_vehicle", fields: [vehicle_id], references: [id])
+  rating  rating? @relation("rated_ride")
 }
 
 model rating {
   id      String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  ride_id String @db.Uuid @unique
+  ride_id String @unique @db.Uuid
 
-  user_rating Int @default(1) // user rate driver 
-  driver_rating Int @default(1) // driver rate user
+  user_rating   Float @default(5) // user rate driver 
+  driver_rating Float @default(5) // driver rate user
 
   ride ride @relation("rated_ride", fields: [ride_id], references: [id])
 }
