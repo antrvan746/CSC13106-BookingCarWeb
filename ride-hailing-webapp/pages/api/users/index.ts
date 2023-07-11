@@ -2,13 +2,12 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { Prisma, PrismaClient } from "@prisma/client";
 import { z, ZodType } from "zod";
 
-
 const prisma = new PrismaClient();
 
 const UserCreateRequest = z.object({
-  email: z.string().email(),
+  email: z.string().email().optional(),
   phone: z.string().nonempty(),
-  name: z.string().nonempty()
+  name: z.string().nonempty(),
 });
 
 export default async function handler(
@@ -18,7 +17,15 @@ export default async function handler(
   switch (req.method) {
     case "GET":
       try {
-        const users = await prisma.user.findMany();
+        const NumberQueryType = z.number().optional();
+
+        let skip = NumberQueryType.parse(req.query.skip);
+        let take = NumberQueryType.parse(req.query.take);
+
+        const users = await prisma.user.findMany({
+          skip: skip,
+          take: take
+        });
         res.status(200).json(users);
       } catch (error) {
         res.status(500).json({ message: error });
@@ -31,8 +38,8 @@ export default async function handler(
           data: {
             email: user.email,
             phone: user.phone,
-            name: user.name
-          }
+            name: user.name,
+          },
         });
         res.status(200).json(createdUser);
       } catch (error) {
