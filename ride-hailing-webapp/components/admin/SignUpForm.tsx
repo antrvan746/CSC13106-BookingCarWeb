@@ -13,11 +13,9 @@ import {
 import React, { useState } from "react";
 import styled from "styled-components";
 import { StaffRole } from "@prisma/client";
-import { useRouter } from 'next/router';
-import {
-  createUserWithEmailAndPassword,
-  getAuth,
-} from "firebase/auth";
+import { useRouter } from "next/router";
+import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
+import FirebaseApp from "../../config/firebase";
 
 const StyledFormContainer = styled.div`
   display: flex;
@@ -26,8 +24,10 @@ const StyledFormContainer = styled.div`
   margin-top: 10vh;
 `;
 
-
 const apiURL = "http://localhost:3000";
+
+const app = FirebaseApp;
+const auth = getAuth();
 
 interface SignUpFormData {
   firstName: string;
@@ -87,8 +87,6 @@ const SignUpForm = () => {
     }
 
     if (Object.keys(validationErrors).length === 0) {
-      const auth = getAuth();
-
       try {
         await createUserWithEmailAndPassword(
           auth,
@@ -112,7 +110,7 @@ const SignUpForm = () => {
           const responseData = await response.json();
           console.log(responseData);
 
-          router.push("/admin")
+          router.push("/admin");
         } else {
           throw new Error(response.statusText);
         }

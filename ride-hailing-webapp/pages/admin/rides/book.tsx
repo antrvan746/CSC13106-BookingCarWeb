@@ -4,6 +4,7 @@ import MapComponent from "../../../components/admin/MapComponent";
 import Head from "next/head";
 import React from "react";
 import styled from "styled-components";
+import withAuth from "../../_withAuth";
 
 const StyledPageContainer = styled.div`
 `;
@@ -37,4 +38,4 @@ const BookingRideView = () => {
   );
 };
 
-export default BookingRideView;
+export default withAuth(BookingRideView);

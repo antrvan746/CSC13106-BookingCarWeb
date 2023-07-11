@@ -20,8 +20,12 @@ const StyledFormContainer = styled.div`
 
 const StyledLoginTitle = styled.h3``;
 
+
+
+
 const LoginForm = () => {
-	const handleSubmit = () => {};
+
+
 
 	return (
 		<StyledFormContainer>
@@ -37,7 +41,7 @@ const LoginForm = () => {
 				>
 					<Box
 						component="form"
-						onSubmit={handleSubmit}
+						onSubmit={}
 						noValidate
 						sx={{ mt: 1 }}
 					>

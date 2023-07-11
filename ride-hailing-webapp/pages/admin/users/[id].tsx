@@ -1,4 +1,5 @@
 import React from 'react'
+import withAuth from '../../_withAuth';
 
 const UserDetailView = () => {
   return (
@@ -6,4 +7,4 @@ const UserDetailView = () => {
   )
 }
 
-export default UserDetailView
+export default withAuth(UserDetailView);

@@ -4,6 +4,7 @@ import ListUser from "../../components/admin/ListUser";
 import React from "react";
 import styled from "styled-components";
 import Head from "next/head";
+import withAuth from "../_withAuth";
 
 const StyledPageContainer = styled.div`
 	max-heigth: 100vh;
@@ -32,4 +33,4 @@ const Customers = () => {
 	);
 };
 
-export default Customers;
+export default withAuth(Customers);

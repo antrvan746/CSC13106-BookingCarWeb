@@ -4,6 +4,7 @@ import UserView from "../../components/admin/UserView";
 import Head from "next/head";
 import React from "react";
 import styled from "styled-components";
+import withAuth from "../_withAuth";
 
 const StyledPageContainer = styled.div``;
 
@@ -30,4 +31,4 @@ const Drivers = () => {
 	);
 };
 
-export default Drivers;
+export default withAuth(Drivers);
