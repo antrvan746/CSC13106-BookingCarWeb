@@ -30,7 +30,7 @@ export default async function handler(
       break;
     case "PUT":
       try {
-        const staffId = z.string().parse(req.query.id);
+        const staffId = z.string().uuid().parse(req.query.id);
         const staff = StaffUpdateRequest.parse(req.body);
         const updatedStaff = await prisma.staff.update({
           where: {
