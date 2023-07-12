@@ -8,7 +8,7 @@ import {
   ListItemText,
   IconButton,
 } from "@mui/material";
-import HeaderLogo from "../../assets/grab.png";
+import HeaderLogo from "../../assets/mai-don.png";
 import MenuIcon from "@mui/icons-material/Menu";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import HomeIcon from "@mui/icons-material/Home";
@@ -63,7 +63,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ isLoggedIn = true }) => {
   const [signOut, _loading, _error] = useSignOut(auth);
 
   const listNavigation = [
-    { name: "Home dashboard", icon: <WhiteHomeIcon />, link: "/admin/" },
+    { name: "Dashboard", icon: <WhiteHomeIcon />, link: "/admin/" },
     { name: "Customers", icon: <CustomerIcon />, link: "/admin/customers" },
     { name: "Drivers", icon: <DriversIcon />, link: "/admin/drivers" },
   ];

@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import Image from "next/image";
 import Link from "next/link";
-import HeaderLogo from "../assets/grab.png";
+import HeaderLogo from "../assets/mai-don.png";
 
 const StyledContainer = styled.div`
 	display: flex;

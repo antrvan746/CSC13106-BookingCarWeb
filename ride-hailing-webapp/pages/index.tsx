@@ -7,7 +7,7 @@ import Head from "next/head";
 import Link from "next/link";
 import styled from "styled-components";
 
-import GrabBackground from "../assets/grab_background.jpg";
+import GrabBackground from "../assets/grab_background.png";
 import GrabHiringGraphic from "../assets/grab-driver-graphic.png";
 import CHPlayStoreIcon from "../assets/google-play-logo.svg";
 import AppStoreIcon from "../assets/app-store-logo.svg";

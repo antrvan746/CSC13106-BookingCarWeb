@@ -4,6 +4,7 @@ import Head from "next/head";
 import React from "react";
 import styled from "styled-components";
 import withAuth from "../_withAuth";
+import Dashboard from "../../components/admin/Dashboard";
 
 const StyledPageContainer = styled.div``;
 
@@ -16,6 +17,8 @@ const AdminHome = () => {
       </Head>
 
       <AdminHeader />
+
+      <Dashboard />
     </StyledPageContainer>
   );
 };
