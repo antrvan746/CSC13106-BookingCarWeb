@@ -5,9 +5,11 @@ import styled from "styled-components";
 import Header from "../components/Header";
 import AdminHeader from "../components/admin/AdminHeader";
 
-const StyledPageContainer = styled.div`
+const StyledContainer = styled.div`
+  height: 100vh;
   display: flex;
   flex-direction: column;
+  align-items: center;
   justify-content: center;
 `;
 
@@ -19,13 +21,15 @@ const LoadingPage = () => {
         <meta name="description" content="Created by NextJs" />
       </Head>
 
-      <StyledPageContainer>
-        <AdminHeader />
+
+      <AdminHeader isLoggedIn={false} />
+
+      <StyledContainer>
 
         <Box sx={{ display: "flex" }}>
           <CircularProgress />
         </Box>
-      </StyledPageContainer>
+      </StyledContainer>
     </>
   );
 };

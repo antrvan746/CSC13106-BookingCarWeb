@@ -59,7 +59,8 @@ const StyledRecentRidesContainer = styled.div`
 
 const StyledRideHistoriesContainer = styled.div`
   overflow-y: scroll;
-  max-height: 300px;
+  padding: 0.5rem;
+  max-height: 500px;
 `;
 
 const UserView = () => {
@@ -95,11 +96,11 @@ const UserView = () => {
           <RideHistoryView />
           <RideHistoryView />
           <RideHistoryView />
-		  <RideHistoryView />
-		  <RideHistoryView />
           <RideHistoryView />
           <RideHistoryView />
-		  <RideHistoryView />
+          <RideHistoryView />
+          <RideHistoryView />
+          <RideHistoryView />
         </StyledRideHistoriesContainer>
       </StyledRecentRidesContainer>
     </StyledContainer>
