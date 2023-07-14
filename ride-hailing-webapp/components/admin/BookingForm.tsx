@@ -108,6 +108,7 @@ const BookingForm = () => {
               marginRight: "1rem",
             }}
           />
+
           <Autocomplete
             onLoad={onStartPlaceLoad}
             onPlaceChanged={onStartPlaceChange}
@@ -116,7 +117,6 @@ const BookingForm = () => {
               label="Điểm đi"
               size="small"
               variant="outlined"
-              fullWidth
             />
           </Autocomplete>
         </StyledPlaceInput>
