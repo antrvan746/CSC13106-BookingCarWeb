@@ -28,9 +28,10 @@ import DigitalWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import PaymentIcon from "@mui/icons-material/Payment";
 import MoneyIcon from "@mui/icons-material/Money";
 
-import { DateTimeField, LocalizationProvider } from "@mui/x-date-pickers";
+import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Autocomplete } from "@react-google-maps/api";
+
 
 const StyledContainer = styled.div`
   display: flex;
@@ -108,17 +109,23 @@ const BookingForm = () => {
               marginRight: "1rem",
             }}
           />
-
-          <Autocomplete
-            onLoad={onStartPlaceLoad}
-            onPlaceChanged={onStartPlaceChange}
+          <div
+            style={{
+              width: "100%",
+            }}
           >
-            <TextField
-              label="Điểm đi"
-              size="small"
-              variant="outlined"
-            />
-          </Autocomplete>
+            <Autocomplete
+              onLoad={onStartPlaceLoad}
+              onPlaceChanged={onStartPlaceChange}
+            >
+              <TextField
+                label="Điểm đi"
+                size="small"
+                variant="outlined"
+                fullWidth
+              />
+            </Autocomplete>
+          </div>
         </StyledPlaceInput>
 
         <StyledPlaceInput>
@@ -129,17 +136,23 @@ const BookingForm = () => {
               marginRight: "1rem",
             }}
           />
-          <Autocomplete
-            onLoad={onEndPlaceLoad}
-            onPlaceChanged={onEndPlaceChange}
+          <div
+            style={{
+              width: "100%",
+            }}
           >
-            <TextField
-              label="Điểm đến"
-              size="small"
-              variant="outlined"
-              fullWidth
-            />
-          </Autocomplete>
+            <Autocomplete
+              onLoad={onEndPlaceLoad}
+              onPlaceChanged={onEndPlaceChange}
+            >
+              <TextField
+                label="Điểm đến"
+                size="small"
+                variant="outlined"
+                fullWidth
+              />
+            </Autocomplete>
+          </div>
         </StyledPlaceInput>
 
         <StyleInforInput>
