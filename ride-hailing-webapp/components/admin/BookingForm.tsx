@@ -56,10 +56,21 @@ const StyleInforInput = styled.div`
   margin-bottom: 0.5rem;
 `;
 
+
+interface BookingFormData {
+  startPlace: string,
+  endPlace: string,
+  firstName: string,
+  lastName: string,
+  phone: string,
+  date: Dayjs | null,
+  checkedVehicle: string,
+  checkedPayment: string 
+}
+
 const BookingForm = () => {
   const [age, setAge] = React.useState("");
   const [selectedVehicle, setSelectedVehicle] = React.useState("motorcycle");
-
   const [value, setValue] = React.useState<Dayjs | null>(dayjsFunc());
 
   const handleVehicleChange = (event: any) => {
@@ -97,6 +108,21 @@ const BookingForm = () => {
       console.log("Autocomplete is not loaded yet!");
     }
   };
+
+  const [formData, setFormData] = useState<BookingFormData>({
+    startPlace: "",
+    endPlace: "",
+    firstName: "",
+    lastName: "",
+    phone: "",
+    date: null,
+    checkedVehicle: "",
+    checkedPayment: "" 
+  });
+
+  const handleSubmit = async () => {
+    
+  }
 
   return (
     <StyledContainer>
@@ -409,6 +435,7 @@ const BookingForm = () => {
             right: "1rem",
             bottom: "2rem",
           }}
+          onClick={handleSubmit}
         >
           Tìm chuyến xe
         </Button>
