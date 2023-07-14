@@ -30,6 +30,7 @@ import MoneyIcon from "@mui/icons-material/Money";
 
 import { DateTimeField, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { Autocomplete } from "@react-google-maps/api";
 
 const StyledContainer = styled.div`
   display: flex;
@@ -64,6 +65,39 @@ const BookingForm = () => {
     setSelectedVehicle(event.target.value);
   };
 
+
+
+  const [startPlace, setStartPlace] =
+    useState<google.maps.places.Autocomplete | null>(null);
+  const [endPlace, setEndPlace] =
+    useState<google.maps.places.Autocomplete | null>(null);
+
+  const onStartPlaceLoad = (autocomplete: google.maps.places.Autocomplete) => {
+    console.log("Autocomplete start place: ", autocomplete);
+    setStartPlace(autocomplete);
+  };
+
+  const onEndPlaceLoad = (autocomplete: google.maps.places.Autocomplete) => {
+    console.log("Autocomplete end place: ", autocomplete);
+    setEndPlace(autocomplete);
+  };
+
+  const onStartPlaceChange = () => {
+    if (startPlace !== null) {
+      console.log(startPlace.getPlace());
+    } else {
+      console.log("Autocomplete is not loaded yet!");
+    }
+  };
+
+  const onEndPlaceChange = () => {
+    if (endPlace !== null) {
+      console.log(endPlace.getPlace());
+    } else {
+      console.log("Autocomplete is not loaded yet!");
+    }
+  };
+
   return (
     <StyledContainer>
       <FormControl style={{ width: "95%" }}>
@@ -75,12 +109,17 @@ const BookingForm = () => {
               marginRight: "1rem",
             }}
           />
-          <TextField
-            label="Điểm đi"
-            size="small"
-            variant="outlined"
-            fullWidth
-          />
+          <Autocomplete
+            onLoad={onStartPlaceLoad}
+            onPlaceChanged={onStartPlaceChange}
+          >
+            <TextField
+              label="Điểm đi"
+              size="small"
+              variant="outlined"
+              fullWidth
+            />
+          </Autocomplete>
         </StyledPlaceInput>
 
         <StyledPlaceInput>
@@ -91,12 +130,17 @@ const BookingForm = () => {
               marginRight: "1rem",
             }}
           />
-          <TextField
-            label="Điểm đến"
-            size="small"
-            variant="outlined"
-            fullWidth
-          />
+          <Autocomplete
+            onLoad={onEndPlaceLoad}
+            onPlaceChanged={onEndPlaceChange}
+          >
+            <TextField
+              label="Điểm đến"
+              size="small"
+              variant="outlined"
+              fullWidth
+            />
+          </Autocomplete>
         </StyledPlaceInput>
 
         <StyleInforInput>

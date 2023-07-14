@@ -25,6 +25,7 @@ const BookingRideView = () => {
       <Head> 
         <title> Mai Đón Admin - Đặt xe cho khách hàng </title>
         <meta name="description" content="Created by NextJs" />
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDekTKGUSYNDS2O17iZV8Lw9l0ysEWtT_A&callback=initMap"></script>
       </Head>
       <AdminHeader />
       <StyledContentContainer>
