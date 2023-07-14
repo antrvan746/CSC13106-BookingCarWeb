@@ -44,6 +44,7 @@ const StyledPlaceInput = styled.div`
   align-items: center;
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
+  width: 100%;
 `;
 
 const StyleInforInput = styled.div`
@@ -64,8 +65,6 @@ const BookingForm = () => {
     console.log(event.target.value);
     setSelectedVehicle(event.target.value);
   };
-
-
 
   const [startPlace, setStartPlace] =
     useState<google.maps.places.Autocomplete | null>(null);
