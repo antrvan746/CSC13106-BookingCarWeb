@@ -32,6 +32,8 @@ import { DateTimeField, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Autocomplete } from "@react-google-maps/api";
 
+import styles from "../../styles/BookingForm.module.css"
+
 const StyledContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -100,7 +102,7 @@ const BookingForm = () => {
   return (
     <StyledContainer>
       <FormControl style={{ width: "95%" }}>
-        <StyledPlaceInput>
+        <StyledPlaceInput >
           <PlaceIcon
             style={{
               fill: "#237FEB",
@@ -108,17 +110,18 @@ const BookingForm = () => {
               marginRight: "1rem",
             }}
           />
-
-          <Autocomplete
-            onLoad={onStartPlaceLoad}
-            onPlaceChanged={onStartPlaceChange}
-          >
-            <TextField
-              label="Điểm đi"
-              size="small"
-              variant="outlined"
-            />
-          </Autocomplete>
+          <div className={styles["place_input_style"]}>
+            <Autocomplete
+              onLoad={onStartPlaceLoad}
+              onPlaceChanged={onStartPlaceChange}
+            >
+              <TextField
+                label="Điểm đi"
+                size="small"
+                variant="outlined"
+              />
+            </Autocomplete>
+          </div>
         </StyledPlaceInput>
 
         <StyledPlaceInput>

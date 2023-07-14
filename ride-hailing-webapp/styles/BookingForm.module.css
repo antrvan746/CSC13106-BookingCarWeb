@@ -1,0 +1,7 @@
+.place_input_style {
+  width: 100%;
+  flex: 1;
+}
+.place_input_style > div > div{
+  width: 100%;
+}

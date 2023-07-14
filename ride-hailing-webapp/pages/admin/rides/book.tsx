@@ -43,4 +43,4 @@ const BookingRideView = () => {
   );
 };
 
-export default withAuth(BookingRideView);
+export default BookingRideView;
