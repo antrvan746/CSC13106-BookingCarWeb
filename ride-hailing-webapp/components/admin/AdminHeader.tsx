@@ -158,7 +158,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ isLoggedIn = true }) => {
         <Link href="/admin/">
           <Image src={HeaderLogo} alt="Logo" height={40} />
         </Link>
-		<LogOutButton isLoggedIn={isLoggedIn} />
+        <LogOutButton isLoggedIn={isLoggedIn} />
       </StyledContainer>
       <Sidebar />
     </div>
