@@ -4,9 +4,10 @@ import MapComponent from "../../../components/admin/MapComponent";
 import Head from "next/head";
 import React from "react";
 import styled from "styled-components";
+import withAuth from "../../_withAuth";
+import { LoadScript } from "@react-google-maps/api";
 
-const StyledPageContainer = styled.div`
-`;
+const StyledPageContainer = styled.div``;
 
 const StyledContentContainer = styled.div`
   display: inline-grid;
@@ -18,23 +19,28 @@ const StyledDividedContainer = styled.div`
   width: 100%;
 `;
 
+const ggMapApiKey =
+  process.env.GGMAP_API_KEY || "AIzaSyDekTKGUSYNDS2O17iZV8Lw9l0ysEWtT_A";
+
 const BookingRideView = () => {
   return (
     <StyledPageContainer>
-      <Head> 
+      <Head>
         <title> Mai Đón Admin - Đặt xe cho khách hàng </title>
         <meta name="description" content="Created by NextJs" />
       </Head>
       <AdminHeader />
-      <StyledContentContainer>
-        <MapComponent />
+      <LoadScript googleMapsApiKey={ggMapApiKey} libraries={["places"]}>
+        <StyledContentContainer>
+          <MapComponent />
 
-        <StyledDividedContainer>
-          <BookingForm />
-        </StyledDividedContainer>
-      </StyledContentContainer>
+          <StyledDividedContainer>
+            <BookingForm />
+          </StyledDividedContainer>
+        </StyledContentContainer>
+      </LoadScript>
     </StyledPageContainer>
   );
 };
 
-export default BookingRideView;
+export default withAuth(BookingRideView);

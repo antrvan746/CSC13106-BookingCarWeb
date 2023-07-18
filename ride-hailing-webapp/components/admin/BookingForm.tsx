@@ -28,8 +28,9 @@ import DigitalWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import PaymentIcon from "@mui/icons-material/Payment";
 import MoneyIcon from "@mui/icons-material/Money";
 
-import { DateTimeField, LocalizationProvider } from "@mui/x-date-pickers";
+import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { Autocomplete } from "@react-google-maps/api";
 
 const StyledContainer = styled.div`
   display: flex;
@@ -43,6 +44,7 @@ const StyledPlaceInput = styled.div`
   align-items: center;
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
+  width: 100%;
 `;
 
 const StyleInforInput = styled.div`
@@ -53,15 +55,109 @@ const StyleInforInput = styled.div`
   margin-bottom: 0.5rem;
 `;
 
+interface BookingFormData {
+  startPlace: string;
+  endPlace: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  date: Dayjs | null;
+  checkedVehicle: string;
+  checkedPayment: string;
+}
+
 const BookingForm = () => {
   const [age, setAge] = React.useState("");
   const [selectedVehicle, setSelectedVehicle] = React.useState("motorcycle");
-
   const [value, setValue] = React.useState<Dayjs | null>(dayjsFunc());
 
   const handleVehicleChange = (event: any) => {
     console.log(event.target.value);
     setSelectedVehicle(event.target.value);
+  };
+
+  const [startPlace, setStartPlace] =
+    useState<google.maps.places.Autocomplete | null>(null);
+  const [endPlace, setEndPlace] =
+    useState<google.maps.places.Autocomplete | null>(null);
+
+  const onStartPlaceLoad = (autocomplete: google.maps.places.Autocomplete) => {
+    console.log("Autocomplete start place: ", autocomplete);
+    setStartPlace(autocomplete);
+  };
+
+  const onEndPlaceLoad = (autocomplete: google.maps.places.Autocomplete) => {
+    console.log("Autocomplete end place: ", autocomplete);
+    setEndPlace(autocomplete);
+  };
+
+  const onStartPlaceChange = () => {
+    if (startPlace !== null) {
+      console.log(startPlace.getPlace());
+    } else {
+      console.log("Autocomplete is not loaded yet!");
+    }
+  };
+
+  const onEndPlaceChange = () => {
+    if (endPlace !== null) {
+      console.log(endPlace.getPlace());
+    } else {
+      console.log("Autocomplete is not loaded yet!");
+    }
+  };
+
+  const [formData, setFormData] = useState<BookingFormData>({
+    startPlace: "",
+    endPlace: "",
+    firstName: "",
+    lastName: "",
+    phone: "",
+    date: null,
+    checkedVehicle: "",
+    checkedPayment: "",
+  });
+
+  const [errors, setErrors] = useState<Partial<BookingFormData>>({});
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+    setErrors((prevErrors) => ({ ...prevErrors, [name]: undefined }));
+  };
+
+  const handleSubmit = async () => {
+    const validationErrors: Partial<BookingFormData> = {};
+
+    if (!formData.startPlace.trim()) {
+      validationErrors.startPlace = "Start place is required";
+    }
+    if (!formData.endPlace.trim()) {
+      validationErrors.endPlace = "End place is required";
+    }
+    if (!formData.firstName.trim()) {
+      validationErrors.firstName = "First name is required";
+    }
+    if (!formData.lastName.trim()) {
+      validationErrors.lastName = "Last name is required";
+    }
+    if (!formData.phone.trim()) {
+      validationErrors.phone = "Phone is required";
+    } else if (
+      /^[+]*[(]{0,1}[0-9]{1,3}[)]{0,1}[-\s\./0-9]*$/g.test(formData.phone)
+    ) {
+      validationErrors.phone = "Phone number is not valid";
+    }
+
+    if (formData.date?.isAfter(formData.date)) {
+    }
+
+    if (Object.keys(validationErrors).length === 0) {
+      try {
+      } catch (err) {}
+    } else {
+      setErrors(validationErrors);
+    }
   };
 
   return (
@@ -75,12 +171,28 @@ const BookingForm = () => {
               marginRight: "1rem",
             }}
           />
-          <TextField
-            label="Điểm đi"
-            size="small"
-            variant="outlined"
-            fullWidth
-          />
+          <div
+            style={{
+              width: "100%",
+            }}
+          >
+            <Autocomplete
+              onLoad={onStartPlaceLoad}
+              onPlaceChanged={onStartPlaceChange}
+            >
+              <TextField
+                label="Điểm đi"
+                size="small"
+                variant="outlined"
+                value={formData.startPlace}
+                onChange={handleChange}
+                error={!!errors.startPlace}
+                helperText={errors.startPlace}
+                autoFocus
+                fullWidth
+              />
+            </Autocomplete>
+          </div>
         </StyledPlaceInput>
 
         <StyledPlaceInput>
@@ -91,12 +203,27 @@ const BookingForm = () => {
               marginRight: "1rem",
             }}
           />
-          <TextField
-            label="Điểm đến"
-            size="small"
-            variant="outlined"
-            fullWidth
-          />
+          <div
+            style={{
+              width: "100%",
+            }}
+          >
+            <Autocomplete
+              onLoad={onEndPlaceLoad}
+              onPlaceChanged={onEndPlaceChange}
+            >
+              <TextField
+                label="Điểm đến"
+                size="small"
+                variant="outlined"
+                value={formData.endPlace}
+                onChange={handleChange}
+                error={!!errors.endPlace}
+                helperText={errors.endPlace}
+                fullWidth
+              />
+            </Autocomplete>
+          </div>
         </StyledPlaceInput>
 
         <StyleInforInput>
@@ -116,6 +243,10 @@ const BookingForm = () => {
             autoComplete="given-name"
             size="small"
             variant="outlined"
+            value={formData.firstName}
+            onChange={handleChange}
+            error={!!errors.firstName}
+            helperText={errors.firstName}
             style={{
               marginRight: "5px",
             }}
@@ -127,6 +258,10 @@ const BookingForm = () => {
             label="Last name"
             fullWidth
             autoComplete="given-name"
+            value={formData.lastName}
+            onChange={handleChange}
+            error={!!errors.lastName}
+            helperText={errors.lastName}
             size="small"
             variant="outlined"
           />
@@ -143,6 +278,10 @@ const BookingForm = () => {
             label="Số điện thoại"
             size="small"
             variant="outlined"
+            value={formData.phone}
+            onChange={handleChange}
+            error={!!errors.phone}
+            helperText={errors.phone}
             fullWidth
             required
           />
@@ -310,7 +449,6 @@ const BookingForm = () => {
                 />
               }
             />
-
             <Radio
               icon={
                 <PaymentIcon
@@ -353,6 +491,7 @@ const BookingForm = () => {
             right: "1rem",
             bottom: "2rem",
           }}
+          onClick={handleSubmit}
         >
           Tìm chuyến xe
         </Button>

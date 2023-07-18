@@ -1,5 +1,18 @@
-import React from "react";
 import Image from "next/image";
+import React, { Component } from "react";
+import { GoogleMap, LoadScript } from "@react-google-maps/api";
+
+
+
+const containerStyle = {
+  width: '100%',
+  height: '100%'
+};
+
+const center = {
+  lat: 10.780293274142215,
+  lng: 106.69906571528465
+};
 
 const MapComponent = () => {
   return (
@@ -9,18 +22,17 @@ const MapComponent = () => {
         listStyle: "none",
         transition: "none",
         overflow: "hidden",
-        height: "98vh"
+        height: "98vh",
       }}
     >
-      <div
-        id="display-google-map"
-        style={{ height: "100%", width: "100%", maxWidth: "100%" }}
-      >
-        <iframe
-          style={{ height: "100%", width: "100%", border: 0 }}
-          src="https://www.google.com/maps/embed/v1/place?q=Nhà+thờ+Đức+Bà,+Công+xã+Paris,+Bến+Nghé,+Quận+1,+Thành+phố+Hồ+Chí+Minh,+Việt+Nam&key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8"
-        ></iframe>
-      </div>
+      <GoogleMap
+          mapContainerStyle={containerStyle}
+          center={center}
+          zoom={14}
+        >
+          { /* Child components, such as markers, info windows, etc. */ }
+          <></>
+        </GoogleMap>
     </div>
   );
 };

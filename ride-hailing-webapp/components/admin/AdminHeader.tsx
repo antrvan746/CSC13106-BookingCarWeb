@@ -3,137 +3,166 @@ import styled from "styled-components";
 import Image from "next/image";
 import Link from "next/link";
 import {
-	ListItem,
-	ListItemIcon,
-	ListItemText,
-	IconButton
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  IconButton,
 } from "@mui/material";
-import HeaderLogo from "../../assets/grab.png";
+import HeaderLogo from "../../assets/mai-don.png";
 import MenuIcon from "@mui/icons-material/Menu";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import HomeIcon from "@mui/icons-material/Home";
-import zIndex from "@mui/material/styles/zIndex";
+import LogoutIcon from "@mui/icons-material/Logout";
+import { useSignOut } from "react-firebase-hooks/auth";
+import FirebaseApp from "../../config/firebase";
+import { getAuth } from "firebase/auth";
 
 const WhiteHomeIcon = styled(HomeIcon)`
-	color: #ffffff;
-	width: 40;
+  color: #ffffff;
+  width: 40;
 `;
 
 const CustomerIcon = styled(PeopleAltIcon)`
-	color: #ffffff;
-	width: 40;
+  color: #ffffff;
+  width: 40;
 `;
 
 const DriversIcon = styled(PeopleAltIcon)`
-	color: #13b45d;
-	width: 40;
+  color: #13b45d;
+  width: 40;
 `;
 
 const StyledContainer = styled.div`
-	display: flex;
-	flex-direction: row;
-	background-color: #1e1e1e;
-	align-items: center;
-	position: sticky;
-	top: 0;
-	padding: 0.5rem 1rem 0.5rem 0.5rem;
-	transition: background-color 0.5s;
-	min-height: 50px;
-	transition: background-color 0.5s;
+  display: flex;
+  flex-direction: row;
+  background-color: #1e1e1e;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  padding: 0.5rem 1rem 0.5rem 0.5rem;
+  transition: background-color 0.5s;
+  min-height: 50px;
+  transition: background-color 0.5s;
 
-	@media (min-height: 110vh) {
-		background-color: #1e1e1eba;
-	}
+  @media (min-height: 110vh) {
+    background-color: #1e1e1eba;
+  }
 `;
 
 interface AdminHeaderProps {
-	isLoggedIn?: boolean;
+  isLoggedIn?: boolean;
 }
 
+const app = FirebaseApp;
+
+const auth = getAuth();
+
 const AdminHeader: React.FC<AdminHeaderProps> = ({ isLoggedIn = true }) => {
-	const [isOpen, setOpen] = useState(false);
+  const [isOpen, setOpen] = useState(false);
 
-	const listNavigation = [
-		{ name: "Home dashboard", icon: <WhiteHomeIcon />, link: "/admin/" },
-		{ name: "Customers", icon: <CustomerIcon />, link: "/admin/customers" },
-		{ name: "Drivers", icon: <DriversIcon />, link: "/admin/drivers" },
-	];
+  const [signOut, _loading, _error] = useSignOut(auth);
 
-	const getList = () => (
-		<div
-			style={{
-				width: 250,
-				backgroundColor: "#1e1e1e",
-				height: '300vh',
-				position: 'absolute',
-				zIndex: 1,				
-			}}
-			onClick={() => setOpen(false)}
-		>
-			{listNavigation.map((item, index) => (
-				<ListItem
-					key={index}
-					style={{
-						paddingTop: "8px",
-						paddingBottom: "8px",
-						paddingLeft: "0.5rem",
-					}}
-					disablePadding
-				>
-					<ListItemIcon style={{ padding: "8px 0px 8px 8px" }}>
-						{item.icon}
-					</ListItemIcon>
-					<Link
-						href={item.link}
-						style={{
-							color: "#ffffff",
-							padding: "8px 0px 8px 0px",
-							textDecoration: "none",
-						}}
-					>
-						{item.name}
-					</Link>
-				</ListItem>
-			))}
-		</div>
-	);
+  const listNavigation = [
+    { name: "Dashboard", icon: <WhiteHomeIcon />, link: "/admin/" },
+    { name: "Customers", icon: <CustomerIcon />, link: "/admin/customers" },
+    { name: "Drivers", icon: <DriversIcon />, link: "/admin/drivers" },
+  ];
 
-	const MenuButton: React.FC<AdminHeaderProps> = ({ isLoggedIn }) => {
-		if (isLoggedIn) {
-			return (
-				<IconButton
-					style={{
-						margin: "0rem 1rem 0rem 0rem",
-					}}
-					onClick={() => setOpen(!isOpen)}
-				>
-					<MenuIcon
-						style={{
-							color: "#ffffff",
-						}}
-					/>
-				</IconButton>
-			);
-		} else return <></>;
-	};
+  const getList = () => (
+    <div
+      style={{
+        width: 250,
+        backgroundColor: "#1e1e1e",
+        height: "300vh",
+        position: "absolute",
+        zIndex: 1,
+      }}
+      onClick={() => setOpen(false)}
+    >
+      {listNavigation.map((item, index) => (
+        <ListItem
+          key={index}
+          style={{
+            paddingTop: "8px",
+            paddingBottom: "8px",
+            paddingLeft: "0.5rem",
+          }}
+          disablePadding
+        >
+          <ListItemIcon style={{ padding: "8px 0px 8px 8px" }}>
+            {item.icon}
+          </ListItemIcon>
+          <Link
+            href={item.link}
+            style={{
+              color: "#ffffff",
+              padding: "8px 0px 8px 0px",
+              textDecoration: "none",
+            }}
+          >
+            {item.name}
+          </Link>
+        </ListItem>
+      ))}
+    </div>
+  );
 
-	const Sidebar: React.FC<AdminHeaderProps> = ({}) => {
-		if (isOpen) {
-			return getList();
-		}
-	};
+  const MenuButton: React.FC<AdminHeaderProps> = ({ isLoggedIn }) => {
+    if (isLoggedIn) {
+      return (
+        <IconButton
+          style={{
+            margin: "0rem 1rem 0rem 0rem",
+          }}
+          onClick={() => setOpen(!isOpen)}
+        >
+          <MenuIcon
+            style={{
+              color: "#ffffff",
+            }}
+          />
+        </IconButton>
+      );
+    } else return <></>;
+  };
 
-	return (
-		<div>
-			<StyledContainer>
-				<MenuButton isLoggedIn={isLoggedIn} />
-				<Link href="/admin/">
-					<Image src={HeaderLogo} alt="Logo" height={40} />
-				</Link>
-			</StyledContainer>
-			<Sidebar />
-		</div>
-	);
+  const LogOutButton: React.FC<AdminHeaderProps> = ({ isLoggedIn }) => {
+    if (isLoggedIn) {
+      return (
+        <IconButton
+          style={{
+            marginLeft: "auto",
+          }}
+          onClick={signOut}
+        >
+          <LogoutIcon
+            style={{
+              color: "#ffffff",
+            }}
+          />
+        </IconButton>
+      );
+    }
+  };
+
+  const Sidebar: React.FC<AdminHeaderProps> = ({}) => {
+    if (isOpen) {
+      return getList();
+    }
+  };
+
+  return (
+    <div>
+      <StyledContainer>
+        <MenuButton isLoggedIn={isLoggedIn} />
+        <Link href="/admin/">
+          <Image src={HeaderLogo} alt="Logo" height={40} />
+        </Link>
+        <LogOutButton isLoggedIn={isLoggedIn} />
+      </StyledContainer>
+      <Sidebar />
+    </div>
+  );
 };
 
 export default AdminHeader;

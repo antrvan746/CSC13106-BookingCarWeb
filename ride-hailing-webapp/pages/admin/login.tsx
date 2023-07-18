@@ -3,21 +3,22 @@ import LoginForm from "../../components/admin/LoginForm";
 import Head from "next/head";
 import React from "react";
 import styled from "styled-components";
+import withAuth from "../_withAuth";
 
 const StyledPageContainer = styled.div``;
 
 const AdminLogin = () => {
-	return (
-		<StyledPageContainer>
-			<Head>
-				<title>Mai Đón Admin - Đăng nhập </title>
-				<meta name="description" content="Created by NextJs" />
-			</Head>
+  return (
+    <StyledPageContainer>
+      <Head>
+        <title>Mai Đón Admin - Đăng nhập </title>
+        <meta name="description" content="Created by NextJs" />
+      </Head>
 
-			<AdminHeader isLoggedIn={false} />
-			<LoginForm />
-		</StyledPageContainer>
-	);
+      <AdminHeader isLoggedIn={false} />
+      <LoginForm />
+    </StyledPageContainer>
+  );
 };
 
 export default AdminLogin;
