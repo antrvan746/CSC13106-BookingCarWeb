@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 const vehicleSchema = z.object({
   driver_id: z.string(),
-  plate_number: z.string().max(20),
+  plate_number: z.string().max(10),
   model: z.string(),
   color: z.string().optional(),
   type: z.string().optional(),
