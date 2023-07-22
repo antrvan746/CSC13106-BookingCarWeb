@@ -36,11 +36,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         res.status(500).json({ error: "Something went wrong" });
       }
       break;
+
     case "PUT":
       try {
         const updatedData = driverSchema.parse(req.body);
-        const id = req.query.id as string;
-        const existingDriver = await prisma.driver.findFirst({ where: { id } });
+        const { driverId } = req.query;
+        const id = driverIdSchema.parse(driverId);
+        const existingDriver = await prisma.driver.findUnique({ where: { id } });
   
         if (!existingDriver) {
           return res.status(404).json({ error: "Driver not found" });
@@ -57,7 +59,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         res.status(400).json({ error: "Invalid request payload" });
       }
       break;
-    case "DELETE":
+
+    case "DELETE": 
       try {
         const { driverId } = req.query;
         const id = driverIdSchema.parse(driverId);
@@ -78,11 +81,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         res.status(500).json({ error: "Something went wrong" });
       }
       break;
+
     default:
-      res.setHeader('Allow', ['GET', 'DELETE']);
+      res.setHeader('Allow', ['GET', "PUT", 'DELETE']);
       res.status(405).json({ error: `Method ${req.method} Not Allowed` });
       break;
   }
 }
-
-
