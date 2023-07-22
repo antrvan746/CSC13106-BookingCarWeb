@@ -1,6 +1,8 @@
 import { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
-import { prismaClient } from "../../../libs/prisma";
+import { PrismaClient } from "@prisma/client";
 import z from "zod";
+
+const prisma = new PrismaClient();
 
 const vehicleSchema = z.object({
   driver_id: z.string(),
@@ -16,10 +18,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   switch (req.method) {
     case "GET":
       try {
-        const validId = vehicleIdSchema.parse(req.query);
-        const vehicle = await prismaClient.vehicle.findUnique({
+        const { vehiclesId } = req.query;
+        const id = vehicleIdSchema.parse(vehiclesId);
+        const vehicle = await prisma.vehicle.findUnique({
           where: {
-            id: validId,
+            id: id,
           },
         });
 
@@ -36,16 +39,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     case "DELETE":
       try {
-        const id = vehicleIdSchema.parse(req.query);
-        const existingVehicle = await prismaClient.vehicle.findUnique({ where: { id: String(id) } });
-    
+        const { vehiclesId } = req.query;
+        const id = vehicleIdSchema.parse(vehiclesId);
+        const existingVehicle = await prisma.vehicle.findUnique({ where: { id: id } });
+
         if (!existingVehicle) {
           return res.status(404).json({ error: "Vehicle not found" });
         }
 
-        await prismaClient.vehicle.delete({
+        await prisma.vehicle.delete({
           where: {
-            id: String(id),
+            id: id,
           },
         });
 
@@ -61,5 +65,4 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       res.status(405).json({ error: `Method ${req.method} Not Allowed` });
       break;
   }
-};
-
+}
