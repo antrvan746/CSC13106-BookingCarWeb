@@ -54,7 +54,6 @@ interface AdminHeaderProps {
 }
 
 const app = FirebaseApp;
-
 const auth = getAuth();
 
 const AdminHeader: React.FC<AdminHeaderProps> = ({ isLoggedIn = true }) => {

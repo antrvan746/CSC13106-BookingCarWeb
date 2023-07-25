@@ -1,14 +1,12 @@
 import AdminHeader from "../../components/admin/AdminHeader";
-import UserView from "../../components/admin/UserView";
-import ListUser from "../../components/admin/ListUser";
+import UsersView from "../../components/admin/UsersView";
 import React from "react";
 import styled from "styled-components";
 import Head from "next/head";
 import withAuth from "../_withAuth";
 import { Container } from "@mui/material";
 
-const StyledPageContainer = styled.div`
-`;
+const StyledPageContainer = styled.div``;
 
 const StyledContentContainer = styled.div`
   display: flex;
@@ -33,10 +31,7 @@ const Customers = () => {
       <AdminHeader />
 
       <Container maxWidth="xl">
-        <StyledMainView>
-          <ListUser />
-          <UserView />
-        </StyledMainView>
+        <UsersView />
       </Container>
     </StyledPageContainer>
   );

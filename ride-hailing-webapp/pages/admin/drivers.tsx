@@ -1,6 +1,5 @@
 import AdminHeader from "../../components/admin/AdminHeader";
-import ListUser from "../../components/admin/ListUser";
-import UserView from "../../components/admin/UserView";
+import DriversView from "../../components/admin/DriversView";
 import Head from "next/head";
 import React from "react";
 import styled from "styled-components";
@@ -9,11 +8,7 @@ import { Container } from "@mui/material";
 
 const StyledPageContainer = styled.div``;
 
-const StyledMainView = styled.div`
-  display: grid;
-  grid-template-columns: 2.5fr 1.5fr;
-  max-width: 1280px;
-`;
+
 
 const Drivers = () => {
   return (
@@ -26,10 +21,7 @@ const Drivers = () => {
       <AdminHeader />
 
       <Container maxWidth="xl">
-        <StyledMainView>
-          <ListUser />
-          <UserView />
-        </StyledMainView>
+        <DriversView />
       </Container>
     </StyledPageContainer>
   );

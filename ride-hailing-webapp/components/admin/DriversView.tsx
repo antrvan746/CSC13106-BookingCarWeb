@@ -17,6 +17,14 @@ import {
     email: string | null;
     name: string;
   }
+
+  interface UIDriverDataItem {
+    id: string;
+    phone: string;
+    email: string | null;
+    name: string;
+    index: number;
+  }
   
   const StyledContainer = styled.div`
     background-color: #f9f9f9;
@@ -56,16 +64,21 @@ import {
       const fetchedDrivers = fecthDrivers();
       fetchedDrivers.then((data) => {
         if (data) {
-          console.log(data)
-          setDrivers(data);
+          const handledData : UIDriverDataItem[] = data.map(
+            (item: DriverResponse, idx: number) => ({
+              ...item,
+              index: idx
+            })
+          )
+          setDrivers(handledData);
         }
       });
     }, []);
   
     const columns: GridColDef[] = [
-      { field: "id", headerName: "Id", width: 150 },
-      { field: "email", headerName: "Email", width: 150 },
-      { field: "name", headerName: "Name", width: 150 },
+      { field: "index", headerName: "Id", width: 50 },
+      { field: "email", headerName: "Email", width: 250 },
+      { field: "name", headerName: "Name", width: 180 },
       { field: "phone", headerName: "Phone", width: 150 },
     ];
   

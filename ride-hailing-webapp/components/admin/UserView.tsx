@@ -63,7 +63,20 @@ const StyledRideHistoriesContainer = styled.div`
   max-height: 300px;
 `;
 
-const UserView = () => {
+interface RideHistory {
+
+}
+
+
+interface UserViewProps {
+  name: string,
+  phone: string,
+  email: string,
+  rating: number,
+
+}
+
+const UserView : React.FC<UserViewProps> = () => {
   return (
     <StyledContainer>
       <StyledText> Thông tin khách hàng </StyledText>
