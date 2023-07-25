@@ -60,7 +60,7 @@ const StyledRecentRidesContainer = styled.div`
 const StyledRideHistoriesContainer = styled.div`
   overflow-y: scroll;
   padding: 0.5rem;
-  max-height: 500px;
+  max-height: 300px;
 `;
 
 const UserView = () => {
