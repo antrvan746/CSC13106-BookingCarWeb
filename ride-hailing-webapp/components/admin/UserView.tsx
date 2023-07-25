@@ -64,7 +64,10 @@ const StyledRideHistoriesContainer = styled.div`
 `;
 
 interface RideHistory {
-
+  vehicalType: string,
+  startPlaceName: string,
+  endPlaceName: string,
+  fee: number
 }
 
 
