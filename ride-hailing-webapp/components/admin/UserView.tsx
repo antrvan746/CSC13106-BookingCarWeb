@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { Avatar } from "@mui/material";
+import { Avatar, Rating } from "@mui/material";
 import RideHistoryView from "./RideHistoryView";
 
 const StyledContainer = styled.div`
@@ -64,44 +64,50 @@ const StyledRideHistoriesContainer = styled.div`
 `;
 
 interface RideHistory {
-  vehicalType: string,
-  startPlaceName: string,
-  endPlaceName: string,
-  fee: number
+  vehicalType: string;
+  startPlaceName: string;
+  endPlaceName: string;
+  fee: number;
 }
-
 
 interface UserViewProps {
-  name: string,
-  phone: string,
-  email: string,
-  rating: number,
-
+  name: string;
+  phone: string;
+  email: string;
+  rating: number;
+  rides: RideHistory[];
 }
 
-const UserView : React.FC<UserViewProps> = () => {
+const UserView: React.FC<UserViewProps> = (props) => {
+  const { name, phone, email, rating, rides } = props;
+
   return (
     <StyledContainer>
       <StyledText> Thông tin khách hàng </StyledText>
 
       <Avatar sx={{ width: 100, height: 100, margin: "1rem" }} />
 
-      <StyledUserName> Tên tài khoản </StyledUserName>
+      <StyledUserName> {name} </StyledUserName>
 
       <StyledUserInfoContainer>
         <StyledInfoRow>
           <StyledInfoLabel> Số điện thoại </StyledInfoLabel>
-          <StyledInfoContent> 0983 741 587 </StyledInfoContent>
+          <StyledInfoContent> {phone} </StyledInfoContent>
         </StyledInfoRow>
 
         <StyledInfoRow>
           <StyledInfoLabel> Email </StyledInfoLabel>
-          <StyledInfoContent> tmt@gmail.com </StyledInfoContent>
+          <StyledInfoContent> {email} </StyledInfoContent>
         </StyledInfoRow>
 
         <StyledInfoRow>
           <StyledInfoLabel> Đánh giá </StyledInfoLabel>
-          <StyledInfoContent> ⭐ ⭐ ⭐ ⭐ ⭐ </StyledInfoContent>
+          <Rating
+            name="simple-controlled"
+            value={rating}
+            precision={0.5}
+            readOnly
+          />
         </StyledInfoRow>
       </StyledUserInfoContainer>
 
@@ -109,14 +115,7 @@ const UserView : React.FC<UserViewProps> = () => {
         <StyledRecentRidesText> Các chuyến đi gần đây </StyledRecentRidesText>
 
         <StyledRideHistoriesContainer>
-          <RideHistoryView />
-          <RideHistoryView />
-          <RideHistoryView />
-          <RideHistoryView />
-          <RideHistoryView />
-          <RideHistoryView />
-          <RideHistoryView />
-          <RideHistoryView />
+
         </StyledRideHistoriesContainer>
       </StyledRecentRidesContainer>
     </StyledContainer>

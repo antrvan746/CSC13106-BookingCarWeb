@@ -10,6 +10,7 @@ import {
 } from "@mui/x-data-grid";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+import UserView from "./UserView";
 
 interface UsersResponse {
   id: string;
@@ -20,12 +21,19 @@ interface UsersResponse {
 }
 
 interface UIUserDataItem {
-  index: number,
+  index: number;
   id: string;
   email: string | null;
   phone: string;
   name: string;
   is_vip: boolean;
+}
+
+interface RideHistory {
+  vehicalType: string;
+  startPlaceName: string;
+  endPlaceName: string;
+  fee: number;
 }
 
 const StyledContainer = styled.div`
@@ -63,20 +71,28 @@ const ListUser = () => {
     }
   };
 
-  const handleRowClick : GridEventListener<'rowClick'> = (params) => {
-    
-  }
+  const fetchUser = async (userId: string) => {
+    const response = await fetch(`/api/users/{userId}`);
+    try {
+      const data = response.json();
+      return data;
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleRowClick: GridEventListener<"rowClick"> = (params) => {};
 
   useEffect(() => {
     const fetchedUsers = fecthUsers();
     fetchedUsers.then((data) => {
       if (data) {
-        const handledData : UIUserDataItem[] = data.map(
-          (item : UsersResponse, idx : number) => ({
+        const handledData: UIUserDataItem[] = data.map(
+          (item: UsersResponse, idx: number) => ({
             ...item,
-            index: idx, 
+            index: idx,
           })
-        )
+        );
         setUsers(handledData);
       }
     });
@@ -91,18 +107,21 @@ const ListUser = () => {
   ];
 
   return (
-    <StyledContainer>
-      <DataGrid
-        rows={users}
-        columns={columns}
-        slots={{
-          toolbar: CustomToolBar,
-        }}
-        pagination
-        autoPageSize
-        onRowClick={handleRowClick}
-      />
-    </StyledContainer>
+    <StyledMainView>
+      <StyledContainer>
+        <DataGrid
+          rows={users}
+          columns={columns}
+          slots={{
+            toolbar: CustomToolBar,
+          }}
+          pagination
+          autoPageSize
+          onRowClick={handleRowClick}
+        />
+      </StyledContainer>
+      <UserView name="" phone="" email="" rating={5} rides={[]} />
+    </StyledMainView>
   );
 };
 
