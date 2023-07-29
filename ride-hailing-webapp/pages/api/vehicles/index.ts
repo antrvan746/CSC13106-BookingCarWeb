@@ -7,7 +7,7 @@ const vehicleSchema = z.object({
   plate_number: z.string().max(10),
   model: z.string(),
   color: z.string().optional(),
-  type: z.string().optional(),
+  type: z.string(),
 });
 
 export default async function handler(

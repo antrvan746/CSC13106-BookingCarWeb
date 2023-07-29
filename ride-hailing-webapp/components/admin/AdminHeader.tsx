@@ -53,6 +53,10 @@ interface AdminHeaderProps {
   isLoggedIn?: boolean;
 }
 
+interface SidebarProps {
+  isOpen: boolean;
+}
+
 const app = FirebaseApp;
 const auth = getAuth();
 
@@ -144,7 +148,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ isLoggedIn = true }) => {
     }
   };
 
-  const Sidebar: React.FC<AdminHeaderProps> = ({}) => {
+  const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
     if (isOpen) {
       return getList();
     }
@@ -159,7 +163,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ isLoggedIn = true }) => {
         </Link>
         <LogOutButton isLoggedIn={isLoggedIn} />
       </StyledContainer>
-      <Sidebar />
+      <Sidebar isOpen={isOpen} />
     </div>
   );
 };
