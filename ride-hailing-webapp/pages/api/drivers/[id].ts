@@ -13,8 +13,10 @@ const driverSchema = z.object({
 
 const driverIdSchema = z.string().uuid();
 
-
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   switch (req.method) {
     case "GET":
       try {
@@ -42,17 +44,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const updatedData = driverSchema.parse(req.body);
         const { driverId } = req.query;
         const id = driverIdSchema.parse(driverId);
-        const existingDriver = await prisma.driver.findUnique({ where: { id } });
-  
+        const existingDriver = await prisma.driver.findUnique({
+          where: { id },
+        });
+
         if (!existingDriver) {
           return res.status(404).json({ error: "Driver not found" });
         }
-  
+
         const updatedDriver = await prisma.driver.update({
           where: { id },
           data: updatedData,
         });
-  
+
         res.status(200).json(updatedDriver);
       } catch (error) {
         console.error(error);
@@ -60,12 +64,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
       break;
 
-    case "DELETE": 
+    case "DELETE":
       try {
         const { driverId } = req.query;
         const id = driverIdSchema.parse(driverId);
 
-        const existingDriver = await prisma.driver.findUnique({ where: { id: id } });
+        const existingDriver = await prisma.driver.findUnique({
+          where: { id: id },
+        });
 
         if (!existingDriver) {
           return res.status(404).json({ error: "Driver not found" });
@@ -83,7 +89,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       break;
 
     default:
-      res.setHeader('Allow', ['GET', "PUT", 'DELETE']);
+      res.setHeader("Allow", ["GET", "PUT", "DELETE"]);
       res.status(405).json({ error: `Method ${req.method} Not Allowed` });
       break;
   }

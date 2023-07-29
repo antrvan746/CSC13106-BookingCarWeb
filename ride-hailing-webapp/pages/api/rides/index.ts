@@ -1,18 +1,21 @@
 import { NextApiHandler } from "next";
-import { ride } from "@prisma/client"
+import { ride } from "@prisma/client";
 import { prismaClient } from "../../../libs/prisma";
 import { z } from "zod";
-import { RideGetQuery, RidePostBody, RidePutBody } from "../../../types/api/rides/RideZodSchema";
+import {
+  RideGetQuery,
+  RidePostBody,
+  RidePutBody,
+} from "../../../types/api/rides/RideZodSchema";
 
 interface ErrorRespond {
-  error: string
+  error: string;
 }
 
 interface RidesGetRespond {
-  data: ride[]
-  limit_per_page: number
+  data: ride[];
+  limit_per_page: number;
 }
-
 
 const query_limit = 41;
 
@@ -35,47 +38,53 @@ const handler: NextApiHandler = function (req, res) {
   }
 
   res.status(405).json({ error: "Invalid method" });
-}
+};
 
-
-const GET: NextApiHandler<RidesGetRespond | ErrorRespond> = async function (req, res) {
+const GET: NextApiHandler<RidesGetRespond | ErrorRespond> = async function (
+  req,
+  res
+) {
   const query = RideGetQuery.safeParse(req.query);
   if (query.success == false) {
     res.status(400).json({
-      error: query.error.name
+      error: query.error.name,
     });
     return;
   }
 
-  const userIdQuery = !(query.data.userId) ? {} : { user_id: query.data.userId };
-  const driverIdQuery = !(query.data.driverId) ? {} : { driver_id: query.data.driverId }
+  const userIdQuery = !query.data.userId ? {} : { user_id: query.data.userId };
+  const driverIdQuery = !query.data.driverId
+    ? {}
+    : { driver_id: query.data.driverId };
 
   try {
     const queryResult = await prismaClient.ride.findMany({
       where: {
         ...userIdQuery,
-        ...driverIdQuery
+        ...driverIdQuery,
       },
       skip: query.data.page * query_limit,
-      take: query_limit
+      take: query_limit,
     });
 
     res.status(200).json({
       data: queryResult,
-      limit_per_page: query_limit
+      limit_per_page: query_limit,
     });
     return;
   } catch (e: any) {
     res.status(500).json({ error: "Query error" });
   }
-}
+};
 
-
-const POST: NextApiHandler<ErrorRespond | { data: ride }> = async function name(req, res) {
+const POST: NextApiHandler<ErrorRespond | { data: ride }> = async function name(
+  req,
+  res
+) {
   const body = RidePostBody.safeParse(req.body);
   if (!body.success) {
     res.status(400).json({
-      error: body.error.message
+      error: body.error.message,
     });
     return;
   }
@@ -84,19 +93,20 @@ const POST: NextApiHandler<ErrorRespond | { data: ride }> = async function name(
     const result = await prismaClient.ride.create({
       data: {
         ...body.data,
-        status: "BOOKED"
-      }
+        status: "BOOKED",
+      },
     });
     res.status(201).json({ data: result });
-    return
+    return;
   } catch (e: any) {
     return res.status(500).json({ error: e.message || "some error occured" });
   }
+};
 
-}
-
-
-const PUT: NextApiHandler<ErrorRespond | { data: ride }> = async function name(req, res) {
+const PUT: NextApiHandler<ErrorRespond | { data: ride }> = async function name(
+  req,
+  res
+) {
   const body = RidePutBody.safeParse(req.body);
   if (!body.success) {
     res.json({ error: body.error.message });
@@ -107,19 +117,20 @@ const PUT: NextApiHandler<ErrorRespond | { data: ride }> = async function name(r
     const result = await prismaClient.ride.update({
       where: { id: body.data.rideId },
       data: {
-        ...body.data
-      }
+        ...body.data,
+      },
     });
     res.status(200).json({ data: result });
     return;
   } catch (e: any) {
-    res.status(500).json({ error: e.message || "Some error" })
+    res.status(500).json({ error: e.message || "Some error" });
   }
+};
 
-}
-
-
-const DELETE: NextApiHandler<ErrorRespond | { data: ride }> = async function (req, res) {
+const DELETE: NextApiHandler<ErrorRespond | { data: ride }> = async function (
+  req,
+  res
+) {
   const body = RidePutBody.safeParse(req.body);
   if (!body.success) {
     res.json({ error: body.error.message });
@@ -127,13 +138,13 @@ const DELETE: NextApiHandler<ErrorRespond | { data: ride }> = async function (re
   }
   try {
     const result = await prismaClient.ride.delete({
-      where: { id: body.data.rideId }
+      where: { id: body.data.rideId },
     });
     res.status(200).json({ data: result });
     return;
   } catch (e: any) {
-    res.status(500).json({ error: e.message || "some error occured" })
+    res.status(500).json({ error: e.message || "some error occured" });
   }
-}
+};
 
 export default handler;
