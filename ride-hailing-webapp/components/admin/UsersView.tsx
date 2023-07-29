@@ -20,6 +20,27 @@ interface UsersResponse {
   is_vip: boolean;
 }
 
+interface RideHistoryResponse {
+  rideId: string;
+  startPlaceId: string;
+  startPlaceName: string;
+  endPlaceId: string;
+  endPlaceName: string;
+  fee: number;
+  rating: Rating;
+  vehicle: Vehicle;
+}
+
+interface Vehicle {
+  plateNumber: string;
+  model: string;
+  type: string;
+}
+
+interface Rating {
+  rating: number;
+}
+
 interface UIUserDataItem {
   index: number;
   id: string;
@@ -60,6 +81,11 @@ const CustomToolBar = () => {
 
 const ListUser = () => {
   const [users, setUsers] = useState<UsersResponse[]>([]);
+  const [userName, setUserName] = useState("");
+  const [userEmail, setUserEmail] = useState("");
+  const [userPhone, setUserPhone] = useState("");
+  const [userRidesHistory, setUserRidesHistory] = useState<RideHistory[]>([]);
+  const [rating, setUserRating] = useState("");
 
   const fecthUsers = async () => {
     const response = await fetch("/api/users");
@@ -81,12 +107,20 @@ const ListUser = () => {
     }
   };
 
-  const handleRowClick: GridEventListener<"rowClick"> = (params) => {};
+  const handleRowClick: GridEventListener<"rowClick"> = (params) => {
+    console.log(params.row);
+    if (params.row) {
+      setUserName(params.row.name);
+      setUserPhone(params.row.phone);
+      setUserEmail(params.row.email);
+    }
+  };
 
   useEffect(() => {
     const fetchedUsers = fecthUsers();
     fetchedUsers.then((data) => {
       if (data) {
+        console.log(data);
         const handledData: UIUserDataItem[] = data.map(
           (item: UsersResponse, idx: number) => ({
             ...item,
@@ -120,7 +154,13 @@ const ListUser = () => {
           onRowClick={handleRowClick}
         />
       </StyledContainer>
-      <UserView name="" phone="" email="" rating={5} rides={[]} />
+      <UserView
+        name={userName}
+        phone={userPhone}
+        email={userEmail}
+        rating={5}
+        rides={[]}
+      />
     </StyledMainView>
   );
 };

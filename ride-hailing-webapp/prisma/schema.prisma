@@ -59,7 +59,7 @@ model vehicle {
   plate_number String  @db.VarChar(10)
   model        String
   color        String?
-  type         String?
+  type         String
 
   driver driver @relation("vehicle_belong_to", fields: [driver_id], references: [id])
   ride   ride[] @relation("ride_vehicle")

@@ -10,6 +10,7 @@ const StyledContainer = styled.div`
   background-color: #f9f9f9;
   border-radius: 5px;
   margin: 3rem 2rem 2rem 0.5rem;
+  min-height: 500px;
 `;
 
 const StyledText = styled.span`

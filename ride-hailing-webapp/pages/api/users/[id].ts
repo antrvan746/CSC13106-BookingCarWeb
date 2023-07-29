@@ -27,14 +27,27 @@ export default async function handler(
           include : {
             rides: {
               select: {
-                vehicle: true,
+                id: true,
+                vehicle: {
+                  select: {
+                    plate_number: true,
+                    model: true,
+                    type: true,
+                  }
+                },
                 fee: true,
                 start_google_place_id: true,
                 start_place_name: true,
                 end_google_place_id: true,
-                end_place_name: true
+                end_place_name: true,
+                rating : {
+                  select: {
+                    driver_rating: true
+                  }
+                }
               }
-            }
+            },
+            
           }
         });
         res.status(200).json(user);
