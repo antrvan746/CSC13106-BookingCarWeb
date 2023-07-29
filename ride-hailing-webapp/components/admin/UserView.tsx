@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { Avatar } from "@mui/material";
+import { Avatar, Rating } from "@mui/material";
 import RideHistoryView from "./RideHistoryView";
 
 const StyledContainer = styled.div`
@@ -10,6 +10,7 @@ const StyledContainer = styled.div`
   background-color: #f9f9f9;
   border-radius: 5px;
   margin: 3rem 2rem 2rem 0.5rem;
+  min-height: 500px;
 `;
 
 const StyledText = styled.span`
@@ -60,32 +61,54 @@ const StyledRecentRidesContainer = styled.div`
 const StyledRideHistoriesContainer = styled.div`
   overflow-y: scroll;
   padding: 0.5rem;
-  max-height: 500px;
+  max-height: 300px;
 `;
 
-const UserView = () => {
+interface RideHistory {
+  vehicalType: string;
+  startPlaceName: string;
+  endPlaceName: string;
+  fee: number;
+}
+
+interface UserViewProps {
+  name: string;
+  phone: string;
+  email: string;
+  rating: number;
+  rides: RideHistory[];
+}
+
+const UserView: React.FC<UserViewProps> = (props) => {
+  const { name, phone, email, rating, rides } = props;
+
   return (
     <StyledContainer>
       <StyledText> Thông tin khách hàng </StyledText>
 
       <Avatar sx={{ width: 100, height: 100, margin: "1rem" }} />
 
-      <StyledUserName> Tên tài khoản </StyledUserName>
+      <StyledUserName> {name} </StyledUserName>
 
       <StyledUserInfoContainer>
         <StyledInfoRow>
           <StyledInfoLabel> Số điện thoại </StyledInfoLabel>
-          <StyledInfoContent> 0983 741 587 </StyledInfoContent>
+          <StyledInfoContent> {phone} </StyledInfoContent>
         </StyledInfoRow>
 
         <StyledInfoRow>
           <StyledInfoLabel> Email </StyledInfoLabel>
-          <StyledInfoContent> tmt@gmail.com </StyledInfoContent>
+          <StyledInfoContent> {email} </StyledInfoContent>
         </StyledInfoRow>
 
         <StyledInfoRow>
           <StyledInfoLabel> Đánh giá </StyledInfoLabel>
-          <StyledInfoContent> ⭐ ⭐ ⭐ ⭐ ⭐ </StyledInfoContent>
+          <Rating
+            name="simple-controlled"
+            value={rating}
+            precision={0.5}
+            readOnly
+          />
         </StyledInfoRow>
       </StyledUserInfoContainer>
 
@@ -93,14 +116,7 @@ const UserView = () => {
         <StyledRecentRidesText> Các chuyến đi gần đây </StyledRecentRidesText>
 
         <StyledRideHistoriesContainer>
-          <RideHistoryView />
-          <RideHistoryView />
-          <RideHistoryView />
-          <RideHistoryView />
-          <RideHistoryView />
-          <RideHistoryView />
-          <RideHistoryView />
-          <RideHistoryView />
+
         </StyledRideHistoriesContainer>
       </StyledRecentRidesContainer>
     </StyledContainer>

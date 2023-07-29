@@ -1,11 +1,32 @@
 html,
 body {
-    padding: 0;
-    margin: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 0;
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
-
 img {
-    display: block;
+  display: block;
+}
+
+div {
+  &::-webkit-scrollbar {
+    width: 0.5em;
+    background-color: #f9f9f9;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 5px;
+  }
+}
+
+&::-webkit-scrollbar {
+  width: 0.5em;
+  background-color: #f9f9f9;
+}
+
+&::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 5px;
 }

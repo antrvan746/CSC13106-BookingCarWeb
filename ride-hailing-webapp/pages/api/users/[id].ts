@@ -24,6 +24,31 @@ export default async function handler(
           where: {
             id: userId,
           },
+          include : {
+            rides: {
+              select: {
+                id: true,
+                vehicle: {
+                  select: {
+                    plate_number: true,
+                    model: true,
+                    type: true,
+                  }
+                },
+                fee: true,
+                start_google_place_id: true,
+                start_place_name: true,
+                end_google_place_id: true,
+                end_place_name: true,
+                rating : {
+                  select: {
+                    driver_rating: true
+                  }
+                }
+              }
+            },
+            
+          }
         });
         res.status(200).json(user);
       } catch (error) {
@@ -43,7 +68,6 @@ export default async function handler(
             email: user.email,
             phone: user.phone,
             is_vip: user.isVip,
-            rating: user.rating,
           },
         });
         res.status(200).json(updatedUser);
