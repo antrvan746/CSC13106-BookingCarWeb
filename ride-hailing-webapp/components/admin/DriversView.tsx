@@ -116,7 +116,6 @@ const ListDriver = () => {
   const handleRowClick: GridEventListener<"rowClick"> = async (params) => {
     const rides: RideHistoryResponse[] = await fetchDriverRides(params.row.id);
     const rating = await fetchDriverRating(params.row.id);
-    console.log(rating)
     if (params.row) {
       setDriverName(params.row.name);
       setDriverPhone(params.row.phone);
