@@ -21,24 +21,19 @@ interface UsersResponse {
 }
 
 interface RideHistoryResponse {
-  rideId: string;
-  startPlaceId: string;
-  startPlaceName: string;
-  endPlaceId: string;
-  endPlaceName: string;
+  id: string;
+  start_place_id: string;
+  start_place_name: string;
+  end_place_id: string;
+  end_place_name: string;
   fee: number;
-  rating: Rating;
   vehicle: Vehicle;
 }
 
 interface Vehicle {
-  plateNumber: string;
+  plate_number: string;
   model: string;
   type: string;
-}
-
-interface Rating {
-  rating: number;
 }
 
 interface UIUserDataItem {
@@ -51,7 +46,8 @@ interface UIUserDataItem {
 }
 
 interface RideHistory {
-  vehicalType: string;
+  id: string;
+  vehicleType: string;
   startPlaceName: string;
   endPlaceName: string;
   fee: number;
@@ -85,7 +81,7 @@ const ListUser = () => {
   const [userEmail, setUserEmail] = useState("");
   const [userPhone, setUserPhone] = useState("");
   const [userRidesHistory, setUserRidesHistory] = useState<RideHistory[]>([]);
-  const [rating, setUserRating] = useState("");
+  const [userRating, setUserRating] = useState(5.0);
 
   const fecthUsers = async () => {
     const response = await fetch("/api/users");
@@ -97,22 +93,49 @@ const ListUser = () => {
     }
   };
 
-  const fetchUser = async (userId: string) => {
-    const response = await fetch(`/api/users/{userId}`);
+  const fetchUserRides = async (userId: string) => {
+    const response = await fetch(`/api/users/rides?user_id=${userId}`);
     try {
-      const data = response.json();
+      const data = await response.json();
       return data;
     } catch (err) {
       console.log(err);
     }
   };
 
-  const handleRowClick: GridEventListener<"rowClick"> = (params) => {
-    console.log(params.row);
+  const fetchUserRating = async (userId: string) => {
+    const response = await fetch(`/api/users/rating?user_id=${userId}`);
+    try {
+      const data = await response.json();
+      return data;
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleRowClick: GridEventListener<"rowClick"> = async (params) => {
+    const rides: RideHistoryResponse[] = await fetchUserRides(params.row.id);
+    const rating = await fetchUserRating(params.row.id);
+
     if (params.row) {
       setUserName(params.row.name);
       setUserPhone(params.row.phone);
       setUserEmail(params.row.email);
+    }
+    if (rides) {
+      const rideInfos: RideHistory[] = rides.map((item) => {
+        return {
+          id: item.id,
+          vehicleType: item.vehicle.type,
+          startPlaceName: item.start_place_name,
+          endPlaceName: item.end_place_name,
+          fee: item.fee,
+        };
+      });
+      setUserRidesHistory(rideInfos);
+    }
+    if (rating) {
+      setUserRating(rating);
     }
   };
 
@@ -158,8 +181,8 @@ const ListUser = () => {
         name={userName}
         phone={userPhone}
         email={userEmail}
-        rating={5}
-        rides={[]}
+        rating={userRating}
+        rides={userRidesHistory}
       />
     </StyledMainView>
   );

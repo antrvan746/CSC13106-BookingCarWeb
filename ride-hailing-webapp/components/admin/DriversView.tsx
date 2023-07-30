@@ -18,12 +18,36 @@ interface DriverResponse {
   name: string;
 }
 
+interface RideHistoryResponse {
+  id: string;
+  start_place_id: string;
+  start_place_name: string;
+  end_place_id: string;
+  end_place_name: string;
+  fee: number;
+  vehicle: Vehicle;
+}
+
+interface Vehicle {
+  plate_number: string;
+  model: string;
+  type: string;
+}
+
 interface UIDriverDataItem {
   id: string;
   phone: string;
   email: string | null;
   name: string;
   index: number;
+}
+
+interface RideHistory {
+  id: string;
+  vehicleType: string;
+  startPlaceName: string;
+  endPlaceName: string;
+  fee: number;
 }
 
 const StyledContainer = styled.div`
@@ -51,6 +75,14 @@ const CustomToolBar = () => {
 const ListDriver = () => {
   const [drivers, setDrivers] = useState<DriverResponse[]>([]);
 
+  const [driverName, setDriverName] = useState("");
+  const [driverEmail, setDriverEmail] = useState("");
+  const [driverPhone, setDriverPhone] = useState("");
+  const [driverRidesHistory, setDriverRidesHistory] = useState<RideHistory[]>(
+    []
+  );
+  const [driverRating, setDriverRating] = useState(5.0);
+
   const fecthDrivers = async () => {
     const response = await fetch("/api/drivers");
     try {
@@ -61,7 +93,51 @@ const ListDriver = () => {
     }
   };
 
-  const handleRowClick: GridEventListener<"rowClick"> = (params) => {};
+  const fetchDriverRides = async (driverId: string) => {
+    const response = await fetch(`/api/drivers/rides?driver_id=${driverId}`);
+    try {
+      const data = await response.json();
+      return data;
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const fetchDriverRating = async (driverId: string) => {
+    const response = await fetch(`/api/drivers/rating?driver_id=${driverId}`);
+    try {
+      const data = await response.json();
+      return data;
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleRowClick: GridEventListener<"rowClick"> = async (params) => {
+    const rides: RideHistoryResponse[] = await fetchDriverRides(params.row.id);
+    const rating = await fetchDriverRating(params.row.id);
+    console.log(rating)
+    if (params.row) {
+      setDriverName(params.row.name);
+      setDriverPhone(params.row.phone);
+      setDriverEmail(params.row.email);
+    }
+    if (rides) {
+      const rideInfos: RideHistory[] = rides.map((item) => {
+        return {
+          id: item.id,
+          vehicleType: item.vehicle.type,
+          startPlaceName: item.start_place_name,
+          endPlaceName: item.end_place_name,
+          fee: item.fee,
+        };
+      });
+      setDriverRidesHistory(rideInfos);
+    }
+    if (rating) {
+      setDriverRating(rating);
+    }
+  };
 
   useEffect(() => {
     const fetchedDrivers = fecthDrivers();
@@ -99,7 +175,13 @@ const ListDriver = () => {
           onRowClick={handleRowClick}
         />
       </StyledContainer>
-      <UserView name="" phone="" email="" rating={5} rides={[]} />
+      <UserView
+        name={driverName}
+        phone={driverPhone}
+        email={driverEmail}
+        rating={driverRating}
+        rides={driverRidesHistory}
+      />
     </StyledMainView>
   );
 };

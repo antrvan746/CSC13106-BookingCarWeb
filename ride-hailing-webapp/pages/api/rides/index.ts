@@ -8,11 +8,11 @@ import {
   RidePutBody,
 } from "../../../types/api/rides/RideZodSchema";
 
-interface ErrorRespond {
+interface ErrorRespone {
   error: string;
 }
 
-interface RidesGetRespond {
+interface RidesGetRespone {
   data: ride[];
   limit_per_page: number;
 }
@@ -40,7 +40,7 @@ const handler: NextApiHandler = function (req, res) {
   res.status(405).json({ error: "Invalid method" });
 };
 
-const GET: NextApiHandler<RidesGetRespond | ErrorRespond> = async function (
+const GET: NextApiHandler<RidesGetRespone | ErrorRespone> = async function (
   req,
   res
 ) {
@@ -77,7 +77,7 @@ const GET: NextApiHandler<RidesGetRespond | ErrorRespond> = async function (
   }
 };
 
-const POST: NextApiHandler<ErrorRespond | { data: ride }> = async function name(
+const POST: NextApiHandler<ErrorRespone | { data: ride }> = async function name(
   req,
   res
 ) {
@@ -103,7 +103,7 @@ const POST: NextApiHandler<ErrorRespond | { data: ride }> = async function name(
   }
 };
 
-const PUT: NextApiHandler<ErrorRespond | { data: ride }> = async function name(
+const PUT: NextApiHandler<ErrorRespone | { data: ride }> = async function name(
   req,
   res
 ) {
@@ -127,7 +127,7 @@ const PUT: NextApiHandler<ErrorRespond | { data: ride }> = async function name(
   }
 };
 
-const DELETE: NextApiHandler<ErrorRespond | { data: ride }> = async function (
+const DELETE: NextApiHandler<ErrorRespone | { data: ride }> = async function (
   req,
   res
 ) {

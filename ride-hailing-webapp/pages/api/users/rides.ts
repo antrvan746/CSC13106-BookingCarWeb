@@ -12,7 +12,7 @@ export default async function handler(
     case "GET":
       try {
         const IdentityType = z.string();
-        const userId = IdentityType.parse(req);
+        const userId = IdentityType.parse(req.query.user_id);
 
         const userRides = await prisma.ride.findMany({
           where: {

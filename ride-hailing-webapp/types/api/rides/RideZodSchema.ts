@@ -1,12 +1,16 @@
-import {z} from "zod";
+import { z } from "zod";
 
-
-const RideGetQuery = z.object({
-  rideId:z.string().optional(),
-  userId: z.string().optional(),
-  driverId: z.string().optional(),
-  page: z.coerce.number().default(0)
-}).refine(val => !!val.driverId || !!val.userId || !!val.rideId, "At least 1 id is needed");
+const RideGetQuery = z
+  .object({
+    rideId: z.string().optional(),
+    userId: z.string().optional(),
+    driverId: z.string().optional(),
+    page: z.coerce.number().default(0),
+  })
+  .refine(
+    (val) => !!val.driverId || !!val.userId || !!val.rideId,
+    "At least 1 id is needed"
+  );
 
 const RidePostBody = z.object({
   user_id: z.string(),
@@ -16,24 +20,26 @@ const RidePostBody = z.object({
   payment_type: z.union([
     z.literal("CASH"),
     z.literal("CARD"),
-    z.literal("E_WALLET")
+    z.literal("E_WALLET"),
   ]),
   start_google_place_id: z.string(),
+  start_place_name: z.string().optional(),
   end_google_place_id: z.string(),
-  book_time: z.coerce.date()
+  end_place_name: z.string().optional(),
+  book_time: z.coerce.date(),
 });
 
 const RidePutBody = z.object({
   rideId: z.string(),
   fee: z.number().optional(),
+  start_google_place_id: z.string().optional(),
   start_place_name: z.string().optional(),
+  end_google_place_id: z.string().optional(),
   end_place_name: z.string().optional(),
   arrive_time: z.coerce.date().optional(),
-  status: z.union([
-    z.literal("BOOKED"),
-    z.literal("CANCELED"),
-    z.literal("FINISED")
-  ]).optional()
+  status: z
+    .union([z.literal("BOOKED"), z.literal("CANCELED"), z.literal("FINISED")])
+    .optional(),
 });
 
-export {RideGetQuery,RidePostBody,RidePutBody}
+export { RideGetQuery, RidePostBody, RidePutBody };

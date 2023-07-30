@@ -12,19 +12,27 @@ export default async function handler(
     case "GET":
       try {
         const IdentityType = z.string();
-        const userId = IdentityType.parse(req);
+        const userId = IdentityType.parse(req.query.user_id);
 
-        const result = await prisma.rating.findFirstOrThrow({
+        const result = await prisma.rating.findMany({
           where: {
             ride: {
-                user_id: userId
-            }
+              user_id: userId,
+            },
           },
           select: {
             driver_rating: true,
           },
         });
-        res.status(200).json(result);
+
+        let rating = 5;
+        if (result.length > 0) {
+          rating = result
+            .map((item) => item.driver_rating)
+            .reduce((partialSum, a) => partialSum + a, 0);
+          rating /= result.length;
+        }
+        res.status(200).json(rating);
       } catch (err) {
         res.status(500).json(err);
       }

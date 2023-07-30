@@ -12,7 +12,7 @@ export default async function handler(
     case "GET":
       try {
         const IdentityType = z.string();
-        const driverId = IdentityType.parse(req);
+        const driverId = IdentityType.parse(req.query.driver_id);
 
         const result = await prisma.rating.findMany({
           where: {
@@ -25,7 +25,15 @@ export default async function handler(
           },
         });
 
-        res.status(200).json(result);
+        let rating = 5;
+        if (result.length > 0) {
+          rating = result
+            .map((item) => item.user_rating)
+            .reduce((partialSum, a) => partialSum + a, 0);
+          rating /= result.length;
+        }
+        console.log(rating);
+        res.status(200).json(rating);
       } catch (err) {
         res.status(500).json(err);
       }

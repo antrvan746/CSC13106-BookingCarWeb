@@ -12,7 +12,7 @@ export default async function handler(
     case "GET":
       try {
         const IdentityType = z.string();
-        const driverId = IdentityType.parse(req);
+        const driverId = IdentityType.parse(req.query.driver_id);
 
         const driverRides = await prisma.ride.findMany({
           where: {

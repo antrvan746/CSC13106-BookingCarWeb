@@ -43,13 +43,18 @@ const StyledInfoRow = styled.div`
   padding: 3px;
   width: 100%;
   z-index: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const StyledInfoLabel = styled.span`
   font-weight: bold;
 `;
 
-const StyledInfoContent = styled.span``;
+const StyledInfoContent = styled.span`
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
 
 const StyledRecentRidesContainer = styled.div`
   display: flex;
@@ -65,7 +70,8 @@ const StyledRideHistoriesContainer = styled.div`
 `;
 
 interface RideHistory {
-  vehicalType: string;
+  id: string;
+  vehicleType: string;
   startPlaceName: string;
   endPlaceName: string;
   fee: number;
@@ -81,6 +87,15 @@ interface UserViewProps {
 
 const UserView: React.FC<UserViewProps> = (props) => {
   const { name, phone, email, rating, rides } = props;
+
+  const listRides = rides.map((item) => (
+    <RideHistoryView
+      vehicleType={item.vehicleType}
+      startPlaceName={item.startPlaceName}
+      endPlaceName={item.endPlaceName}
+      fee={item.fee}
+    />
+  ));
 
   return (
     <StyledContainer>
@@ -114,10 +129,7 @@ const UserView: React.FC<UserViewProps> = (props) => {
 
       <StyledRecentRidesContainer>
         <StyledRecentRidesText> Các chuyến đi gần đây </StyledRecentRidesText>
-
-        <StyledRideHistoriesContainer>
-
-        </StyledRideHistoriesContainer>
+        <StyledRideHistoriesContainer>{listRides}</StyledRideHistoriesContainer>
       </StyledRecentRidesContainer>
     </StyledContainer>
   );
