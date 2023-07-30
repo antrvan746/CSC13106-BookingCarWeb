@@ -14,6 +14,7 @@ import {
   SelectChangeEvent,
   FormGroup,
   Button,
+  Autocomplete,
 } from "@mui/material";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import MotorcycleIcon from "../../assets/motorcycle.png";
@@ -30,7 +31,7 @@ import MoneyIcon from "@mui/icons-material/Money";
 
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { Autocomplete } from "@react-google-maps/api";
+import encodeRFC5987ValueChars from "../../utils/URLEncoder";
 
 const StyledContainer = styled.div`
   display: flex;
@@ -66,46 +67,27 @@ interface BookingFormData {
   checkedPayment: string;
 }
 
+interface PlaceInfoResponse {
+  lat: string;
+  lon: string;
+  display_name: string;
+  display_address: string;
+}
+
+const LOCATION_IQ_KEY =
+  process.env.LOCATION_IQ_TOKEN || "pk.b5db726701a914af3d4f2e075b07dabb";
+
 const BookingForm = () => {
-  const [age, setAge] = React.useState("");
   const [selectedVehicle, setSelectedVehicle] = React.useState("motorcycle");
   const [value, setValue] = React.useState<Dayjs | null>(dayjsFunc());
 
-  const handleVehicleChange = (event: any) => {
-    console.log(event.target.value);
-    setSelectedVehicle(event.target.value);
-  };
+  const [startPlaceInput, setStartPlace] = useState("");
+  const [endPlaceInput, setEndPlace] = useState("");
 
-  const [startPlace, setStartPlace] =
-    useState<google.maps.places.Autocomplete | null>(null);
-  const [endPlace, setEndPlace] =
-    useState<google.maps.places.Autocomplete | null>(null);
-
-  const onStartPlaceLoad = (autocomplete: google.maps.places.Autocomplete) => {
-    console.log("Autocomplete start place: ", autocomplete);
-    setStartPlace(autocomplete);
-  };
-
-  const onEndPlaceLoad = (autocomplete: google.maps.places.Autocomplete) => {
-    console.log("Autocomplete end place: ", autocomplete);
-    setEndPlace(autocomplete);
-  };
-
-  const onStartPlaceChange = () => {
-    if (startPlace !== null) {
-      console.log(startPlace.getPlace());
-    } else {
-      console.log("Autocomplete is not loaded yet!");
-    }
-  };
-
-  const onEndPlaceChange = () => {
-    if (endPlace !== null) {
-      console.log(endPlace.getPlace());
-    } else {
-      console.log("Autocomplete is not loaded yet!");
-    }
-  };
+  const [suggestingStartPlace, setSuggestingStartPlaces] = useState<string[]>(
+    []
+  );
+  const [suggestingEndPlace, setSuggestingEndPlaces] = useState<string[]>([]);
 
   const [formData, setFormData] = useState<BookingFormData>({
     startPlace: "",
@@ -120,10 +102,49 @@ const BookingForm = () => {
 
   const [errors, setErrors] = useState<Partial<BookingFormData>>({});
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleVehicleChange = (event: any) => {
+    console.log(event.target.value);
+    setSelectedVehicle(event.target.value);
+  };
+
+  const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
     setErrors((prevErrors) => ({ ...prevErrors, [name]: undefined }));
+
+    try {
+      if (name === "startPlace") {
+        if (value !== "") {
+          const res = await fetch(
+            `https://api.locationiq.com/v1/autocomplete?key=${LOCATION_IQ_KEY}&q=${value}&limit=5&dedupe=1&countrycodes=vn`
+          );
+          const resBody: PlaceInfoResponse[] = await res.json();
+          if (resBody) {
+            const suggestingPlaces: string[] = resBody.map(
+              (item) => item.display_name
+            );
+            setSuggestingStartPlaces(suggestingPlaces);
+          }
+        }
+        setStartPlace(value);
+      } else if (name === "endPlace") {
+        if (value !== "") {
+          const res = await fetch(
+            `https://api.locationiq.com/v1/autocomplete?key=${LOCATION_IQ_KEY}&q=${encodeRFC5987ValueChars(value)}&limit=5&dedupe=1&countrycodes=vn`
+          );
+          const resBody: PlaceInfoResponse[] = await res.json();
+          if (resBody) {
+            const suggestingPlaces: string[] = resBody.map(
+              (item) => item.display_name
+            );
+            setSuggestingEndPlaces(suggestingPlaces);
+          }
+        }
+        setEndPlace(value);
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const handleSubmit = async () => {
@@ -177,21 +198,23 @@ const BookingForm = () => {
             }}
           >
             <Autocomplete
-              onLoad={onStartPlaceLoad}
-              onPlaceChanged={onStartPlaceChange}
-            >
-              <TextField
-                label="Điểm đi"
-                size="small"
-                variant="outlined"
-                value={formData.startPlace}
-                onChange={handleChange}
-                error={!!errors.startPlace}
-                helperText={errors.startPlace}
-                autoFocus
-                fullWidth
-              />
-            </Autocomplete>
+              freeSolo
+              options={suggestingStartPlace}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Điểm đi"
+                  size="small"
+                  name="startPlace"
+                  variant="outlined"
+                  value={formData.startPlace}
+                  onChange={handleChange}
+                  error={!!errors.startPlace}
+                  helperText={errors.startPlace}
+                  fullWidth
+                />
+              )}
+            />
           </div>
         </StyledPlaceInput>
 
@@ -209,20 +232,23 @@ const BookingForm = () => {
             }}
           >
             <Autocomplete
-              onLoad={onEndPlaceLoad}
-              onPlaceChanged={onEndPlaceChange}
-            >
-              <TextField
-                label="Điểm đến"
-                size="small"
-                variant="outlined"
-                value={formData.endPlace}
-                onChange={handleChange}
-                error={!!errors.endPlace}
-                helperText={errors.endPlace}
-                fullWidth
-              />
-            </Autocomplete>
+              freeSolo
+              options={suggestingEndPlace}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Điểm đến"
+                  name="endPlace"
+                  size="small"
+                  variant="outlined"
+                  value={formData.endPlace}
+                  onChange={handleChange}
+                  error={!!errors.endPlace}
+                  helperText={errors.endPlace}
+                  fullWidth
+                />
+              )}
+            />
           </div>
         </StyledPlaceInput>
 
