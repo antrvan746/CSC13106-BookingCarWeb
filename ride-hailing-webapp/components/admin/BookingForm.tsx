@@ -116,7 +116,7 @@ const BookingForm = () => {
       if (name === "startPlace") {
         if (value !== "") {
           const res = await fetch(
-            `https://api.locationiq.com/v1/autocomplete?key=${LOCATION_IQ_KEY}&q=${value}&limit=5&dedupe=1&countrycodes=vn`
+            `https://api.locationiq.com/v1/autocomplete?key=${LOCATION_IQ_KEY}&q=${encodeRFC5987ValueChars(value)}&limit=5&dedupe=1&countrycodes=vn`
           );
           const resBody: PlaceInfoResponse[] = await res.json();
           if (resBody) {
