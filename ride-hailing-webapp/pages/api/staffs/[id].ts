@@ -52,12 +52,12 @@ export default async function handler(
         const staffId = z.string().uuid().parse(req.query.id);
         const deletedStaff = await prisma.staff.delete({
           where: {
-            id: staffId
-          }
-        })
-        res.status(200).json({ deletedStaff })
+            id: staffId,
+          },
+        });
+        res.status(200).json({ deletedStaff });
       } catch (error) {
-        res.status(500).json({ message: error })
+        res.status(500).json({ message: error });
       }
     default:
       res.status(400).json({ message: "Invalid request method" });

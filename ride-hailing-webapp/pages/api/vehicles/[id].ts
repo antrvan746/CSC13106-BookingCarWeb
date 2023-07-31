@@ -14,7 +14,10 @@ const vehicleSchema = z.object({
   type: z.string().optional(),
 });
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   switch (req.method) {
     case "GET":
       try {
@@ -37,36 +40,40 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
       break;
 
-      case "PUT":
-        try {
-          const updatedData = vehicleSchema.parse(req.body);
-          const { vehiclesId } = req.query;
-          console.log("Vehicle id is: ",vehiclesId);
-          console.log("Updated data is: ",updatedData);
+    case "PUT":
+      try {
+        const updatedData = vehicleSchema.parse(req.body);
+        const { vehiclesId } = req.query;
+        console.log("Vehicle id is: ", vehiclesId);
+        console.log("Updated data is: ", updatedData);
 
-          const id = vehicleIdSchema.parse(vehiclesId);
-          const existingVehicle = await prisma.vehicle.findUnique({ where: { id } });
-            
-          if (!existingVehicle) {
-            return res.status(404).json({ error: 'Vehicle not found' });
-          }
-    
-          const updatedVehicle = await prisma.vehicle.update({
-            where: { id },
-            data: updatedData,
-          });
-          res.status(200).json(updatedVehicle);
-        } catch (error) {
-          console.error(error);
-          res.status(400).json({ error: 'Invalid request payload' });
+        const id = vehicleIdSchema.parse(vehiclesId);
+        const existingVehicle = await prisma.vehicle.findUnique({
+          where: { id },
+        });
+
+        if (!existingVehicle) {
+          return res.status(404).json({ error: "Vehicle not found" });
         }
-        break;
+
+        const updatedVehicle = await prisma.vehicle.update({
+          where: { id },
+          data: updatedData,
+        });
+        res.status(200).json(updatedVehicle);
+      } catch (error) {
+        console.error(error);
+        res.status(400).json({ error: "Invalid request payload" });
+      }
+      break;
 
     case "DELETE":
       try {
         const { vehiclesId } = req.query;
         const id = vehicleIdSchema.parse(vehiclesId);
-        const existingVehicle = await prisma.vehicle.findUnique({ where: { id: id } });
+        const existingVehicle = await prisma.vehicle.findUnique({
+          where: { id: id },
+        });
 
         if (!existingVehicle) {
           return res.status(404).json({ error: "Vehicle not found" });

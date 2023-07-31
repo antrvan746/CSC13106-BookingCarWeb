@@ -24,7 +24,7 @@ export default async function handler(
 
         const users = await prisma.user.findMany({
           skip: skip,
-          take: take
+          take: take,
         });
         res.status(200).json(users);
       } catch (error) {
