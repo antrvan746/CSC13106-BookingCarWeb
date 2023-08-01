@@ -114,9 +114,11 @@ const BookingForm = () => {
 
     try {
       if (name === "startPlace") {
-        if (value !== "") {
+        if (value !== "" && value.length % 3 === 0) {
           const res = await fetch(
-            `https://api.locationiq.com/v1/autocomplete?key=${LOCATION_IQ_KEY}&q=${encodeRFC5987ValueChars(value)}&limit=5&dedupe=1&countrycodes=vn`
+            `https://api.locationiq.com/v1/autocomplete?key=${LOCATION_IQ_KEY}&q=${encodeRFC5987ValueChars(
+              value
+            )}&limit=5&dedupe=1&countrycodes=vn`
           );
           const resBody: PlaceInfoResponse[] = await res.json();
           if (resBody) {
@@ -128,9 +130,11 @@ const BookingForm = () => {
         }
         setStartPlace(value);
       } else if (name === "endPlace") {
-        if (value !== "") {
+        if (value !== "" && value.length % 3 == 0) {
           const res = await fetch(
-            `https://api.locationiq.com/v1/autocomplete?key=${LOCATION_IQ_KEY}&q=${encodeRFC5987ValueChars(value)}&limit=5&dedupe=1&countrycodes=vn`
+            `https://api.locationiq.com/v1/autocomplete?key=${LOCATION_IQ_KEY}&q=${encodeRFC5987ValueChars(
+              value
+            )}&limit=5&dedupe=1&countrycodes=vn`
           );
           const resBody: PlaceInfoResponse[] = await res.json();
           if (resBody) {
