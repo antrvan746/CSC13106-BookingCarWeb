@@ -5,16 +5,12 @@ import {
   FormControl,
   FormControlLabel,
   FormLabel,
-  InputLabel,
   Radio,
   RadioGroup,
   TextField,
-  Select,
-  MenuItem,
-  SelectChangeEvent,
   FormGroup,
   Button,
-  Autocomplete,
+  FilterOptionsState,
 } from "@mui/material";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import MotorcycleIcon from "../../assets/motorcycle.png";
@@ -31,7 +27,8 @@ import MoneyIcon from "@mui/icons-material/Money";
 
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import encodeRFC5987ValueChars from "../../utils/URLEncoder";
+import usePlacesAutocomplete from "use-places-autocomplete";
+
 
 const StyledContainer = styled.div`
   display: flex;
@@ -79,15 +76,16 @@ const LOCATION_IQ_KEY =
 
 const BookingForm = () => {
   const [selectedVehicle, setSelectedVehicle] = React.useState("motorcycle");
-  const [value, setValue] = React.useState<Dayjs | null>(dayjsFunc());
+  const [dateValue, setDateValue] = React.useState<Dayjs | null>(dayjsFunc());
 
-  const [startPlaceInput, setStartPlace] = useState("");
-  const [endPlaceInput, setEndPlace] = useState("");
 
-  const [suggestingStartPlace, setSuggestingStartPlaces] = useState<string[]>(
-    []
-  );
-  const [suggestingEndPlace, setSuggestingEndPlaces] = useState<string[]>([]);
+  const {
+    ready,
+    value,
+    setValue,
+    suggestions: { status, data },
+    clearSuggestions,
+  } = usePlacesAutocomplete();
 
   const [formData, setFormData] = useState<BookingFormData>({
     startPlace: "",
@@ -107,43 +105,16 @@ const BookingForm = () => {
     setSelectedVehicle(event.target.value);
   };
 
-  const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
     setErrors((prevErrors) => ({ ...prevErrors, [name]: undefined }));
 
-    try {
-      if (name === "startPlace") {
-        if (value !== "") {
-          const res = await fetch(
-            `https://api.locationiq.com/v1/autocomplete?key=${LOCATION_IQ_KEY}&q=${encodeRFC5987ValueChars(value)}&limit=5&dedupe=1&countrycodes=vn`
-          );
-          const resBody: PlaceInfoResponse[] = await res.json();
-          if (resBody) {
-            const suggestingPlaces: string[] = resBody.map(
-              (item) => item.display_name
-            );
-            setSuggestingStartPlaces(suggestingPlaces);
-          }
-        }
-        setStartPlace(value);
-      } else if (name === "endPlace") {
-        if (value !== "") {
-          const res = await fetch(
-            `https://api.locationiq.com/v1/autocomplete?key=${LOCATION_IQ_KEY}&q=${encodeRFC5987ValueChars(value)}&limit=5&dedupe=1&countrycodes=vn`
-          );
-          const resBody: PlaceInfoResponse[] = await res.json();
-          if (resBody) {
-            const suggestingPlaces: string[] = resBody.map(
-              (item) => item.display_name
-            );
-            setSuggestingEndPlaces(suggestingPlaces);
-          }
-        }
-        setEndPlace(value);
-      }
-    } catch (err) {
-      console.log(err);
+    if (name == "startPlace") {
+      setValue(value);
+    } else if (name == "endPlace") {
+      setValue(value);
     }
   };
 
@@ -175,10 +146,19 @@ const BookingForm = () => {
 
     if (Object.keys(validationErrors).length === 0) {
       try {
+        clearSuggestions();
+        setValue("");
       } catch (err) {}
     } else {
       setErrors(validationErrors);
     }
+  };
+
+  const customFilterOptions = (
+    options: string[],
+    state: FilterOptionsState<string>
+  ) => {
+    return options;
   };
 
   return (
@@ -199,7 +179,8 @@ const BookingForm = () => {
           >
             <Autocomplete
               freeSolo
-              options={suggestingStartPlace}
+              options={data.map((suggestion) => suggestion.description)}
+              filterOptions={customFilterOptions}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -212,6 +193,7 @@ const BookingForm = () => {
                   error={!!errors.startPlace}
                   helperText={errors.startPlace}
                   fullWidth
+                  required
                 />
               )}
             />
@@ -233,19 +215,21 @@ const BookingForm = () => {
           >
             <Autocomplete
               freeSolo
-              options={suggestingEndPlace}
+              options={data.map((suggestion) => suggestion.description)}
+              filterOptions={customFilterOptions}
               renderInput={(params) => (
                 <TextField
                   {...params}
                   label="Điểm đến"
-                  name="endPlace"
                   size="small"
+                  name="endPlace"
                   variant="outlined"
-                  value={formData.endPlace}
+                  value={formData.startPlace}
                   onChange={handleChange}
-                  error={!!errors.endPlace}
-                  helperText={errors.endPlace}
+                  error={!!errors.startPlace}
+                  helperText={errors.startPlace}
                   fullWidth
+                  required
                 />
               )}
             />
@@ -323,8 +307,8 @@ const BookingForm = () => {
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DateTimePicker
               label="Date"
-              value={value}
-              onChange={(newValue) => setValue(newValue)}
+              value={dateValue}
+              onChange={(newValue) => setDateValue(newValue)}
               format="L hh:mm a"
             />
           </LocalizationProvider>
