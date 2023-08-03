@@ -19,9 +19,9 @@ const withAuth = (WrappedComponent: React.ComponentType<any>) => {
       }
     }, [user, loading, router]);
 
-    {
-      loading ? <LoadingPage /> : <WrappedComponent {...props} />;
-    }
+    if (loading) {
+      <LoadingPage />;
+    } else return <WrappedComponent {...props} />;
   };
 };
 
