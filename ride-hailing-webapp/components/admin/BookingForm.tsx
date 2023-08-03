@@ -11,7 +11,6 @@ import {
   FormGroup,
   Button,
   FilterOptionsState,
-  Autocomplete,
 } from "@mui/material";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import MotorcycleIcon from "../../assets/motorcycle.png";
@@ -29,6 +28,7 @@ import MoneyIcon from "@mui/icons-material/Money";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import usePlacesAutocomplete from "use-places-autocomplete";
+
 
 const StyledContainer = styled.div`
   display: flex;
@@ -64,9 +64,20 @@ interface BookingFormData {
   checkedPayment: string;
 }
 
+interface PlaceInfoResponse {
+  lat: string;
+  lon: string;
+  display_name: string;
+  display_address: string;
+}
+
+const LOCATION_IQ_KEY =
+  process.env.LOCATION_IQ_TOKEN || "pk.b5db726701a914af3d4f2e075b07dabb";
+
 const BookingForm = () => {
   const [selectedVehicle, setSelectedVehicle] = React.useState("motorcycle");
   const [dateValue, setDateValue] = React.useState<Dayjs | null>(dayjsFunc());
+
 
   const {
     ready,
@@ -93,6 +104,7 @@ const BookingForm = () => {
     console.log(event.target.value);
     setSelectedVehicle(event.target.value);
   };
+
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
