@@ -5,15 +5,13 @@ import {
   FormControl,
   FormControlLabel,
   FormLabel,
-  InputLabel,
   Radio,
   RadioGroup,
   TextField,
-  Select,
-  MenuItem,
-  SelectChangeEvent,
   FormGroup,
   Button,
+  FilterOptionsState,
+  Autocomplete,
 } from "@mui/material";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import MotorcycleIcon from "../../assets/motorcycle.png";
@@ -30,7 +28,7 @@ import MoneyIcon from "@mui/icons-material/Money";
 
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { Autocomplete } from "@react-google-maps/api";
+import usePlacesAutocomplete from "use-places-autocomplete";
 
 const StyledContainer = styled.div`
   display: flex;
@@ -67,45 +65,16 @@ interface BookingFormData {
 }
 
 const BookingForm = () => {
-  const [age, setAge] = React.useState("");
   const [selectedVehicle, setSelectedVehicle] = React.useState("motorcycle");
-  const [value, setValue] = React.useState<Dayjs | null>(dayjsFunc());
+  const [dateValue, setDateValue] = React.useState<Dayjs | null>(dayjsFunc());
 
-  const handleVehicleChange = (event: any) => {
-    console.log(event.target.value);
-    setSelectedVehicle(event.target.value);
-  };
-
-  const [startPlace, setStartPlace] =
-    useState<google.maps.places.Autocomplete | null>(null);
-  const [endPlace, setEndPlace] =
-    useState<google.maps.places.Autocomplete | null>(null);
-
-  const onStartPlaceLoad = (autocomplete: google.maps.places.Autocomplete) => {
-    console.log("Autocomplete start place: ", autocomplete);
-    setStartPlace(autocomplete);
-  };
-
-  const onEndPlaceLoad = (autocomplete: google.maps.places.Autocomplete) => {
-    console.log("Autocomplete end place: ", autocomplete);
-    setEndPlace(autocomplete);
-  };
-
-  const onStartPlaceChange = () => {
-    if (startPlace !== null) {
-      console.log(startPlace.getPlace());
-    } else {
-      console.log("Autocomplete is not loaded yet!");
-    }
-  };
-
-  const onEndPlaceChange = () => {
-    if (endPlace !== null) {
-      console.log(endPlace.getPlace());
-    } else {
-      console.log("Autocomplete is not loaded yet!");
-    }
-  };
+  const {
+    ready,
+    value,
+    setValue,
+    suggestions: { status, data },
+    clearSuggestions,
+  } = usePlacesAutocomplete();
 
   const [formData, setFormData] = useState<BookingFormData>({
     startPlace: "",
@@ -120,10 +89,21 @@ const BookingForm = () => {
 
   const [errors, setErrors] = useState<Partial<BookingFormData>>({});
 
+  const handleVehicleChange = (event: any) => {
+    console.log(event.target.value);
+    setSelectedVehicle(event.target.value);
+  };
+
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
     setErrors((prevErrors) => ({ ...prevErrors, [name]: undefined }));
+
+    if (name == "startPlace") {
+      setValue(value);
+    } else if (name == "endPlace") {
+      setValue(value);
+    }
   };
 
   const handleSubmit = async () => {
@@ -154,10 +134,19 @@ const BookingForm = () => {
 
     if (Object.keys(validationErrors).length === 0) {
       try {
+        clearSuggestions();
+        setValue("");
       } catch (err) {}
     } else {
       setErrors(validationErrors);
     }
+  };
+
+  const customFilterOptions = (
+    options: string[],
+    state: FilterOptionsState<string>
+  ) => {
+    return options;
   };
 
   return (
@@ -177,21 +166,25 @@ const BookingForm = () => {
             }}
           >
             <Autocomplete
-              onLoad={onStartPlaceLoad}
-              onPlaceChanged={onStartPlaceChange}
-            >
-              <TextField
-                label="Điểm đi"
-                size="small"
-                variant="outlined"
-                value={formData.startPlace}
-                onChange={handleChange}
-                error={!!errors.startPlace}
-                helperText={errors.startPlace}
-                autoFocus
-                fullWidth
-              />
-            </Autocomplete>
+              freeSolo
+              options={data.map((suggestion) => suggestion.description)}
+              filterOptions={customFilterOptions}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Điểm đi"
+                  size="small"
+                  name="startPlace"
+                  variant="outlined"
+                  value={formData.startPlace}
+                  onChange={handleChange}
+                  error={!!errors.startPlace}
+                  helperText={errors.startPlace}
+                  fullWidth
+                  required
+                />
+              )}
+            />
           </div>
         </StyledPlaceInput>
 
@@ -209,20 +202,25 @@ const BookingForm = () => {
             }}
           >
             <Autocomplete
-              onLoad={onEndPlaceLoad}
-              onPlaceChanged={onEndPlaceChange}
-            >
-              <TextField
-                label="Điểm đến"
-                size="small"
-                variant="outlined"
-                value={formData.endPlace}
-                onChange={handleChange}
-                error={!!errors.endPlace}
-                helperText={errors.endPlace}
-                fullWidth
-              />
-            </Autocomplete>
+              freeSolo
+              options={data.map((suggestion) => suggestion.description)}
+              filterOptions={customFilterOptions}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Điểm đến"
+                  size="small"
+                  name="endPlace"
+                  variant="outlined"
+                  value={formData.startPlace}
+                  onChange={handleChange}
+                  error={!!errors.startPlace}
+                  helperText={errors.startPlace}
+                  fullWidth
+                  required
+                />
+              )}
+            />
           </div>
         </StyledPlaceInput>
 
@@ -297,8 +295,8 @@ const BookingForm = () => {
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DateTimePicker
               label="Date"
-              value={value}
-              onChange={(newValue) => setValue(newValue)}
+              value={dateValue}
+              onChange={(newValue) => setDateValue(newValue)}
               format="L hh:mm a"
             />
           </LocalizationProvider>
