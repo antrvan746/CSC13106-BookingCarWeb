@@ -1,16 +1,20 @@
 import AdminHeader from "../../../components/admin/AdminHeader";
 import BookingForm from "../../../components/admin/BookingForm";
 import Head from "next/head";
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import styled from "styled-components";
 import withAuth from "../../_withAuth";
-import {
-  GoogleMap,
-  LoadScript,
-  Marker,
-  MarkerClusterer,
-  DirectionsRenderer,
-} from "@react-google-maps/api";
+import mapboxgl, { LngLatLike, accessToken } from "mapbox-gl";
+
+const MapboxAPIKey =
+  process.env.MAPBOX_API_KEY ||
+  "pk.eyJ1IjoiYW50cnZhbjc0NiIsImEiOiJjbGwwdW1lb2wxcWZuM3BtemF5aWNhc21sIn0.ErBzL1xKS1JTgauuHsvsCg";
 
 const StyledPageContainer = styled.div``;
 
@@ -26,102 +30,73 @@ const StyledDividedContainer = styled.div`
   overflow-y: scroll;
 `;
 
-const ggMapApiKey =
-  process.env.GGMAP_API_KEY || "AIzaSyA3iUAcVdOPHmYXE8LM2dj5OmSPbTDO0SM";
-
-type LatLngLiteral = google.maps.LatLngLiteral;
-type DirectionsResult = google.maps.DirectionsResult;
-type MapOptions = google.maps.MapOptions;
-
-const containerStyle = {
-  width: "100%",
-  height: "100%",
-};
-
-const center = {
-  lat: 10.780293274142215,
-  lng: 106.69906571528465,
-};
-
 const BookingRideView = () => {
-  const [startPlace, setStartPlace] = useState<LatLngLiteral>();
-  const [endPlace, setEndPlace] = useState<LatLngLiteral>();
-  const [directions, setDirections] = useState<DirectionsResult>();
+  const [currentLocation, setCurrentLocation] = useState<LngLatLike>([
+    -74.5, 40,
+  ] as LngLatLike);
 
-  const mapRef = useRef<google.maps.Map>();
-  const center = useMemo<LatLngLiteral>(
-    () => ({ lat: 10.780293274142215, lng: 106.69906571528465 }),
-    []
-  );
+  useEffect(() => {
+    // Get user's current location using the Geolocation API
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setCurrentLocation([longitude, latitude]);
+        },
+        (error) => {
+          console.error("Error getting current location:", error);
+        }
+      );
+    }
+  }, []);
 
-  const onLoad = useCallback(
-    (map: google.maps.Map) => (mapRef.current = map),
-    []
-  );
+  useEffect(() => {
+    if (typeof window === undefined) {
+      return;
+    }
+    mapboxgl.accessToken = MapboxAPIKey;
+
+    const map = new mapboxgl.Map({
+      container: "map",
+      style: "mapbox://styles/mapbox/streets-v12",
+      center: currentLocation,
+      zoom: 12,
+      attributionControl: false,
+    });
+    new mapboxgl.Marker({ color: "red" }).setLngLat(currentLocation).addTo(map);
+    
+    return () => {
+      map.remove();
+    };
+  }, [currentLocation]);
 
   return (
     <StyledPageContainer>
       <Head>
         <title> Mai Đón Admin - Đặt xe cho khách hàng </title>
         <meta name="description" content="Created by NextJs" />
+        <link href="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css" rel="stylesheet" />
       </Head>
       <AdminHeader />
-      <LoadScript
-        googleMapsApiKey={ggMapApiKey}
-        libraries={["places", "geometry"]}
-      >
-        <StyledContentContainer>
+      <StyledContentContainer>
+        <div
+          style={{
+            maxWidth: "100%",
+            overflow: "hidden"
+          }}
+        >
           <div
+            id="map"
             style={{
-              maxWidth: "100%",
-              listStyle: "none",
-              transition: "none",
-              overflow: "hidden",
               height: "100%",
             }}
-          >
-            <GoogleMap
-              mapContainerStyle={containerStyle}
-              center={center}
-              zoom={14}
-              // onLoad={onLoad}
-            >
-              {directions && (
-                <DirectionsRenderer
-                  directions={directions}
-                  options={{
-                    polylineOptions: {
-                      zIndex: 50,
-                      strokeColor: "#1976D2",
-                      strokeWeight: 5,
-                    },
-                  }}
-                />
-              )}
+          ></div>
+        </div>
 
-              {startPlace && endPlace && (
-                <>
-                  <Marker
-                    position={startPlace}
-                    icon="https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png"
-                  />
-                  <Marker
-                    position={endPlace}
-                    icon="https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png"
-                  />
-                </>
-              )}
-            </GoogleMap>
-          </div>
-
-          <StyledDividedContainer>
-            <BookingForm
-              setStartPlace={setStartPlace}
-              setEndPlace={setEndPlace}
-            />
-          </StyledDividedContainer>
-        </StyledContentContainer>
-      </LoadScript>
+        <StyledDividedContainer>
+          <BookingForm />
+        </StyledDividedContainer>
+      </StyledContentContainer>
     </StyledPageContainer>
   );
 };

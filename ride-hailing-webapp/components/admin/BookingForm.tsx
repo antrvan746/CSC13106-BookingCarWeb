@@ -27,10 +27,6 @@ import CashIcon from "@mui/icons-material/Money";
 import CardIcon from "@mui/icons-material/CreditCard";
 import EWalletIcon from "@mui/icons-material/Wallet";
 
-import { LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import usePlacesAutocomplete, { getGeocode, getLatLng } from "use-places-autocomplete";
-
 const StyledContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -60,28 +56,20 @@ interface BookingFormData {
   firstName: string;
   lastName: string;
   phone: string;
-  date: Dayjs | null;
+  // date: Dayjs | null;
   checkedVehicle: string;
   checkedPayment: string;
 }
 
 type BookingFormProps = {
-  setStartPlace: (position: google.maps.LatLngLiteral) => void;
-  setEndPlace: (position: google.maps.LatLngLiteral) => void;
-}
 
-const BookingForm = ({setStartPlace, setEndPlace} : BookingFormProps) => {
+};
+
+const BookingForm = () => {
   const [selectedVehicle, setSelectedVehicle] = React.useState("motorcycle");
   const [selectedPayment, setSelectedPayment] = React.useState("cash");
-  const [dateValue, setDateValue] = React.useState<Dayjs | null>(dayjsFunc());
+  // const [dateValue, setDateValue] = React.useState<Dayjs | null>(dayjsFunc());
 
-  const {
-    ready,
-    value,
-    setValue,
-    suggestions: { status, data },
-    clearSuggestions,
-  } = usePlacesAutocomplete();
 
   const [formData, setFormData] = useState<BookingFormData>({
     startPlace: "",
@@ -89,33 +77,33 @@ const BookingForm = ({setStartPlace, setEndPlace} : BookingFormProps) => {
     firstName: "",
     lastName: "",
     phone: "",
-    date: null,
+    // date: null,
     checkedVehicle: "",
     checkedPayment: "",
   });
 
   const [errors, setErrors] = useState<Partial<BookingFormData>>({});
 
-  const handleSelectStartPlace = async (event: any) => {
-    const val = event.target.value;
-    setValue(val, false);
-    clearSuggestions();
+  // const handleSelectStartPlace = async (event: any) => {
+  //   const val = event.target.value;
+  //   setValue(val, false);
+  //   clearSuggestions();
 
-    const results = await getGeocode({address: val});
-    const { lat, lng} = await getLatLng(results[0]);
-    console.log(lat, lng);
-    setStartPlace({lat, lng});
-  }
+  //   const results = await getGeocode({address: val});
+  //   const { lat, lng} = await getLatLng(results[0]);
+  //   console.log(lat, lng);
+  //   setStartPlace({lat, lng});
+  // }
 
-  const handleSelectEndPlace = async (event: any) => {
-    const val = event.target.value;
-    setValue(val, false);
-    clearSuggestions();
+  // const handleSelectEndPlace = async (event: any) => {
+  //   const val = event.target.value;
+  //   setValue(val, false);
+  //   clearSuggestions();
 
-    const results = await getGeocode({address: val});
-    const { lat, lng} = await getLatLng(results[0]);
-    setStartPlace({lat, lng});
-  }
+  //   const results = await getGeocode({address: val});
+  //   const { lat, lng} = await getLatLng(results[0]);
+  //   setStartPlace({lat, lng});
+  // }
 
   const handleVehicleChange = (event: any) => {
     console.log(event.target.value);
@@ -132,11 +120,11 @@ const BookingForm = ({setStartPlace, setEndPlace} : BookingFormProps) => {
     setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
     setErrors((prevErrors) => ({ ...prevErrors, [name]: undefined }));
 
-    if (name == "startPlace") {
-      setValue(value);
-    } else if (name == "endPlace") {
-      setValue(value);
-    }
+    // if (name == "startPlace") {
+    //   setValue(value);
+    // } else if (name == "endPlace") {
+    //   setValue(value);
+    // }
   };
 
   const handleSubmit = async () => {
@@ -162,13 +150,8 @@ const BookingForm = ({setStartPlace, setEndPlace} : BookingFormProps) => {
       validationErrors.phone = "Phone number is not valid";
     }
 
-    if (formData.date?.isAfter(formData.date)) {
-    }
-
     if (Object.keys(validationErrors).length === 0) {
       try {
-        clearSuggestions();
-        setValue("");
       } catch (err) {}
     } else {
       setErrors(validationErrors);
@@ -200,9 +183,10 @@ const BookingForm = ({setStartPlace, setEndPlace} : BookingFormProps) => {
           >
             <Autocomplete
               freeSolo
-              options={data.map((suggestion) => suggestion.description)}
+              // options={data.map((suggestion) => suggestion.description)}
+              options={[]}
               filterOptions={customFilterOptions}
-              onSelect={handleSelectStartPlace}
+              // onSelect={handleSelectStartPlace}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -237,9 +221,10 @@ const BookingForm = ({setStartPlace, setEndPlace} : BookingFormProps) => {
           >
             <Autocomplete
               freeSolo
-              options={data.map((suggestion) => suggestion.description)}
+              // options={data.map((suggestion) => suggestion.description)}
+              options={[]}
               filterOptions={customFilterOptions}
-              onSelect={handleSelectEndPlace}
+              // onSelect={handleSelectEndPlace}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -320,7 +305,7 @@ const BookingForm = ({setStartPlace, setEndPlace} : BookingFormProps) => {
           />
         </StyleInforInput>
 
-        <StyleInforInput>
+        {/* <StyleInforInput>
           <CalendarMonthIcon
             style={{
               marginLeft: "1rem",
@@ -335,7 +320,7 @@ const BookingForm = ({setStartPlace, setEndPlace} : BookingFormProps) => {
               format="L hh:mm a"
             />
           </LocalizationProvider>
-        </StyleInforInput>
+        </StyleInforInput> */}
 
         <FormGroup>
           <FormLabel
