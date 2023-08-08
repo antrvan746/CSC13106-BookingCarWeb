@@ -26,9 +26,9 @@ import CardIcon from "@mui/icons-material/CreditCard";
 import EWalletIcon from "@mui/icons-material/Wallet";
 import { LngLatLike, Marker } from "mapbox-gl";
 import { UUID, randomUUID } from "crypto";
+import { v4 as uuidv4 } from "uuid";
 
-const GoongApiKey =
-  process.env.API_GOONG_KEY || "4xsMpUsUm57ogvFDPCjlQlvmUWq6JqzeYOYJfjJe";
+const GoongApiKey = "4xsMpUsUm57ogvFDPCjlQlvmUWq6JqzeYOYJfjJe";
 
 const StyledContainer = styled.div`
   display: flex;
@@ -65,8 +65,9 @@ interface BookingFormData {
 }
 
 type BookingFormProps = {
-  startPlace: Marker;
-  endPlace: Marker;
+  location: number[];
+  // startPlace: Marker;
+  // endPlace: Marker;
 };
 
 type AutocompletePlaceStatus = {
@@ -81,7 +82,7 @@ type PlaceInformation = {
   place_id: string;
 };
 
-const BookingForm = () => {
+const BookingForm = ({ location }: BookingFormProps) => {
   const [selectedVehicle, setSelectedVehicle] = React.useState("motorcycle");
   const [selectedPayment, setSelectedPayment] = React.useState("cash");
   // const [dateValue, setDateValue] = React.useState<Dayjs | null>(dayjsFunc());
@@ -89,13 +90,22 @@ const BookingForm = () => {
   const [autocompleteStatus, setAutocompleteStatus] =
     React.useState<AutocompletePlaceStatus>({
       value: "",
-      sessionToken: randomUUID(),
+      sessionToken: uuidv4(),
       predictions: [],
       status: "WAITING",
     });
 
   const handleSuggestPlaces = async (value: string) => {
-    const response = await fetch(`https://rsapi.goong.io/Place/AutoComplete?${GoongApiKey}`);
+    const url = `https://rsapi.goong.io/Place/AutoComplete?api_key=${GoongApiKey}&location=${location[1]},${location[0]}&input=${autocompleteStatus.value}`;
+
+    const response = await fetch(url);
+
+    try {
+      const data = await response.json();
+      console.log(data);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const clearSuggestions = () => {};
@@ -150,7 +160,7 @@ const BookingForm = () => {
     setErrors((prevErrors) => ({ ...prevErrors, [name]: undefined }));
 
     if (name == "startPlace" || "endPlace") {
-      setValue(value);
+      handleSuggestPlaces(value);
     }
   };
 

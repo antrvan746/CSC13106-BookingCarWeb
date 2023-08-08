@@ -10,7 +10,7 @@ import React, {
 } from "react";
 import styled from "styled-components";
 import withAuth from "../../_withAuth";
-import mapboxgl, { LngLatLike, accessToken } from "mapbox-gl";
+import mapboxgl, { LngLat, LngLatLike, accessToken } from "mapbox-gl";
 
 const MapboxAPIKey =
   process.env.MAPBOX_API_KEY ||
@@ -22,7 +22,7 @@ const StyledContentContainer = styled.div`
   display: inline-grid;
   grid-template-columns: 2fr 1fr;
   width: 100%;
-  height: 100%;
+  height: 95vh;
 `;
 
 const StyledDividedContainer = styled.div`
@@ -31,9 +31,9 @@ const StyledDividedContainer = styled.div`
 `;
 
 const BookingRideView = () => {
-  const [currentLocation, setCurrentLocation] = useState<LngLatLike>([
-    -74.5, 40,
-  ] as LngLatLike);
+  const [currentLocation, setCurrentLocation] = useState<LngLat>(
+    new mapboxgl.LngLat(106.6994168168476, 10.78109609495359)
+  );
 
   useEffect(() => {
     // Get user's current location using the Geolocation API
@@ -41,7 +41,7 @@ const BookingRideView = () => {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
-          setCurrentLocation([longitude, latitude]);
+          setCurrentLocation(new mapboxgl.LngLat(longitude, latitude));
         },
         (error) => {
           console.error("Error getting current location:", error);
@@ -51,7 +51,7 @@ const BookingRideView = () => {
   }, []);
 
   useEffect(() => {
-    if (typeof window === undefined) {
+    if (typeof window === "undefined") {
       return;
     }
     mapboxgl.accessToken = MapboxAPIKey;
@@ -60,11 +60,11 @@ const BookingRideView = () => {
       container: "map",
       style: "mapbox://styles/mapbox/streets-v12",
       center: currentLocation,
-      zoom: 12,
+      zoom: 13,
       attributionControl: false,
     });
     new mapboxgl.Marker({ color: "red" }).setLngLat(currentLocation).addTo(map);
-    
+
     return () => {
       map.remove();
     };
@@ -75,14 +75,18 @@ const BookingRideView = () => {
       <Head>
         <title> Mai Đón Admin - Đặt xe cho khách hàng </title>
         <meta name="description" content="Created by NextJs" />
-        <link href="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css" rel="stylesheet" />
+        <link
+          href="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css"
+          rel="stylesheet"
+        />
       </Head>
       <AdminHeader />
       <StyledContentContainer>
         <div
           style={{
             maxWidth: "100%",
-            overflow: "hidden"
+            overflow: "hidden",
+            height: "100%",
           }}
         >
           <div
@@ -94,7 +98,7 @@ const BookingRideView = () => {
         </div>
 
         <StyledDividedContainer>
-          <BookingForm />
+          <BookingForm location={currentLocation.toArray()} />
         </StyledDividedContainer>
       </StyledContentContainer>
     </StyledPageContainer>
