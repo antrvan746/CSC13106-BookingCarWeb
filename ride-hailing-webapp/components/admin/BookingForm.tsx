@@ -95,7 +95,8 @@ const BookingForm = ({ location }: BookingFormProps) => {
       status: "WAITING",
     });
 
-  const handleSuggestPlaces = async (value: string) => {
+  const handleSuggestPlaces = async (input: string) => {
+    setAutocompleteStatus((prevStatus) => ({ ...prevStatus, value: input }));
     const url = `https://rsapi.goong.io/Place/AutoComplete?api_key=${GoongApiKey}&location=${location[1]},${location[0]}&input=${autocompleteStatus.value}`;
 
     const response = await fetch(url);
