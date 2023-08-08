@@ -70,15 +70,18 @@ type BookingFormProps = {
   // endPlace: Marker;
 };
 
-type AutocompletePlaceStatus = {
-  value: string;
-  sessionToken: string;
+type AutocompletePlacesResponse = {
   predictions: PlaceInformation[];
   status: string;
 };
 
+type AutocompletePlaceStatus = {
+  value: string;
+  suggestions: string[];
+};
+
 type PlaceInformation = {
-  descriptions: string;
+  description: string;
   place_id: string;
 };
 
@@ -90,26 +93,52 @@ const BookingForm = ({ location }: BookingFormProps) => {
   const [autocompleteStatus, setAutocompleteStatus] =
     React.useState<AutocompletePlaceStatus>({
       value: "",
-      sessionToken: uuidv4(),
-      predictions: [],
-      status: "WAITING",
+      suggestions: [],
     });
 
-  const handleSuggestPlaces = async (input: string) => {
-    setAutocompleteStatus((prevStatus) => ({ ...prevStatus, value: input }));
+  const fetchSuggestPlaces = async (input: string) => {
     const url = `https://rsapi.goong.io/Place/AutoComplete?api_key=${GoongApiKey}&location=${location[1]},${location[0]}&input=${autocompleteStatus.value}`;
-
     const response = await fetch(url);
 
     try {
       const data = await response.json();
-      console.log(data);
+      return data;
     } catch (err) {
       console.log(err);
     }
   };
 
-  const clearSuggestions = () => {};
+  const handleSuggestPlaces = async (input: string) => {
+    setAutocompleteStatus((prevStatus) => ({ ...prevStatus, value: input }));
+    const fetchedPlaces: AutocompletePlacesResponse = await fetchSuggestPlaces(
+      autocompleteStatus.value
+    );
+
+    try {
+      const { predictions, status } = fetchedPlaces;
+      if (status === "OK") {
+        setAutocompleteStatus((prevStatus) => ({
+          ...prevStatus,
+          suggestions: predictions.map((item) => item.description),
+        }));
+      } else {
+        setAutocompleteStatus((prevStatus) => ({
+          ...prevStatus,
+          suggestions: [],
+        }));
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const clearSuggestions = () => {
+    setAutocompleteStatus((prevStatus) => ({ ...prevStatus, value: "" }));
+    setAutocompleteStatus((prevStatus) => ({
+      ...prevStatus,
+      suggestions: [],
+    }));
+  };
 
   const [formData, setFormData] = useState<BookingFormData>({
     startPlace: "",
@@ -124,26 +153,22 @@ const BookingForm = ({ location }: BookingFormProps) => {
 
   const [errors, setErrors] = useState<Partial<BookingFormData>>({});
 
-  // const handleSelectStartPlace = async (event: any) => {
-  //   const val = event.target.value;
-  //   setValue(val, false);
-  //   clearSuggestions();
+  const handleSelectStartPlace = async (event: any) => {
+    clearSuggestions();
 
-  //   const results = await getGeocode({address: val});
-  //   const { lat, lng} = await getLatLng(results[0]);
-  //   console.log(lat, lng);
-  //   setStartPlace({lat, lng});
-  // }
+    // const results = await getGeocode({address: val});
+    // const { lat, lng} = await getLatLng(results[0]);
+    // console.log(lat, lng);
+    // setStartPlace({lat, lng});
+  };
 
-  // const handleSelectEndPlace = async (event: any) => {
-  //   const val = event.target.value;
-  //   setValue(val, false);
-  //   clearSuggestions();
+  const handleSelectEndPlace = async (event: any) => {
+    clearSuggestions();
 
-  //   const results = await getGeocode({address: val});
-  //   const { lat, lng} = await getLatLng(results[0]);
-  //   setStartPlace({lat, lng});
-  // }
+    // const results = await getGeocode({address: val});
+    // const { lat, lng} = await getLatLng(results[0]);
+    // setStartPlace({lat, lng});
+  };
 
   const handleVehicleChange = (event: any) => {
     console.log(event.target.value);
@@ -222,7 +247,7 @@ const BookingForm = ({ location }: BookingFormProps) => {
             <Autocomplete
               freeSolo
               // options={data.map((suggestion) => suggestion.description)}
-              options={[]}
+              options={autocompleteStatus.suggestions}
               filterOptions={customFilterOptions}
               // onSelect={handleSelectStartPlace}
               renderInput={(params) => (
@@ -260,7 +285,7 @@ const BookingForm = ({ location }: BookingFormProps) => {
             <Autocomplete
               freeSolo
               // options={data.map((suggestion) => suggestion.description)}
-              options={[]}
+              options={autocompleteStatus.suggestions}
               filterOptions={customFilterOptions}
               // onSelect={handleSelectEndPlace}
               renderInput={(params) => (

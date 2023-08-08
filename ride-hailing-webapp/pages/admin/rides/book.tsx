@@ -31,6 +31,8 @@ const StyledDividedContainer = styled.div`
 `;
 
 const BookingRideView = () => {
+  const mapRef = useRef<mapboxgl.Map>(null);
+
   const [currentLocation, setCurrentLocation] = useState<LngLat>(
     new mapboxgl.LngLat(106.6994168168476, 10.78109609495359)
   );
@@ -63,12 +65,27 @@ const BookingRideView = () => {
       zoom: 13,
       attributionControl: false,
     });
+
+    map.addControl(new mapboxgl.NavigationControl());
+
     new mapboxgl.Marker({ color: "red" }).setLngLat(currentLocation).addTo(map);
+
+    new mapboxgl.Marker({ color: "red" })
+      .setLngLat(new mapboxgl.LngLat(105.85245053068172, 21.03091278748681))
+      .addTo(map);
 
     return () => {
       map.remove();
     };
   }, [currentLocation]);
+
+
+  const fit = () => {
+    map.fitBounds([
+      [32.958984, -5.353521], // southwestern corner of the bounds
+      [43.50585, 5.615985], // northeastern corner of the bounds
+    ]);
+  }
 
   return (
     <StyledPageContainer>
@@ -95,6 +112,26 @@ const BookingRideView = () => {
               height: "100%",
             }}
           ></div>
+          <button
+            id="fit"
+            onClick={}
+            style={{
+              display: "block",
+              position: "relative",
+              margin: "0px auto",
+              width: "50%",
+              height: "40px",
+              padding: "10px",
+              border: "none",
+              borderRadius: "3px",
+              fontSize: "12px",
+              textAlign: "center",
+              color: "#fff",
+              background: "#ee8a65",
+            }}
+          >
+            Fit to Kenya
+          </button>
         </div>
 
         <StyledDividedContainer>
