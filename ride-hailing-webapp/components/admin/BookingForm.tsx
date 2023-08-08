@@ -13,11 +13,9 @@ import {
   FilterOptionsState,
   Autocomplete,
 } from "@mui/material";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import PlaceIcon from "@mui/icons-material/Place";
 import ContactPhoneIcon from "@mui/icons-material/ContactPhone";
 import PersonIcon from "@mui/icons-material/Person";
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 
 import MotorcycleIcon from "@mui/icons-material/TwoWheeler";
 import SedanIcon from "@mui/icons-material/DirectionsCar";
@@ -26,6 +24,11 @@ import ShuttleBusIcon from "@mui/icons-material/AirportShuttle";
 import CashIcon from "@mui/icons-material/Money";
 import CardIcon from "@mui/icons-material/CreditCard";
 import EWalletIcon from "@mui/icons-material/Wallet";
+import { LngLatLike, Marker } from "mapbox-gl";
+import { UUID, randomUUID } from "crypto";
+
+const GoongApiKey =
+  process.env.API_GOONG_KEY || "4xsMpUsUm57ogvFDPCjlQlvmUWq6JqzeYOYJfjJe";
 
 const StyledContainer = styled.div`
   display: flex;
@@ -62,7 +65,20 @@ interface BookingFormData {
 }
 
 type BookingFormProps = {
+  startPlace: Marker;
+  endPlace: Marker;
+};
 
+type AutocompletePlaceStatus = {
+  value: string;
+  sessionToken: string;
+  predictions: PlaceInformation[];
+  status: string;
+};
+
+type PlaceInformation = {
+  descriptions: string;
+  place_id: string;
 };
 
 const BookingForm = () => {
@@ -70,6 +86,19 @@ const BookingForm = () => {
   const [selectedPayment, setSelectedPayment] = React.useState("cash");
   // const [dateValue, setDateValue] = React.useState<Dayjs | null>(dayjsFunc());
 
+  const [autocompleteStatus, setAutocompleteStatus] =
+    React.useState<AutocompletePlaceStatus>({
+      value: "",
+      sessionToken: randomUUID(),
+      predictions: [],
+      status: "WAITING",
+    });
+
+  const handleSuggestPlaces = async (value: string) => {
+    const response = await fetch(`https://rsapi.goong.io/Place/AutoComplete?${GoongApiKey}`);
+  };
+
+  const clearSuggestions = () => {};
 
   const [formData, setFormData] = useState<BookingFormData>({
     startPlace: "",
@@ -120,11 +149,9 @@ const BookingForm = () => {
     setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
     setErrors((prevErrors) => ({ ...prevErrors, [name]: undefined }));
 
-    // if (name == "startPlace") {
-    //   setValue(value);
-    // } else if (name == "endPlace") {
-    //   setValue(value);
-    // }
+    if (name == "startPlace" || "endPlace") {
+      setValue(value);
+    }
   };
 
   const handleSubmit = async () => {
