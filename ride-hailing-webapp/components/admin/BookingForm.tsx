@@ -128,7 +128,7 @@ const BookingForm = ({
   };
 
   const fetchPlace = async (placeId: string) => {
-    const url = `https://rsapi.goong.io/Place/Detail?place_id=${placeId}&api_key=${GoongApiKey}"`;
+    const url = `https://rsapi.goong.io/Place/Detail?place_id=${placeId}&api_key=${GoongApiKey}`;
     const response = await fetch(url);
 
     try {
@@ -183,11 +183,10 @@ const BookingForm = ({
 
   const [errors, setErrors] = useState<Partial<BookingFormData>>({});
 
-  const handleSelectStartPlace = async (event: any) => {
-    console.log("Here");
-    const address = event.target.value;
+  const handleSelectStartPlace = async (value: string | null) => {
+    const address = value;
     const place_id = autocompleteStatus.suggestions.find(
-      (item) => item.description == address
+      (item) => item.description === address
     )?.place_id;
 
     if (place_id) {
@@ -202,18 +201,19 @@ const BookingForm = ({
     clearSuggestions();
   };
 
-  const handleSelectEndPlace = async (event: any) => {
-    const address = event.target.value;
+  const handleSelectEndPlace = async (value: string | null) => {
+    const address = value;
     const place_id = autocompleteStatus.suggestions.find(
       (item) => item.description == address
     )?.place_id;
 
     if (place_id) {
       fetchPlace(place_id).then((place: PlaceResponse) => {
+        console.log(place_id);
         if (place.status === "OK") {
           const lng = place.result.geometry.location.lng;
           const lat = place.result.geometry.location.lat;
-          setStartPlace(new mapboxgl.LngLat(lng, lat));
+          setEndPlace(new mapboxgl.LngLat(lng, lat));
         }
       });
     }
@@ -309,14 +309,15 @@ const BookingForm = ({
                   variant="outlined"
                   value={formData.startPlace}
                   error={!!errors.startPlace}
+                  onChange={handleChange}
                   helperText={errors.startPlace}
                   fullWidth
                   required
                 />
               )}
-              onChange={(event, value, reason) => {
+              onChange={(_event, value, reason) => {
                 if (reason === "selectOption") {
-                  handleSelectStartPlace
+                  handleSelectStartPlace(value);
                 }
               }}
             />
@@ -357,10 +358,10 @@ const BookingForm = ({
                   required
                 />
               )}
-              onChange={(event, value, reason) => {
-                console.log(reason)
+              onChange={(_event, value, reason) => {
+                console.log(reason);
                 if (reason === "selectOption") {
-                  handleSelectStartPlace(event)
+                  handleSelectEndPlace(value);
                 }
               }}
             />
