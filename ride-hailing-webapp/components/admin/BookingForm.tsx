@@ -12,6 +12,7 @@ import {
   Button,
   FilterOptionsState,
   Autocomplete,
+  AutocompleteChangeReason,
 } from "@mui/material";
 import PlaceIcon from "@mui/icons-material/Place";
 import ContactPhoneIcon from "@mui/icons-material/ContactPhone";
@@ -24,7 +25,7 @@ import ShuttleBusIcon from "@mui/icons-material/AirportShuttle";
 import CashIcon from "@mui/icons-material/Money";
 import CardIcon from "@mui/icons-material/CreditCard";
 import EWalletIcon from "@mui/icons-material/Wallet";
-import { LngLatLike, Marker } from "mapbox-gl";
+import mapboxgl, { LngLatLike, Marker } from "mapbox-gl";
 import { UUID, randomUUID } from "crypto";
 import { v4 as uuidv4 } from "uuid";
 
@@ -59,15 +60,14 @@ interface BookingFormData {
   firstName: string;
   lastName: string;
   phone: string;
-  // date: Dayjs | null;
   checkedVehicle: string;
   checkedPayment: string;
 }
 
 type BookingFormProps = {
   location: number[];
-  // startPlace: Marker;
-  // endPlace: Marker;
+  setStartPlace: (position: mapboxgl.LngLat) => void;
+  setEndPlace: (position: mapboxgl.LngLat) => void;
 };
 
 type AutocompletePlacesResponse = {
@@ -75,9 +75,25 @@ type AutocompletePlacesResponse = {
   status: string;
 };
 
+type PlaceResponse = {
+  result: PlaceResult;
+  status: string;
+};
+
+type PlaceResult = {
+  place_id: string;
+  formatted_address: string;
+  geometry: {
+    location: {
+      lat: number;
+      lng: number;
+    };
+  };
+};
+
 type AutocompletePlaceStatus = {
   value: string;
-  suggestions: string[];
+  suggestions: PlaceInformation[];
 };
 
 type PlaceInformation = {
@@ -85,10 +101,13 @@ type PlaceInformation = {
   place_id: string;
 };
 
-const BookingForm = ({ location }: BookingFormProps) => {
+const BookingForm = ({
+  location,
+  setStartPlace,
+  setEndPlace,
+}: BookingFormProps) => {
   const [selectedVehicle, setSelectedVehicle] = React.useState("motorcycle");
   const [selectedPayment, setSelectedPayment] = React.useState("cash");
-  // const [dateValue, setDateValue] = React.useState<Dayjs | null>(dayjsFunc());
 
   const [autocompleteStatus, setAutocompleteStatus] =
     React.useState<AutocompletePlaceStatus>({
@@ -98,6 +117,18 @@ const BookingForm = ({ location }: BookingFormProps) => {
 
   const fetchSuggestPlaces = async (input: string) => {
     const url = `https://rsapi.goong.io/Place/AutoComplete?api_key=${GoongApiKey}&location=${location[1]},${location[0]}&input=${autocompleteStatus.value}`;
+    const response = await fetch(url);
+
+    try {
+      const data = await response.json();
+      return data;
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const fetchPlace = async (placeId: string) => {
+    const url = `https://rsapi.goong.io/Place/Detail?place_id=${placeId}&api_key=${GoongApiKey}"`;
     const response = await fetch(url);
 
     try {
@@ -119,7 +150,7 @@ const BookingForm = ({ location }: BookingFormProps) => {
       if (status === "OK") {
         setAutocompleteStatus((prevStatus) => ({
           ...prevStatus,
-          suggestions: predictions.map((item) => item.description),
+          suggestions: predictions,
         }));
       } else {
         setAutocompleteStatus((prevStatus) => ({
@@ -146,7 +177,6 @@ const BookingForm = ({ location }: BookingFormProps) => {
     firstName: "",
     lastName: "",
     phone: "",
-    // date: null,
     checkedVehicle: "",
     checkedPayment: "",
   });
@@ -154,20 +184,40 @@ const BookingForm = ({ location }: BookingFormProps) => {
   const [errors, setErrors] = useState<Partial<BookingFormData>>({});
 
   const handleSelectStartPlace = async (event: any) => {
-    clearSuggestions();
+    console.log("Here");
+    const address = event.target.value;
+    const place_id = autocompleteStatus.suggestions.find(
+      (item) => item.description == address
+    )?.place_id;
 
-    // const results = await getGeocode({address: val});
-    // const { lat, lng} = await getLatLng(results[0]);
-    // console.log(lat, lng);
-    // setStartPlace({lat, lng});
+    if (place_id) {
+      fetchPlace(place_id).then((place: PlaceResponse) => {
+        if (place.status === "OK") {
+          const lng = place.result.geometry.location.lng;
+          const lat = place.result.geometry.location.lat;
+          setStartPlace(new mapboxgl.LngLat(lng, lat));
+        }
+      });
+    }
+    clearSuggestions();
   };
 
   const handleSelectEndPlace = async (event: any) => {
-    clearSuggestions();
+    const address = event.target.value;
+    const place_id = autocompleteStatus.suggestions.find(
+      (item) => item.description == address
+    )?.place_id;
 
-    // const results = await getGeocode({address: val});
-    // const { lat, lng} = await getLatLng(results[0]);
-    // setStartPlace({lat, lng});
+    if (place_id) {
+      fetchPlace(place_id).then((place: PlaceResponse) => {
+        if (place.status === "OK") {
+          const lng = place.result.geometry.location.lng;
+          const lat = place.result.geometry.location.lat;
+          setStartPlace(new mapboxgl.LngLat(lng, lat));
+        }
+      });
+    }
+    clearSuggestions();
   };
 
   const handleVehicleChange = (event: any) => {
@@ -180,7 +230,8 @@ const BookingForm = ({ location }: BookingFormProps) => {
     setSelectedPayment(event.target.value);
   };
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (event: any) => {
+    console.log("Hello");
     const { name, value } = event.target;
     setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
     setErrors((prevErrors) => ({ ...prevErrors, [name]: undefined }));
@@ -212,7 +263,6 @@ const BookingForm = ({ location }: BookingFormProps) => {
     ) {
       validationErrors.phone = "Phone number is not valid";
     }
-
     if (Object.keys(validationErrors).length === 0) {
       try {
       } catch (err) {}
@@ -246,10 +296,10 @@ const BookingForm = ({ location }: BookingFormProps) => {
           >
             <Autocomplete
               freeSolo
-              // options={data.map((suggestion) => suggestion.description)}
-              options={autocompleteStatus.suggestions}
+              options={autocompleteStatus.suggestions.map(
+                (item) => item.description
+              )}
               filterOptions={customFilterOptions}
-              // onSelect={handleSelectStartPlace}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -258,13 +308,17 @@ const BookingForm = ({ location }: BookingFormProps) => {
                   name="startPlace"
                   variant="outlined"
                   value={formData.startPlace}
-                  onChange={handleChange}
                   error={!!errors.startPlace}
                   helperText={errors.startPlace}
                   fullWidth
                   required
                 />
               )}
+              onChange={(event, value, reason) => {
+                if (reason === "selectOption") {
+                  handleSelectStartPlace
+                }
+              }}
             />
           </div>
         </StyledPlaceInput>
@@ -284,10 +338,10 @@ const BookingForm = ({ location }: BookingFormProps) => {
           >
             <Autocomplete
               freeSolo
-              // options={data.map((suggestion) => suggestion.description)}
-              options={autocompleteStatus.suggestions}
+              options={autocompleteStatus.suggestions.map(
+                (item) => item.description
+              )}
               filterOptions={customFilterOptions}
-              // onSelect={handleSelectEndPlace}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -303,6 +357,12 @@ const BookingForm = ({ location }: BookingFormProps) => {
                   required
                 />
               )}
+              onChange={(event, value, reason) => {
+                console.log(reason)
+                if (reason === "selectOption") {
+                  handleSelectStartPlace(event)
+                }
+              }}
             />
           </div>
         </StyledPlaceInput>
@@ -388,7 +448,7 @@ const BookingForm = ({ location }: BookingFormProps) => {
         <FormGroup>
           <FormLabel
             style={{
-              paddingLeft: "1rem",
+              paddingLeft: "1.5rem",
               marginTop: "2rem",
             }}
           >
@@ -398,8 +458,8 @@ const BookingForm = ({ location }: BookingFormProps) => {
             onChange={handleVehicleChange}
             style={{
               display: "flex",
+              alignSelf: "center",
               flexDirection: "row",
-              paddingLeft: "2rem",
             }}
           >
             <FormControlLabel
@@ -488,7 +548,7 @@ const BookingForm = ({ location }: BookingFormProps) => {
         <FormGroup>
           <FormLabel
             style={{
-              paddingLeft: "1rem",
+              paddingLeft: "1.5rem",
               marginTop: "2rem",
             }}
           >
@@ -498,8 +558,8 @@ const BookingForm = ({ location }: BookingFormProps) => {
             onChange={handlePaymentChange}
             style={{
               display: "flex",
+              alignSelf: "center",
               flexDirection: "row",
-              paddingLeft: "2rem",
             }}
           >
             <FormControlLabel

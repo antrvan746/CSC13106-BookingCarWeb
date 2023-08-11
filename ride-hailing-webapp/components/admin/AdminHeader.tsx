@@ -43,10 +43,6 @@ const StyledContainer = styled.div`
   transition: background-color 0.5s;
   min-height: 50px;
   transition: background-color 0.5s;
-
-  @media (min-height: 110vh) {
-    background-color: #1e1e1eba;
-  }
 `;
 
 interface AdminHeaderProps {

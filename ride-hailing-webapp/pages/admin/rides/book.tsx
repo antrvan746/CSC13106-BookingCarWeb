@@ -22,16 +22,22 @@ const StyledContentContainer = styled.div`
   display: inline-grid;
   grid-template-columns: 2fr 1fr;
   width: 100%;
-  height: 95vh;
+  height: 100vh;
 `;
 
 const StyledDividedContainer = styled.div`
   width: 100%;
-  overflow-y: scroll;
+
+  .example::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 const BookingRideView = () => {
-  const mapRef = useRef<mapboxgl.Map>(null);
+  const mapRef = useRef<mapboxgl.Map | null>(null);
+
+  const [startPlace, setStartPlace] = useState<LngLat | null>(null);
+  const [endPlace, setEndPlace] = useState<LngLat | null>(null);
 
   const [currentLocation, setCurrentLocation] = useState<LngLat>(
     new mapboxgl.LngLat(106.6994168168476, 10.78109609495359)
@@ -58,7 +64,7 @@ const BookingRideView = () => {
     }
     mapboxgl.accessToken = MapboxAPIKey;
 
-    const map = new mapboxgl.Map({
+    mapRef.current = new mapboxgl.Map({
       container: "map",
       style: "mapbox://styles/mapbox/streets-v12",
       center: currentLocation,
@@ -66,26 +72,18 @@ const BookingRideView = () => {
       attributionControl: false,
     });
 
-    map.addControl(new mapboxgl.NavigationControl());
+    if (mapRef.current) {
+      mapRef.current.addControl(new mapboxgl.NavigationControl());
 
-    new mapboxgl.Marker({ color: "red" }).setLngLat(currentLocation).addTo(map);
-
-    new mapboxgl.Marker({ color: "red" })
-      .setLngLat(new mapboxgl.LngLat(105.85245053068172, 21.03091278748681))
-      .addTo(map);
+      new mapboxgl.Marker({ color: "red" })
+        .setLngLat(currentLocation)
+        .addTo(mapRef.current);
+    }
 
     return () => {
-      map.remove();
+      mapRef.current?.remove();
     };
   }, [currentLocation]);
-
-
-  const fit = () => {
-    map.fitBounds([
-      [32.958984, -5.353521], // southwestern corner of the bounds
-      [43.50585, 5.615985], // northeastern corner of the bounds
-    ]);
-  }
 
   return (
     <StyledPageContainer>
@@ -112,30 +110,20 @@ const BookingRideView = () => {
               height: "100%",
             }}
           ></div>
-          <button
-            id="fit"
-            onClick={}
-            style={{
-              display: "block",
-              position: "relative",
-              margin: "0px auto",
-              width: "50%",
-              height: "40px",
-              padding: "10px",
-              border: "none",
-              borderRadius: "3px",
-              fontSize: "12px",
-              textAlign: "center",
-              color: "#fff",
-              background: "#ee8a65",
-            }}
-          >
-            Fit to Kenya
-          </button>
         </div>
 
         <StyledDividedContainer>
-          <BookingForm location={currentLocation.toArray()} />
+          <BookingForm
+            location={currentLocation.toArray()}
+            setStartPlace={(pos) => {
+              setStartPlace(pos);
+              console.log(pos);
+              mapRef.current?.panTo(pos);
+            }}
+            setEndPlace={(pos) => {
+              setEndPlace(pos);
+            }}
+          />
         </StyledDividedContainer>
       </StyledContentContainer>
     </StyledPageContainer>
