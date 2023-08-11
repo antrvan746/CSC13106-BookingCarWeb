@@ -22,6 +22,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Create a new driver
     try {
       const { phone, name, rating } = driverSchema.parse(req.body);
+
+      const existed = await prismaClient.driver.findFirst({
+        where:{phone: phone}
+      });
+      if(existed){
+        return res.status(200).json(existed)
+      }
+
       const driver = await prismaClient.driver.create({
         data: {
           phone,

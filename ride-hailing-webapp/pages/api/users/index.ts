@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { Prisma, PrismaClient } from "@prisma/client";
 import { z, ZodType } from "zod";
+import { prismaClient } from "../../../libs/prisma";
 
 const prisma = new PrismaClient();
 
@@ -34,6 +35,17 @@ export default async function handler(
     case "POST":
       try {
         const user = UserCreateRequest.parse(req.body);
+        if(user.phone === "0" && !user.email){
+          return res.status(400).json({message:"Invalid data"});
+        }
+
+        const existed = await prisma.user.findFirst({
+          where:{email: user.email,phone: user.phone,name: user.name}
+        });
+        if (existed){
+          return res.status(202).json(existed);
+        }
+
         const createdUser = await prisma.user.create({
           data: {
             email: user.email,
