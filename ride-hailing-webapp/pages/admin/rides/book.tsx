@@ -37,8 +37,13 @@ const BookingRideView = () => {
     new mapboxgl.LngLat(106.6994168168476, 10.78109609495359)
   );
 
+  console.log("Start point",startPoint);
+  console.log("End point",endPoint);
+
   useEffect(() => {
     // Get user's current location using the Geolocation API
+    console.log("Start point effect",startPoint);
+    console.log("End point effect" ,endPoint);
   }, [startPoint, endPoint]);
 
   useEffect(() => {
@@ -105,7 +110,6 @@ const BookingRideView = () => {
                     .setLngLat(pos)
                     .addTo(mapRef.current);
                 }
-                console.log(startPoint);
               }}
               setEndPlace={(pos) => {
                 setEnd(pos);
