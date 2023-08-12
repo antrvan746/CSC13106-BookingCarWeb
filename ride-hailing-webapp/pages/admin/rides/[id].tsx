@@ -4,7 +4,6 @@ import Head from "next/head";
 import React from "react";
 import styled from "styled-components";
 import withAuth from "../../_withAuth";
-import { GoogleMap } from "@react-google-maps/api";
 
 const StyledPageContainer = styled.div``;
 
@@ -18,15 +17,6 @@ const StyledDividedContainer = styled.div`
   width: 100%;
 `;
 
-const containerStyle = {
-  width: "100%",
-  height: "100%",
-};
-
-const center = {
-  lat: 10.780293274142215,
-  lng: 106.69906571528465,
-};
 
 const RideDetailView = () => {
   return (
@@ -46,15 +36,10 @@ const RideDetailView = () => {
             height: "98vh",
           }}
         >
-          <GoogleMap
-            mapContainerStyle={containerStyle}
-            center={center}
-            zoom={14}
-          ></GoogleMap>
         </div>
 
         <StyledDividedContainer>
-          <BookingForm />
+          {/* <BookingForm /> */}
         </StyledDividedContainer>
       </StyledContentContainer>
     </StyledPageContainer>

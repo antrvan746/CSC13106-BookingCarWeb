@@ -25,7 +25,6 @@ const LoadingPage = () => {
       <AdminHeader isLoggedIn={false} />
 
       <StyledContainer>
-
         <Box sx={{ display: "flex" }}>
           <CircularProgress />
         </Box>

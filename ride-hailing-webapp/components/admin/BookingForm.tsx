@@ -1,5 +1,4 @@
-import React, { ChangeEvent, useState } from "react";
-import dayjsFunc, { Dayjs } from "dayjs";
+import React, { useState } from "react";
 import styled from "styled-components";
 import {
   FormControl,
@@ -11,24 +10,22 @@ import {
   FormGroup,
   Button,
   FilterOptionsState,
+  Autocomplete,
 } from "@mui/material";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import MotorcycleIcon from "../../assets/motorcycle.png";
-import SedanIcon from "../../assets/sedan.png";
-import ShuttleBusIcon from "../../assets/shuttlebus.png";
-import Image from "next/image";
 import PlaceIcon from "@mui/icons-material/Place";
 import ContactPhoneIcon from "@mui/icons-material/ContactPhone";
 import PersonIcon from "@mui/icons-material/Person";
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import DigitalWalletIcon from "@mui/icons-material/AccountBalanceWallet";
-import PaymentIcon from "@mui/icons-material/Payment";
-import MoneyIcon from "@mui/icons-material/Money";
 
-import { LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import usePlacesAutocomplete from "use-places-autocomplete";
+import MotorcycleIcon from "@mui/icons-material/TwoWheeler";
+import SedanIcon from "@mui/icons-material/DirectionsCar";
+import ShuttleBusIcon from "@mui/icons-material/AirportShuttle";
 
+import CashIcon from "@mui/icons-material/Money";
+import CardIcon from "@mui/icons-material/CreditCard";
+import EWalletIcon from "@mui/icons-material/Wallet";
+import mapboxgl, { LngLatLike, Marker } from "mapbox-gl";
+
+const GoongApiKey = "4xsMpUsUm57ogvFDPCjlQlvmUWq6JqzeYOYJfjJe";
 
 const StyledContainer = styled.div`
   display: flex;
@@ -59,33 +56,116 @@ interface BookingFormData {
   firstName: string;
   lastName: string;
   phone: string;
-  date: Dayjs | null;
   checkedVehicle: string;
   checkedPayment: string;
 }
 
-interface PlaceInfoResponse {
-  lat: string;
-  lon: string;
-  display_name: string;
-  display_address: string;
-}
+type BookingFormProps = {
+  location: number[];
+  setStartPlace: (position: mapboxgl.LngLat) => void;
+  setEndPlace: (position: mapboxgl.LngLat) => void;
+};
 
-const LOCATION_IQ_KEY =
-  process.env.LOCATION_IQ_TOKEN || "pk.b5db726701a914af3d4f2e075b07dabb";
+type AutocompletePlacesResponse = {
+  predictions: PlaceInformation[];
+  status: string;
+};
 
-const BookingForm = () => {
+type PlaceResponse = {
+  result: PlaceResult;
+  status: string;
+};
+
+type PlaceResult = {
+  place_id: string;
+  formatted_address: string;
+  geometry: {
+    location: {
+      lat: number;
+      lng: number;
+    };
+  };
+};
+
+type AutocompletePlaceStatus = {
+  value: string;
+  suggestions: PlaceInformation[];
+};
+
+type PlaceInformation = {
+  description: string;
+  place_id: string;
+};
+
+const BookingForm = ({
+  location,
+  setStartPlace,
+  setEndPlace,
+}: BookingFormProps) => {
   const [selectedVehicle, setSelectedVehicle] = React.useState("motorcycle");
-  const [dateValue, setDateValue] = React.useState<Dayjs | null>(dayjsFunc());
+  const [selectedPayment, setSelectedPayment] = React.useState("cash");
 
+  const [autocompleteStatus, setAutocompleteStatus] =
+    React.useState<AutocompletePlaceStatus>({
+      value: "",
+      suggestions: [],
+    });
 
-  const {
-    ready,
-    value,
-    setValue,
-    suggestions: { status, data },
-    clearSuggestions,
-  } = usePlacesAutocomplete();
+  const fetchSuggestPlaces = async (input: string) => {
+    const url = `https://rsapi.goong.io/Place/AutoComplete?api_key=${GoongApiKey}&location=${location[1]},${location[0]}&input=${autocompleteStatus.value}`;
+    const response = await fetch(url);
+
+    try {
+      const data = await response.json();
+      return data;
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const fetchPlace = async (placeId: string) => {
+    const url = `https://rsapi.goong.io/Place/Detail?place_id=${placeId}&api_key=${GoongApiKey}`;
+    const response = await fetch(url);
+
+    try {
+      const data = await response.json();
+      return data;
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleSuggestPlaces = async (input: string) => {
+    setAutocompleteStatus((prevStatus) => ({ ...prevStatus, value: input }));
+    const fetchedPlaces: AutocompletePlacesResponse = await fetchSuggestPlaces(
+      autocompleteStatus.value
+    );
+
+    try {
+      const { predictions, status } = fetchedPlaces;
+      if (status === "OK") {
+        setAutocompleteStatus((prevStatus) => ({
+          ...prevStatus,
+          suggestions: predictions,
+        }));
+      } else {
+        setAutocompleteStatus((prevStatus) => ({
+          ...prevStatus,
+          suggestions: [],
+        }));
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const clearSuggestions = () => {
+    setAutocompleteStatus((prevStatus) => ({ ...prevStatus, value: "" }));
+    setAutocompleteStatus((prevStatus) => ({
+      ...prevStatus,
+      suggestions: [],
+    }));
+  };
 
   const [formData, setFormData] = useState<BookingFormData>({
     startPlace: "",
@@ -93,28 +173,63 @@ const BookingForm = () => {
     firstName: "",
     lastName: "",
     phone: "",
-    date: null,
     checkedVehicle: "",
     checkedPayment: "",
   });
 
   const [errors, setErrors] = useState<Partial<BookingFormData>>({});
 
+  const handleSelectStartPlace = async (value: string | null) => {
+    const address = value;
+    const place_id = autocompleteStatus.suggestions.find(
+      (item) => item.description === address
+    )?.place_id;
+
+    if (place_id) {
+      const place = await fetchPlace(place_id) as PlaceResponse;
+      if (place.status === "OK") {
+        const lng = place.result.geometry.location.lng;
+        const lat = place.result.geometry.location.lat;
+        setStartPlace(new mapboxgl.LngLat(lng, lat));
+      }
+    }
+    clearSuggestions();
+  };
+
+  const handleSelectEndPlace = async (value: string | null) => {
+    const address = value;
+    const place_id = autocompleteStatus.suggestions.find(
+      (item) => item.description == address
+    )?.place_id;
+
+    if (place_id) {
+      const place = await fetchPlace(place_id) as PlaceResponse;
+      if (place.status === "OK") {
+        const lng = place.result.geometry.location.lng;
+        const lat = place.result.geometry.location.lat;
+        setEndPlace(new mapboxgl.LngLat(lng, lat));
+      }
+    }
+    clearSuggestions();
+  };
+
   const handleVehicleChange = (event: any) => {
     console.log(event.target.value);
     setSelectedVehicle(event.target.value);
   };
 
+  const handlePaymentChange = (event: any) => {
+    console.log(event.target.value);
+    setSelectedPayment(event.target.value);
+  };
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (event: any) => {
     const { name, value } = event.target;
     setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
     setErrors((prevErrors) => ({ ...prevErrors, [name]: undefined }));
 
-    if (name == "startPlace") {
-      setValue(value);
-    } else if (name == "endPlace") {
-      setValue(value);
+    if (name == "startPlace" || "endPlace") {
+      handleSuggestPlaces(value);
     }
   };
 
@@ -140,15 +255,9 @@ const BookingForm = () => {
     ) {
       validationErrors.phone = "Phone number is not valid";
     }
-
-    if (formData.date?.isAfter(formData.date)) {
-    }
-
     if (Object.keys(validationErrors).length === 0) {
       try {
-        clearSuggestions();
-        setValue("");
-      } catch (err) {}
+      } catch (err) { }
     } else {
       setErrors(validationErrors);
     }
@@ -179,7 +288,9 @@ const BookingForm = () => {
           >
             <Autocomplete
               freeSolo
-              options={data.map((suggestion) => suggestion.description)}
+              options={autocompleteStatus.suggestions.map(
+                (item) => item.description
+              )}
               filterOptions={customFilterOptions}
               renderInput={(params) => (
                 <TextField
@@ -189,13 +300,18 @@ const BookingForm = () => {
                   name="startPlace"
                   variant="outlined"
                   value={formData.startPlace}
-                  onChange={handleChange}
                   error={!!errors.startPlace}
+                  onChange={handleChange}
                   helperText={errors.startPlace}
                   fullWidth
                   required
                 />
               )}
+              onChange={(_event, value, reason) => {
+                if (reason === "selectOption") {
+                  handleSelectStartPlace(value);
+                }
+              }}
             />
           </div>
         </StyledPlaceInput>
@@ -215,7 +331,9 @@ const BookingForm = () => {
           >
             <Autocomplete
               freeSolo
-              options={data.map((suggestion) => suggestion.description)}
+              options={autocompleteStatus.suggestions.map(
+                (item) => item.description
+              )}
               filterOptions={customFilterOptions}
               renderInput={(params) => (
                 <TextField
@@ -232,6 +350,12 @@ const BookingForm = () => {
                   required
                 />
               )}
+              onChange={(_event, value, reason) => {
+                console.log(reason);
+                if (reason === "selectOption") {
+                  handleSelectEndPlace(value);
+                }
+              }}
             />
           </div>
         </StyledPlaceInput>
@@ -297,7 +421,7 @@ const BookingForm = () => {
           />
         </StyleInforInput>
 
-        <StyleInforInput>
+        {/* <StyleInforInput>
           <CalendarMonthIcon
             style={{
               marginLeft: "1rem",
@@ -312,12 +436,12 @@ const BookingForm = () => {
               format="L hh:mm a"
             />
           </LocalizationProvider>
-        </StyleInforInput>
+        </StyleInforInput> */}
 
         <FormGroup>
           <FormLabel
             style={{
-              paddingLeft: "1rem",
+              paddingLeft: "1.5rem",
               marginTop: "2rem",
             }}
           >
@@ -327,8 +451,8 @@ const BookingForm = () => {
             onChange={handleVehicleChange}
             style={{
               display: "flex",
+              alignSelf: "center",
               flexDirection: "row",
-              paddingLeft: "2rem",
             }}
           >
             <FormControlLabel
@@ -337,20 +461,16 @@ const BookingForm = () => {
                 <Radio
                   checked={selectedVehicle === "motorcycle"}
                   icon={
-                    <Image
-                      src={MotorcycleIcon}
-                      alt="Motorcycle Icon"
-                      height={50}
+                    <MotorcycleIcon
+                      fill="#000000"
                       style={{
                         margin: "0.2rem",
                       }}
                     />
                   }
                   checkedIcon={
-                    <Image
-                      src={MotorcycleIcon}
-                      alt="Motorcycle Icon"
-                      height={50}
+                    <MotorcycleIcon
+                      fill="#13b45d"
                       style={{
                         margin: "0.2rem",
                       }}
@@ -368,20 +488,16 @@ const BookingForm = () => {
                 <Radio
                   checked={selectedVehicle === "4seats"}
                   icon={
-                    <Image
-                      src={SedanIcon}
-                      alt="Sedan Icon"
-                      height={50}
+                    <SedanIcon
+                      fill="#000000"
                       style={{
                         margin: "0.2rem",
                       }}
                     />
                   }
                   checkedIcon={
-                    <Image
-                      src={SedanIcon}
-                      alt="Sedan Icon"
-                      height={50}
+                    <SedanIcon
+                      fill="#13b45d"
                       style={{
                         margin: "0.2rem",
                       }}
@@ -399,23 +515,18 @@ const BookingForm = () => {
                 <Radio
                   checked={selectedVehicle === "7seats"}
                   icon={
-                    <Image
-                      src={ShuttleBusIcon}
-                      alt="Shuttle bus Icon"
-                      height={50}
+                    <ShuttleBusIcon
+                      fill="#000000"
                       style={{
                         margin: "0.2rem",
                       }}
                     />
                   }
                   checkedIcon={
-                    <Image
-                      src={ShuttleBusIcon}
-                      alt="Shuttle bus Icon"
-                      height={50}
+                    <ShuttleBusIcon
+                      fill="#13b45d"
                       style={{
                         margin: "0.2rem",
-                        color: "#000000",
                       }}
                     />
                   }
@@ -430,66 +541,100 @@ const BookingForm = () => {
         <FormGroup>
           <FormLabel
             style={{
-              paddingLeft: "1rem",
+              paddingLeft: "1.5rem",
               marginTop: "2rem",
             }}
           >
-            Chọn loại thanh toán
+            Loại thanh toán
           </FormLabel>
           <RadioGroup
+            onChange={handlePaymentChange}
             style={{
               display: "flex",
+              alignSelf: "center",
               flexDirection: "row",
-              paddingLeft: "2rem",
             }}
           >
-            <Radio
-              icon={
-                <DigitalWalletIcon
-                  style={{
-                    margin: "0.2rem",
-                  }}
+            <FormControlLabel
+              value="cash"
+              control={
+                <Radio
+                  checked={selectedPayment === "cash"}
+                  icon={
+                    <CashIcon
+                      fill="#000000"
+                      style={{
+                        margin: "0.2rem",
+                      }}
+                    />
+                  }
+                  checkedIcon={
+                    <CashIcon
+                      fill="#13b45d"
+                      style={{
+                        margin: "0.2rem",
+                      }}
+                    />
+                  }
+                  disableRipple
                 />
               }
-              checkedIcon={
-                <DigitalWalletIcon
-                  style={{
-                    margin: "0.2rem",
-                  }}
-                />
-              }
+              label="Tiền mặt"
+              labelPlacement="bottom"
             />
-            <Radio
-              icon={
-                <PaymentIcon
-                  style={{
-                    margin: "0.2rem",
-                  }}
+
+            <FormControlLabel
+              value="card"
+              control={
+                <Radio
+                  checked={selectedPayment === "card"}
+                  icon={
+                    <CardIcon
+                      fill="#000000"
+                      style={{
+                        margin: "0.2rem",
+                      }}
+                    />
+                  }
+                  checkedIcon={
+                    <CardIcon
+                      fill="#13b45d"
+                      style={{
+                        margin: "0.2rem",
+                      }}
+                    />
+                  }
                 />
               }
-              checkedIcon={
-                <PaymentIcon
-                  style={{
-                    margin: "0.2rem",
-                  }}
-                />
-              }
+              label="Thẻ"
+              labelPlacement="bottom"
             />
-            <Radio
-              icon={
-                <MoneyIcon
-                  style={{
-                    margin: "0.2rem",
-                  }}
+
+            <FormControlLabel
+              value="e_wallet"
+              control={
+                <Radio
+                  checked={selectedPayment === "e_wallet"}
+                  icon={
+                    <EWalletIcon
+                      fill="#000000"
+                      style={{
+                        margin: "0.2rem",
+                      }}
+                    />
+                  }
+                  checkedIcon={
+                    <EWalletIcon
+                      fill="#13b45d"
+                      style={{
+                        margin: "0.2rem",
+                      }}
+                    />
+                  }
                 />
               }
-              checkedIcon={
-                <MoneyIcon
-                  style={{
-                    margin: "0.2rem",
-                  }}
-                />
-              }
+              label="Ví điện tử"
+              labelPlacement="bottom"
             />
           </RadioGroup>
         </FormGroup>
@@ -497,9 +642,10 @@ const BookingForm = () => {
         <Button
           type="submit"
           style={{
-            position: "fixed",
-            right: "1rem",
-            bottom: "2rem",
+            width: "50%",
+            marginTop: "2rem",
+            marginBottom: "1rem",
+            alignSelf: "end",
           }}
           onClick={handleSubmit}
         >

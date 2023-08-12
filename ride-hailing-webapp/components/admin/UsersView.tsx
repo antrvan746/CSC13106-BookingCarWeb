@@ -143,7 +143,6 @@ const ListUser = () => {
     const fetchedUsers = fecthUsers();
     fetchedUsers.then((data) => {
       if (data) {
-        console.log(data);
         const handledData: UIUserDataItem[] = data.map(
           (item: UsersResponse, idx: number) => ({
             ...item,
