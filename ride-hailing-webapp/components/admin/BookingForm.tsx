@@ -1,5 +1,4 @@
-import React, { ChangeEvent, useState } from "react";
-import dayjsFunc, { Dayjs } from "dayjs";
+import React, { useState } from "react";
 import styled from "styled-components";
 import {
   FormControl,
@@ -12,7 +11,6 @@ import {
   Button,
   FilterOptionsState,
   Autocomplete,
-  AutocompleteChangeReason,
 } from "@mui/material";
 import PlaceIcon from "@mui/icons-material/Place";
 import ContactPhoneIcon from "@mui/icons-material/ContactPhone";
@@ -26,8 +24,6 @@ import CashIcon from "@mui/icons-material/Money";
 import CardIcon from "@mui/icons-material/CreditCard";
 import EWalletIcon from "@mui/icons-material/Wallet";
 import mapboxgl, { LngLatLike, Marker } from "mapbox-gl";
-import { UUID, randomUUID } from "crypto";
-import { v4 as uuidv4 } from "uuid";
 
 const GoongApiKey = "4xsMpUsUm57ogvFDPCjlQlvmUWq6JqzeYOYJfjJe";
 
@@ -121,7 +117,6 @@ const BookingForm = ({
 
     try {
       const data = await response.json();
-      console.log("Fetch sug data: ", data);
       return data;
     } catch (err) {
       console.log(err);
@@ -134,7 +129,6 @@ const BookingForm = ({
 
     try {
       const data = await response.json();
-      console.log("Fetch place data: ", data);
       return data;
     } catch (err) {
       console.log(err);
@@ -230,7 +224,6 @@ const BookingForm = ({
   };
 
   const handleChange = (event: any) => {
-    console.log("Hello");
     const { name, value } = event.target;
     setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
     setErrors((prevErrors) => ({ ...prevErrors, [name]: undefined }));

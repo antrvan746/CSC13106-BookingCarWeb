@@ -4,11 +4,15 @@ import Head from "next/head";
 import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import withAuth from "../../_withAuth";
-import mapboxgl, { LngLat, LngLatLike, accessToken } from "mapbox-gl";
+import mapboxgl, { LngLat } from "mapbox-gl";
+import { toGeoJSON } from "@mapbox/polyline";
+import extent from "turf-extent";
 
 const MapboxAPIKey =
   process.env.MAPBOX_API_KEY ||
   "pk.eyJ1IjoiYW50cnZhbjc0NiIsImEiOiJjbGwwdW1lb2wxcWZuM3BtemF5aWNhc21sIn0.ErBzL1xKS1JTgauuHsvsCg";
+
+const GoongApiKey = "4xsMpUsUm57ogvFDPCjlQlvmUWq6JqzeYOYJfjJe";
 
 const StyledPageContainer = styled.div``;
 
@@ -29,6 +33,8 @@ const StyledDividedContainer = styled.div`
 
 const BookingRideView = () => {
   const mapRef = useRef<mapboxgl.Map | null>(null);
+  const startMarkerRef = useRef<mapboxgl.Marker | null>(null);
+  const endMarkerRef = useRef<mapboxgl.Marker | null>(null);
 
   const [startPoint, setStart] = useState<mapboxgl.LngLat | null>(null);
   const [endPoint, setEnd] = useState<mapboxgl.LngLat | null>(null);
@@ -37,13 +43,108 @@ const BookingRideView = () => {
     new mapboxgl.LngLat(106.6994168168476, 10.78109609495359)
   );
 
-  console.log("Start point",startPoint);
-  console.log("End point",endPoint);
+  const routing = async (origin: LngLat, des: LngLat, typeVehicle: string) => {
+    if (!mapRef.current) return;
+    var layers = mapRef.current.getStyle().layers;
+
+    let firstSymbolId;
+    for (var i = 0; i < layers.length; i++) {
+      if (layers[i].type === "line") {
+        firstSymbolId = layers[i].id;
+      }
+    }
+    const goongClient = goongSdk({
+      accessToken: GoongApiKey,
+    });
+    try {
+      const response = await goongClient.directions
+        .getDirections({
+          origin: `${startPoint?.lat},${startPoint?.lng}`,
+          destination: `${endPoint?.lat},${endPoint?.lng}`,
+          vehicle: typeVehicle,
+        })
+        .send();
+
+      const directions = response.body;
+      const route = directions.routes[0];
+      const geometry_string = route.overview_polyline.points;
+      const geoJSON = toGeoJSON(geometry_string);
+
+      if (!mapRef.current.getSource("route")) {
+        mapRef.current.addSource("route", {
+          type: "geojson",
+          data: geoJSON,
+        });
+
+        mapRef.current.addLayer(
+          {
+            id: "route",
+            type: "line",
+            source: "route",
+            layout: {
+              "line-join": "round",
+              "line-cap": "round",
+            },
+            paint: {
+              "line-color": "#1e88e5",
+              "line-width": 8,
+            },
+          },
+          firstSymbolId
+        );
+      }
+    } catch (error) {
+      console.error("Error fetching directions:", error);
+    }
+  };
+
+  const unsubcribeRouting = async () => {
+    if (!mapRef.current) return;
+
+    if (mapRef.current.getLayer("route")) {
+      mapRef.current.removeLayer("route");
+    }
+
+    if (mapRef.current.getSource("route")) {
+      mapRef.current.removeSource("route");
+    }
+  };
 
   useEffect(() => {
-    // Get user's current location using the Geolocation API
-    console.log("Start point effect",startPoint);
-    console.log("End point effect" ,endPoint);
+    unsubcribeRouting();
+    if (mapRef.current && startPoint && endPoint && startPoint !== endPoint) {
+      // Animate map to fit bounds.
+      const bb = extent({
+        type: "FeatureCollection",
+        features: [
+          {
+            type: "Feature",
+            properties: {},
+            geometry: {
+              type: "Point",
+              coordinates: startPoint.toArray(),
+            },
+          },
+          {
+            type: "Feature",
+            properties: {},
+            geometry: {
+              type: "Point",
+              coordinates: endPoint.toArray(),
+            },
+          },
+        ],
+      });
+
+      mapRef.current.fitBounds([
+        [bb[0], bb[1]],
+        [bb[2], bb[3]],
+      ], {
+        padding: 150
+      });
+
+      routing(startPoint, endPoint, "car");
+    }
   }, [startPoint, endPoint]);
 
   useEffect(() => {
@@ -78,6 +179,8 @@ const BookingRideView = () => {
           href="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css"
           rel="stylesheet"
         />
+        <script src="https://unpkg.com/@goongmaps/goong-sdk/umd/goong-sdk.min.js" />
+        <script src="https://cdn.jsdelivr.net/npm/@goongmaps/goong-js@1.0.9/dist/goong-js.js" />
       </Head>
       <StyledPageContainer>
         <AdminHeader />
@@ -102,25 +205,27 @@ const BookingRideView = () => {
               location={currentLocation.toArray()}
               setStartPlace={(pos) => {
                 setStart(pos);
-                console.log("Setstart",pos);
                 mapRef.current?.panTo(pos);
-
                 if (mapRef.current) {
-                  new mapboxgl.Marker({ color: "#237feb" })
+                  startMarkerRef.current?.remove();
+                  startMarkerRef.current = new mapboxgl.Marker({
+                    color: "#237feb",
+                  })
                     .setLngLat(pos)
                     .addTo(mapRef.current);
                 }
               }}
               setEndPlace={(pos) => {
                 setEnd(pos);
-                console.log("Set end",pos);
                 mapRef.current?.panTo(pos);
                 if (mapRef.current) {
-                  new mapboxgl.Marker({ color: "#eb3223" })
+                  endMarkerRef.current?.remove();
+                  endMarkerRef.current = new mapboxgl.Marker({
+                    color: "#eb3223",
+                  })
                     .setLngLat(pos)
                     .addTo(mapRef.current);
                 }
-                console.log(endPoint);
               }}
             />
           </StyledDividedContainer>
