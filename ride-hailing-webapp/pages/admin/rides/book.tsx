@@ -97,7 +97,7 @@ const BookingRideView = () => {
               location={currentLocation.toArray()}
               setStartPlace={(pos) => {
                 setStart(pos);
-                console.log(pos);
+                console.log("Setstart",pos);
                 mapRef.current?.panTo(pos);
 
                 if (mapRef.current) {
@@ -109,7 +109,7 @@ const BookingRideView = () => {
               }}
               setEndPlace={(pos) => {
                 setEnd(pos);
-                console.log(pos);
+                console.log("Set end",pos);
                 mapRef.current?.panTo(pos);
                 if (mapRef.current) {
                   new mapboxgl.Marker({ color: "#eb3223" })

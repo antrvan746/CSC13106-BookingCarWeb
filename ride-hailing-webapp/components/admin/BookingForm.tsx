@@ -121,6 +121,7 @@ const BookingForm = ({
 
     try {
       const data = await response.json();
+      console.log("Fetch sug data: ", data);
       return data;
     } catch (err) {
       console.log(err);
@@ -133,6 +134,7 @@ const BookingForm = ({
 
     try {
       const data = await response.json();
+      console.log("Fetch place data: ", data);
       return data;
     } catch (err) {
       console.log(err);
@@ -190,13 +192,12 @@ const BookingForm = ({
     )?.place_id;
 
     if (place_id) {
-      fetchPlace(place_id).then((place: PlaceResponse) => {
-        if (place.status === "OK") {
-          const lng = place.result.geometry.location.lng;
-          const lat = place.result.geometry.location.lat;
-          setStartPlace(new mapboxgl.LngLat(lng, lat));
-        }
-      });
+      const place = await fetchPlace(place_id) as PlaceResponse;
+      if (place.status === "OK") {
+        const lng = place.result.geometry.location.lng;
+        const lat = place.result.geometry.location.lat;
+        setStartPlace(new mapboxgl.LngLat(lng, lat));
+      }
     }
     clearSuggestions();
   };
@@ -208,14 +209,12 @@ const BookingForm = ({
     )?.place_id;
 
     if (place_id) {
-      fetchPlace(place_id).then((place: PlaceResponse) => {
-        console.log(place_id);
-        if (place.status === "OK") {
-          const lng = place.result.geometry.location.lng;
-          const lat = place.result.geometry.location.lat;
-          setEndPlace(new mapboxgl.LngLat(lng, lat));
-        }
-      });
+      const place = await fetchPlace(place_id) as PlaceResponse;
+      if (place.status === "OK") {
+        const lng = place.result.geometry.location.lng;
+        const lat = place.result.geometry.location.lat;
+        setEndPlace(new mapboxgl.LngLat(lng, lat));
+      }
     }
     clearSuggestions();
   };
@@ -265,7 +264,7 @@ const BookingForm = ({
     }
     if (Object.keys(validationErrors).length === 0) {
       try {
-      } catch (err) {}
+      } catch (err) { }
     } else {
       setErrors(validationErrors);
     }
