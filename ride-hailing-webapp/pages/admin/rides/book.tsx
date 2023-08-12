@@ -1,11 +1,7 @@
 import AdminHeader from "../../../components/admin/AdminHeader";
 import BookingForm from "../../../components/admin/BookingForm";
 import Head from "next/head";
-import React, {
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import withAuth from "../../_withAuth";
 import mapboxgl, { LngLat, LngLatLike, accessToken } from "mapbox-gl";
@@ -34,8 +30,8 @@ const StyledDividedContainer = styled.div`
 const BookingRideView = () => {
   const mapRef = useRef<mapboxgl.Map | null>(null);
 
-  const [start, setStart] = useState<LngLatLike>([0, 0]);
-  const [end, setEnd] = useState<LngLatLike>([0, 0]);
+  const [startPoint, setStart] = useState<mapboxgl.LngLat | null>(null);
+  const [endPoint, setEnd] = useState<mapboxgl.LngLat | null>(null);
 
   const [currentLocation, setCurrentLocation] = useState<LngLat>(
     new mapboxgl.LngLat(106.6994168168476, 10.78109609495359)
@@ -43,18 +39,7 @@ const BookingRideView = () => {
 
   useEffect(() => {
     // Get user's current location using the Geolocation API
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          setCurrentLocation(new mapboxgl.LngLat(longitude, latitude));
-        },
-        (error) => {
-          console.error("Error getting current location:", error);
-        }
-      );
-    }
-  }, []);
+  }, [startPoint, endPoint]);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -111,8 +96,8 @@ const BookingRideView = () => {
             <BookingForm
               location={currentLocation.toArray()}
               setStartPlace={(pos) => {
-                console.log({ lng: pos.lng, lat: pos.lat } as LngLatLike);
-                setStart([ pos.lng, pos.lat ]);
+                setStart(pos);
+                console.log(pos);
                 mapRef.current?.panTo(pos);
 
                 if (mapRef.current) {
@@ -120,17 +105,18 @@ const BookingRideView = () => {
                     .setLngLat(pos)
                     .addTo(mapRef.current);
                 }
-                console.log(start);
+                console.log(startPoint);
               }}
               setEndPlace={(pos) => {
-                setEnd({ lng: pos.lng, lat: pos.lat } as LngLatLike);
+                setEnd(pos);
+                console.log(pos);
                 mapRef.current?.panTo(pos);
                 if (mapRef.current) {
                   new mapboxgl.Marker({ color: "#eb3223" })
                     .setLngLat(pos)
                     .addTo(mapRef.current);
                 }
-                console.log(end);
+                console.log(endPoint);
               }}
             />
           </StyledDividedContainer>
