@@ -11,6 +11,12 @@ import {
   Button,
   FilterOptionsState,
   Autocomplete,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  CircularProgress,
+  DialogTitle,
 } from "@mui/material";
 import PlaceIcon from "@mui/icons-material/Place";
 import ContactPhoneIcon from "@mui/icons-material/ContactPhone";
@@ -173,8 +179,8 @@ const BookingForm = ({
     firstName: "",
     lastName: "",
     phone: "",
-    checkedVehicle: "",
-    checkedPayment: "",
+    checkedVehicle: "motorcycle",
+    checkedPayment: "cash",
   });
 
   const [errors, setErrors] = useState<Partial<BookingFormData>>({});
@@ -185,8 +191,16 @@ const BookingForm = ({
       (item) => item.description === address
     )?.place_id;
 
+    if (place_id && address) {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        startPlaceId: place_id,
+        startPlace: address,
+      }));
+    }
+
     if (place_id) {
-      const place = await fetchPlace(place_id) as PlaceResponse;
+      const place = (await fetchPlace(place_id)) as PlaceResponse;
       if (place.status === "OK") {
         const lng = place.result.geometry.location.lng;
         const lat = place.result.geometry.location.lat;
@@ -202,8 +216,16 @@ const BookingForm = ({
       (item) => item.description == address
     )?.place_id;
 
+    if (place_id && address) {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        endPlaceId: place_id,
+        endPlace: address,
+      }));
+    }
+
     if (place_id) {
-      const place = await fetchPlace(place_id) as PlaceResponse;
+      const place = (await fetchPlace(place_id)) as PlaceResponse;
       if (place.status === "OK") {
         const lng = place.result.geometry.location.lng;
         const lat = place.result.geometry.location.lat;
@@ -214,13 +236,21 @@ const BookingForm = ({
   };
 
   const handleVehicleChange = (event: any) => {
-    console.log(event.target.value);
-    setSelectedVehicle(event.target.value);
+    const value: string = event.target.value;
+    setSelectedVehicle(value);
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      checkedVehicle: selectedVehicle,
+    }));
   };
 
   const handlePaymentChange = (event: any) => {
-    console.log(event.target.value);
-    setSelectedPayment(event.target.value);
+    const value: string = event.target.value;
+    setSelectedPayment(value);
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      checkedVPayment: selectedPayment,
+    }));
   };
 
   const handleChange = (event: any) => {
@@ -250,14 +280,15 @@ const BookingForm = ({
     }
     if (!formData.phone.trim()) {
       validationErrors.phone = "Phone is required";
-    } else if (
-      /^[+]*[(]{0,1}[0-9]{1,3}[)]{0,1}[-\s\./0-9]*$/g.test(formData.phone)
-    ) {
+    } else if (/@"\d{10}"/g.test(formData.phone)) {
       validationErrors.phone = "Phone number is not valid";
     }
     if (Object.keys(validationErrors).length === 0) {
       try {
-      } catch (err) { }
+        setOpen(true);
+        console.log(formData);
+        // TODO: do logic here
+      } catch (err) {}
     } else {
       setErrors(validationErrors);
     }
@@ -269,6 +300,8 @@ const BookingForm = ({
   ) => {
     return options;
   };
+
+
 
   return (
     <StyledContainer>
@@ -411,6 +444,7 @@ const BookingForm = ({
           <TextField
             label="Số điện thoại"
             size="small"
+            name="phone"
             variant="outlined"
             value={formData.phone}
             onChange={handleChange}
@@ -420,23 +454,6 @@ const BookingForm = ({
             required
           />
         </StyleInforInput>
-
-        {/* <StyleInforInput>
-          <CalendarMonthIcon
-            style={{
-              marginLeft: "1rem",
-              marginRight: "1rem",
-            }}
-          />
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DateTimePicker
-              label="Date"
-              value={dateValue}
-              onChange={(newValue) => setDateValue(newValue)}
-              format="L hh:mm a"
-            />
-          </LocalizationProvider>
-        </StyleInforInput> */}
 
         <FormGroup>
           <FormLabel
@@ -652,6 +669,7 @@ const BookingForm = ({
           Tìm chuyến xe
         </Button>
       </FormControl>
+
     </StyledContainer>
   );
 };
