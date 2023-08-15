@@ -7,6 +7,15 @@ import withAuth from "../../_withAuth";
 import mapboxgl, { LngLat } from "mapbox-gl";
 import { toGeoJSON } from "@mapbox/polyline";
 import extent from "turf-extent";
+import {
+  Button,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@mui/material";
 
 const MapboxAPIKey =
   process.env.MAPBOX_API_KEY ||
@@ -31,6 +40,10 @@ const StyledDividedContainer = styled.div`
   }
 `;
 
+const CAR_PRICE_PER_KM = 20000;
+const BIKE_PRICE_PER_KM = 10000;
+const LARGE_CAR_PRICE_PER_KM = 23000;
+
 const BookingRideView = () => {
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const startMarkerRef = useRef<mapboxgl.Marker | null>(null);
@@ -38,10 +51,28 @@ const BookingRideView = () => {
 
   const [startPoint, setStart] = useState<mapboxgl.LngLat | null>(null);
   const [endPoint, setEnd] = useState<mapboxgl.LngLat | null>(null);
+  const [bookingType, setBookingType] = useState("motorcycle");
+  const [distance, setDistance] = useState("");
+  const [duration, setDuration] = useState("");
+  const [price, setPrice] = useState(0);
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [currentLocation, setCurrentLocation] = useState<LngLat>(
     new mapboxgl.LngLat(106.6994168168476, 10.78109609495359)
   );
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleSubscribe = () => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      setOpen(false);
+    }, 3000);
+  };
 
   const routing = async (origin: LngLat, des: LngLat, typeVehicle: string) => {
     if (!mapRef.current) return;
@@ -66,7 +97,25 @@ const BookingRideView = () => {
         .send();
 
       const directions = response.body;
+      console.log(directions);
       const route = directions.routes[0];
+
+      const distance = route.legs[0].distance.text;
+      setDistance(distance);
+      const duration = route.legs[0].duration.text;
+      setDuration(duration);
+
+      let price = distance / 1000;
+      if (bookingType === "4seats") {
+        price *= CAR_PRICE_PER_KM;
+      } else if (bookingType === "motorcycle") {
+        price *= BIKE_PRICE_PER_KM;
+      } else if (bookingType === "7seats") {
+        price *= LARGE_CAR_PRICE_PER_KM;
+      }
+
+      setPrice(Math.floor(price));
+
       const geometry_string = route.overview_polyline.points;
       const geoJSON = toGeoJSON(geometry_string);
 
@@ -136,12 +185,15 @@ const BookingRideView = () => {
         ],
       });
 
-      mapRef.current.fitBounds([
-        [bb[0], bb[1]],
-        [bb[2], bb[3]],
-      ], {
-        padding: 150
-      });
+      mapRef.current.fitBounds(
+        [
+          [bb[0], bb[1]],
+          [bb[2], bb[3]],
+        ],
+        {
+          padding: 150,
+        }
+      );
 
       routing(startPoint, endPoint, "car");
     }
@@ -230,6 +282,44 @@ const BookingRideView = () => {
             />
           </StyledDividedContainer>
         </StyledContentContainer>
+        <Dialog
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+          PaperProps={{
+            style: {
+              boxShadow: "none",
+            },
+          }}
+        >
+          <DialogTitle> Đặt chuyến xe </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              <span> Dự kiến thời gian chuyến đi là {duration} </span>
+              <span> Quãng đường dự kiến dài {distance} </span>
+              <span> Chuyến đi của khách hàng hết {price} </span>
+            </DialogContentText>
+
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              {loading ? (
+                <CircularProgress
+                  style={{
+                    marginTop: "1rem",
+                    alignSelf: "center",
+                  }}
+                />
+              ) : (
+                <></>
+              )}
+            </div>
+          </DialogContent>
+
+          <DialogActions>
+            <Button onClick={handleSubscribe}> Đặt xe </Button>
+            <Button onClick={handleClose}> Huỷ </Button>
+          </DialogActions>
+        </Dialog>
       </StyledPageContainer>
     </>
   );
