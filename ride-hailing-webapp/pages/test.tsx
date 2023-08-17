@@ -48,40 +48,36 @@ const About: NextPage = () => {
   const handleClose = () => {
     setOpen(false);
   };
-  
-  useEffect(()=>{
-    ws.current.client_listeners.onDriverFound = function(e){
+
+  useEffect(() => {
+    ws.current.client_listeners.onDriverFound = function (e) {
       setLoading(false);
-      console.log(!e ? "Khong tim dc driver" : `Tim duoc driver ${e.driver_id}`)
+      console.log(
+        !e ? "Khong tim dc driver" : `Tim duoc driver ${e.driver_id}`
+      );
 
-      setTimeout(()=>{
-        setOpen(false)
-      },3000)
-    }
+      setTimeout(() => {
+        setOpen(false);
+      }, 3000);
+    };
 
-    return ()=>{
+    return () => {
       ws.current.client_listeners.onDriverFound = undefined;
-    }
-  })
+    };
+  }, []);
 
   const handleSubscribe = () => {
     setLoading(true);
     ws.current.Connect({
-      user_id:"admin_user",
-      slon:106.69380051915194,
-      slat:10.78825445546148,
-      sadr:"LeVanTamPark",
-      elat:10.775111871794604,
-      elon:106.69234499244654,
-      eadr:"TaoDangPark"
-    })
-
-    // setTimeout(() => {
-    //   setLoading(false);
-    //   setOpen(false);
-    // }, 3000);
+      user_id: "admin_user",
+      slon: 106.69380051915194,
+      slat: 10.78825445546148,
+      sadr: "LeVanTamPark",
+      elat: 10.775111871794604,
+      elon: 106.69234499244654,
+      eadr: "TaoDangPark",
+    });
   };
-
 
   return (
     <>
