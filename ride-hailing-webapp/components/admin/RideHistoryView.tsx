@@ -63,7 +63,7 @@ const RideHistoryView: React.FC<RideHistoryViewProps> = (props) => {
             display: "flex",
             flexDirection: "column",
             overflow: "hidden",
-            textOverflow: "ellipsis"
+            textOverflow: "ellipsis",
           }}
         >
           <div
@@ -107,7 +107,10 @@ const RideHistoryView: React.FC<RideHistoryViewProps> = (props) => {
       <StyledGridItemContainer>
         <span
           style={{ fontSize: "small", fontWeight: "bold" }}
-        >{`${fee}d`}</span>
+        >{`${fee.toLocaleString("it-IT", {
+          style: "currency",
+          currency: "VND",
+        })}`}</span>
       </StyledGridItemContainer>
     </StyledContainer>
   );

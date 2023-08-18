@@ -11,12 +11,6 @@ import {
   Button,
   FilterOptionsState,
   Autocomplete,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  CircularProgress,
-  DialogTitle,
 } from "@mui/material";
 import PlaceIcon from "@mui/icons-material/Place";
 import ContactPhoneIcon from "@mui/icons-material/ContactPhone";
@@ -70,6 +64,8 @@ type BookingFormProps = {
   location: number[];
   setStartPlace: (position: mapboxgl.LngLat) => void;
   setEndPlace: (position: mapboxgl.LngLat) => void;
+  setOpenDialog: () => void;
+  setBookingVehicle: (vehicle: string) => void;
 };
 
 type AutocompletePlacesResponse = {
@@ -107,6 +103,8 @@ const BookingForm = ({
   location,
   setStartPlace,
   setEndPlace,
+  setOpenDialog,
+  setBookingVehicle,
 }: BookingFormProps) => {
   const [selectedVehicle, setSelectedVehicle] = React.useState("motorcycle");
   const [selectedPayment, setSelectedPayment] = React.useState("cash");
@@ -238,6 +236,7 @@ const BookingForm = ({
   const handleVehicleChange = (event: any) => {
     const value: string = event.target.value;
     setSelectedVehicle(value);
+    setBookingVehicle(value);
     setFormData((prevFormData) => ({
       ...prevFormData,
       checkedVehicle: selectedVehicle,
@@ -285,7 +284,7 @@ const BookingForm = ({
     }
     if (Object.keys(validationErrors).length === 0) {
       try {
-        setOpen(true);
+        setOpenDialog();
         console.log(formData);
         // TODO: do logic here
       } catch (err) {}
@@ -300,8 +299,6 @@ const BookingForm = ({
   ) => {
     return options;
   };
-
-
 
   return (
     <StyledContainer>
@@ -669,7 +666,6 @@ const BookingForm = ({
           Tìm chuyến xe
         </Button>
       </FormControl>
-
     </StyledContainer>
   );
 };
