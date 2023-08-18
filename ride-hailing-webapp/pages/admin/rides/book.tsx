@@ -52,9 +52,11 @@ const BookingRideView = () => {
   const [startPoint, setStart] = useState<mapboxgl.LngLat | null>(null);
   const [endPoint, setEnd] = useState<mapboxgl.LngLat | null>(null);
   const [bookingType, setBookingType] = useState("motorcycle");
+
   const [distance, setDistance] = useState("");
   const [duration, setDuration] = useState("");
   const [price, setPrice] = useState(0);
+
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -90,8 +92,8 @@ const BookingRideView = () => {
     try {
       const response = await goongClient.directions
         .getDirections({
-          origin: `${startPoint?.lat},${startPoint?.lng}`,
-          destination: `${endPoint?.lat},${endPoint?.lng}`,
+          origin: `${origin.lat},${origin.lng}`,
+          destination: `${des.lat},${des.lng}`,
           vehicle: typeVehicle,
         })
         .send();
@@ -105,7 +107,7 @@ const BookingRideView = () => {
       const duration = route.legs[0].duration.text;
       setDuration(duration);
 
-      let price = distance / 1000;
+      let price = route.legs[0].distance.value / 1000;
       if (bookingType === "4seats") {
         price *= CAR_PRICE_PER_KM;
       } else if (bookingType === "motorcycle") {
@@ -113,7 +115,7 @@ const BookingRideView = () => {
       } else if (bookingType === "7seats") {
         price *= LARGE_CAR_PRICE_PER_KM;
       }
-
+      console.log(price);
       setPrice(Math.floor(price));
 
       const geometry_string = route.overview_polyline.points;
@@ -195,9 +197,10 @@ const BookingRideView = () => {
         }
       );
 
-      routing(startPoint, endPoint, "car");
+      const vehicleType = bookingType === "motorcycle" ? "bike" : "car";
+      routing(startPoint, endPoint, vehicleType);
     }
-  }, [startPoint, endPoint]);
+  }, [startPoint, endPoint, bookingType]);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -279,6 +282,12 @@ const BookingRideView = () => {
                     .addTo(mapRef.current);
                 }
               }}
+              setOpenDialog={() => {
+                setOpen(true);
+              }}
+              setBookingVehicle={(vehicle) => {
+                setBookingType(vehicle);
+              }}
             />
           </StyledDividedContainer>
         </StyledContentContainer>
@@ -296,9 +305,15 @@ const BookingRideView = () => {
           <DialogTitle> Đặt chuyến xe </DialogTitle>
           <DialogContent>
             <DialogContentText id="alert-dialog-description">
-              <span> Dự kiến thời gian chuyến đi là {duration} </span>
-              <span> Quãng đường dự kiến dài {distance} </span>
-              <span> Chuyến đi của khách hàng hết {price} </span>
+              <p>
+                Dự kiến thời gian chuyến đi là {duration} <br />
+                Quãng đường dự kiến dài {distance} <br />
+                Chuyến đi của khách hàng hết{" "}
+                {price.toLocaleString("it-IT", {
+                  style: "currency",
+                  currency: "VND",
+                })}
+              </p>
             </DialogContentText>
 
             <div style={{ display: "flex", flexDirection: "column" }}>
