@@ -18,7 +18,8 @@ import {
   LinearProgress,
   TextField,
 } from "@mui/material";
-import RideWs from "../libs/RideWs";
+import RideWs from "../libs/ride-ws";
+import { CheckCircle } from "@mui/icons-material";
 
 const StyledPageContainer = styled.div``;
 
@@ -44,8 +45,13 @@ const StyledIntroductionParagraph = styled.p`
 const About: NextPage = () => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [completeFinding, setCompleteFinding] = useState(false);
   const ws = useRef<RideWs>(new RideWs({}));
   const handleClose = () => {
+    setLoading(false);
+    setTimeout(() => {
+      setCompleteFinding(false);
+    }, 3000);
     setOpen(false);
   };
 
@@ -68,15 +74,10 @@ const About: NextPage = () => {
 
   const handleSubscribe = () => {
     setLoading(true);
-    ws.current.Connect({
-      user_id: "admin_user",
-      slon: 106.69380051915194,
-      slat: 10.78825445546148,
-      sadr: "LeVanTamPark",
-      elat: 10.775111871794604,
-      elon: 106.69234499244654,
-      eadr: "TaoDangPark",
-    });
+
+    setTimeout(() => {
+      setCompleteFinding(true);
+    }, 3000);
   };
 
   return (
@@ -116,12 +117,27 @@ const About: NextPage = () => {
             <DialogTitle> Đặt chuyến xe </DialogTitle>
             <DialogContent>
               <DialogContentText id="alert-dialog-description">
-                Chuyến đi của khách hàng hết 100.000VND
+                <p> Chuyến đi của khách hàng hết 100.000VND </p>
+
+                <span>
+                  {completeFinding ? "Đã tìm thấy tài xế cho chuyến đi." : ""}
+                </span>
               </DialogContentText>
 
               <div style={{ display: "flex", flexDirection: "column" }}>
-                {loading ? (
+                {loading && !completeFinding ? (
                   <CircularProgress
+                    style={{
+                      marginTop: "1rem",
+                      alignSelf: "center",
+                    }}
+                  />
+                ) : (
+                  <></>
+                )}
+                {completeFinding ? (
+                  <CheckCircle
+                    color="success"
                     style={{
                       marginTop: "1rem",
                       alignSelf: "center",
@@ -134,8 +150,14 @@ const About: NextPage = () => {
             </DialogContent>
 
             <DialogActions>
-              <Button onClick={handleSubscribe}> Đặt xe </Button>
-              <Button onClick={handleClose}> Huỷ </Button>
+              {!completeFinding ? (
+                <Button onClick={handleSubscribe}> Đặt xe </Button>
+              ) : (
+                <></>
+              )}
+              <Button onClick={handleClose}>
+                {!completeFinding ? "Huỷ" : "Đóng"}
+              </Button>
             </DialogActions>
           </Dialog>
         </div>

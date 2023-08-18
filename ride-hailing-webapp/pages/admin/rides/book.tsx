@@ -17,6 +17,9 @@ import {
   DialogTitle,
 } from "@mui/material";
 
+import RideWs from "../../../libs/ride-ws";
+import { CheckCircle } from "@mui/icons-material";
+
 const MapboxAPIKey =
   process.env.MAPBOX_API_KEY ||
   "pk.eyJ1IjoiYW50cnZhbjc0NiIsImEiOiJjbGwwdW1lb2wxcWZuM3BtemF5aWNhc21sIn0.ErBzL1xKS1JTgauuHsvsCg";
@@ -49,6 +52,8 @@ const BookingRideView = () => {
   const startMarkerRef = useRef<mapboxgl.Marker | null>(null);
   const endMarkerRef = useRef<mapboxgl.Marker | null>(null);
 
+  const ws = useRef<RideWs>(new RideWs({}));
+
   const [startPoint, setStart] = useState<mapboxgl.LngLat | null>(null);
   const [endPoint, setEnd] = useState<mapboxgl.LngLat | null>(null);
   const [bookingType, setBookingType] = useState("motorcycle");
@@ -59,21 +64,29 @@ const BookingRideView = () => {
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [completeFinding, setCompleteFinding] = useState(false);
 
   const [currentLocation, setCurrentLocation] = useState<LngLat>(
     new mapboxgl.LngLat(106.6994168168476, 10.78109609495359)
   );
 
   const handleClose = () => {
+    setLoading(false);
+    setCompleteFinding(false);
     setOpen(false);
   };
 
   const handleSubscribe = () => {
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      setOpen(false);
-    }, 3000);
+    ws.current.Connect({
+      user_id: "admin_user",
+      slon: 106.69380051915194,
+      slat: 10.78825445546148,
+      sadr: "LeVanTamPark",
+      elat: 10.775111871794604,
+      elon: 106.69234499244654,
+      eadr: "TaoDangPark",
+    });
   };
 
   const routing = async (origin: LngLat, des: LngLat, typeVehicle: string) => {
@@ -225,6 +238,26 @@ const BookingRideView = () => {
     };
   }, [currentLocation]);
 
+  useEffect(() => {
+    ws.current.client_listeners.onDriverFound = function (e) {
+      setLoading(false);
+      // console.log( !e ? "Khong tim dc driver" : `Tim duoc driver ${e.driver_id}`
+      // );
+
+      if (e) {
+        setCompleteFinding(true);
+      }
+
+      setTimeout(() => {
+        setOpen(false);
+      }, 3000);
+    };
+
+    return () => {
+      ws.current.client_listeners.onDriverFound = undefined;
+    };
+  }, []);
+
   return (
     <>
       <Head>
@@ -313,12 +346,28 @@ const BookingRideView = () => {
                   style: "currency",
                   currency: "VND",
                 })}
+                .
               </p>
+
+              <span>
+                {completeFinding ? "Đã tìm thấy tài xế cho chuyến đi" : ""}
+              </span>
             </DialogContentText>
 
             <div style={{ display: "flex", flexDirection: "column" }}>
-              {loading ? (
+              {loading && !completeFinding ? (
                 <CircularProgress
+                  style={{
+                    marginTop: "1rem",
+                    alignSelf: "center",
+                  }}
+                />
+              ) : (
+                <></>
+              )}
+              {completeFinding ? (
+                <CheckCircle
+                  fill="#13b45d"
                   style={{
                     marginTop: "1rem",
                     alignSelf: "center",
@@ -331,8 +380,14 @@ const BookingRideView = () => {
           </DialogContent>
 
           <DialogActions>
-            <Button onClick={handleSubscribe}> Đặt xe </Button>
-            <Button onClick={handleClose}> Huỷ </Button>
+            {!completeFinding ? (
+              <Button onClick={handleSubscribe}> Đặt xe </Button>
+            ) : (
+              <></>
+            )}
+            <Button onClick={handleClose}>
+              {!completeFinding ? "Huỷ" : "Đóng"}
+            </Button>
           </DialogActions>
         </Dialog>
       </StyledPageContainer>
