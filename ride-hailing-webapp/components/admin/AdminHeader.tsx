@@ -67,99 +67,85 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ isLoggedIn = true }) => {
     { name: "Drivers", icon: <DriversIcon />, link: "/admin/drivers" },
   ];
 
-  const getList = () => (
-    <div
-      style={{
-        width: 250,
-        backgroundColor: "#1e1e1e",
-        height: "300vh",
-        position: "absolute",
-        zIndex: 1,
-      }}
-      onClick={() => setOpen(false)}
-    >
-      {listNavigation.map((item, index) => (
-        <ListItem
-          key={index}
-          style={{
-            paddingTop: "8px",
-            paddingBottom: "8px",
-            paddingLeft: "0.5rem",
-          }}
-          disablePadding
-        >
-          <ListItemIcon style={{ padding: "8px 0px 8px 8px" }}>
-            {item.icon}
-          </ListItemIcon>
-          <Link
-            href={item.link}
-            style={{
-              color: "#ffffff",
-              padding: "8px 0px 8px 0px",
-              textDecoration: "none",
-            }}
-          >
-            {item.name}
-          </Link>
-        </ListItem>
-      ))}
-    </div>
-  );
-
-  const MenuButton: React.FC<AdminHeaderProps> = ({ isLoggedIn }) => {
-    if (isLoggedIn) {
-      return (
-        <IconButton
-          style={{
-            margin: "0rem 1rem 0rem 0rem",
-          }}
-          onClick={() => setOpen(!isOpen)}
-        >
-          <MenuIcon
-            style={{
-              color: "#ffffff",
-            }}
-          />
-        </IconButton>
-      );
-    } else return <></>;
-  };
-
-  const LogOutButton: React.FC<AdminHeaderProps> = ({ isLoggedIn }) => {
-    if (isLoggedIn) {
-      return (
-        <IconButton
-          style={{
-            marginLeft: "auto",
-          }}
-          onClick={signOut}
-        >
-          <LogoutIcon
-            style={{
-              color: "#ffffff",
-            }}
-          />
-        </IconButton>
-      );
-    }
-  };
-
-  const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
-    if (isOpen) {
-      return getList();
-    }
-  };
-
   return (
     <div>
       <StyledContainer>
-        <MenuButton isLoggedIn={isLoggedIn} />
+        {isLoggedIn ? (
+          <IconButton
+            style={{
+              margin: "0rem 1rem 0rem 0rem",
+            }}
+            onClick={() => setOpen(!isOpen)}
+          >
+            <MenuIcon
+              style={{
+                color: "#ffffff",
+              }}
+            />
+          </IconButton>
+        ) : (
+          <></>
+        )}
         <Link href="/admin/">
           <Image src={HeaderLogo} alt="Logo" height={40} />
         </Link>
-        <LogOutButton isLoggedIn={isLoggedIn} />
+        {isLoggedIn ? (
+          <IconButton
+            style={{
+              marginLeft: "auto",
+            }}
+            onClick={signOut}
+          >
+            <LogoutIcon
+              style={{
+                color: "#ffffff",
+              }}
+            />
+          </IconButton>
+        ) : (
+          <></>
+        )}
       </StyledContainer>
-      <Sidebar isOpen={isOpen} />
+      {isOpen ? (
+        <div
+          style={{
+            width: 250,
+            backgroundColor: "#1e1e1e",
+            height: "300vh",
+            position: "absolute",
+            zIndex: 1,
+          }}
+          onClick={() => setOpen(false)}
+        >
+          {listNavigation.map((item, index) => (
+            <ListItem
+              key={index}
+              style={{
+                paddingTop: "8px",
+                paddingBottom: "8px",
+                paddingLeft: "0.5rem",
+              }}
+              disablePadding
+            >
+              <ListItemIcon style={{ padding: "8px 0px 8px 8px" }}>
+                {item.icon}
+              </ListItemIcon>
+              <Link
+                href={item.link}
+                style={{
+                  color: "#ffffff",
+                  padding: "8px 0px 8px 0px",
+                  textDecoration: "none",
+                }}
+              >
+                {item.name}
+              </Link>
+            </ListItem>
+          ))}
+        </div>
+      ) : (
+        <></>
+      )}
     </div>
   );
 };
