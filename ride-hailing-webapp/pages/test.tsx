@@ -3,7 +3,7 @@ import Header from "../components/Header";
 import { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 
 import GrabBackground from "../assets/about-background.png";
@@ -18,6 +18,7 @@ import {
   LinearProgress,
   TextField,
 } from "@mui/material";
+import RideWs from "../libs/RideWs";
 
 const StyledPageContainer = styled.div``;
 
@@ -43,18 +44,41 @@ const StyledIntroductionParagraph = styled.p`
 const About: NextPage = () => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-
+  const ws = useRef<RideWs>(new RideWs({}));
   const handleClose = () => {
     setOpen(false);
   };
 
+  useEffect(() => {
+    ws.current.client_listeners.onDriverFound = function (e) {
+      setLoading(false);
+      console.log(
+        !e ? "Khong tim dc driver" : `Tim duoc driver ${e.driver_id}`
+      );
+
+      setTimeout(() => {
+        setOpen(false);
+      }, 3000);
+    };
+
+    return () => {
+      ws.current.client_listeners.onDriverFound = undefined;
+    };
+  }, []);
+
   const handleSubscribe = () => {
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      setOpen(false);
-    }, 3000);
+    ws.current.Connect({
+      user_id: "admin_user",
+      slon: 106.69380051915194,
+      slat: 10.78825445546148,
+      sadr: "LeVanTamPark",
+      elat: 10.775111871794604,
+      elon: 106.69234499244654,
+      eadr: "TaoDangPark",
+    });
   };
+
   return (
     <>
       <Head>
