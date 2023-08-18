@@ -83,7 +83,7 @@ const ListUser = () => {
   const [userRidesHistory, setUserRidesHistory] = useState<RideHistory[]>([]);
   const [userRating, setUserRating] = useState(5.0);
 
-  const fecthUsers = async () => {
+  const fetchUsers = async () => {
     const response = await fetch("/api/users");
     try {
       const data = response.json();
@@ -140,9 +140,9 @@ const ListUser = () => {
   };
 
   useEffect(() => {
-    const fetchedUsers = fecthUsers();
-    fetchedUsers.then((data) => {
-      if (data) {
+    const fetchedUsers = fetchUsers();
+    try {
+      fetchedUsers.then((data) => {
         const handledData: UIUserDataItem[] = data.map(
           (item: UsersResponse, idx: number) => ({
             ...item,
@@ -150,8 +150,10 @@ const ListUser = () => {
           })
         );
         setUsers(handledData);
-      }
-    });
+      });
+    } catch (err) {
+      console.log(err);
+    }
   }, []);
 
   const columns: GridColDef[] = [

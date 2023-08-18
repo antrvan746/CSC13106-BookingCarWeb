@@ -83,7 +83,7 @@ const ListDriver = () => {
   );
   const [driverRating, setDriverRating] = useState(5.0);
 
-  const fecthDrivers = async () => {
+  const fetchDrivers = async () => {
     const response = await fetch("/api/drivers");
     try {
       const data = response.json();
@@ -139,9 +139,9 @@ const ListDriver = () => {
   };
 
   useEffect(() => {
-    const fetchedDrivers = fecthDrivers();
-    fetchedDrivers.then((data) => {
-      if (data) {
+    const fetchedDrivers = fetchDrivers();
+    try {
+      fetchedDrivers.then((data) => {
         const handledData: UIDriverDataItem[] = data.map(
           (item: DriverResponse, idx: number) => ({
             ...item,
@@ -149,8 +149,10 @@ const ListDriver = () => {
           })
         );
         setDrivers(handledData);
-      }
-    });
+      });
+    } catch (err) {
+      console.log(err);
+    }
   }, []);
 
   const columns: GridColDef[] = [
