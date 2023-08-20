@@ -6,7 +6,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
-        <link href="/logo.png" />
+        <link href="../public/logo.png" />
       </Head>
       <Component {...pageProps} />
     </>

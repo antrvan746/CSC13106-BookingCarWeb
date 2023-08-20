@@ -62,7 +62,9 @@ interface BookingFormData {
 
 type BookingFormProps = {
   location: number[];
+  setStartAddress: (placeName: string) => void;
   setStartPlace: (position: mapboxgl.LngLat) => void;
+  setEndAddress: (placeName: string) => void;
   setEndPlace: (position: mapboxgl.LngLat) => void;
   setOpenDialog: () => void;
   setBookingVehicle: (vehicle: string) => void;
@@ -101,7 +103,9 @@ type PlaceInformation = {
 
 const BookingForm = ({
   location,
+  setStartAddress,
   setStartPlace,
+  setEndAddress,
   setEndPlace,
   setOpenDialog,
   setBookingVehicle,
@@ -285,6 +289,8 @@ const BookingForm = ({
     if (Object.keys(validationErrors).length === 0) {
       try {
         setOpenDialog();
+        setStartAddress(formData.startPlace);
+        setEndAddress(formData.endPlace);
         console.log(formData);
         // TODO: do logic here
       } catch (err) {}

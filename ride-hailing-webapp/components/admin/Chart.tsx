@@ -1,25 +1,74 @@
 import { Title } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
-import React from "react";
-import { Label, Line, LineChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
+import React, { useEffect, useState } from "react";
+import {
+  Label,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
+} from "recharts";
 
-function createData(time: string, amount?: number) {
-  return { time, amount };
+interface APIResponse {
+  day: string;
+  count: number;
 }
 
-const data = [
-  createData("00:00", 0),
-  createData("03:00", 300),
-  createData("06:00", 600),
-  createData("09:00", 800),
-  createData("12:00", 1500),
-  createData("15:00", 2000),
-  createData("18:00", 2400),
-  createData("21:00", 2400),
-  createData("24:00", undefined),
-];
+interface UIDataElement {
+  time: string;
+  amount?: number;
+}
 
 const Chart = () => {
+  const [data, setData] = useState<UIDataElement[]>([]);
+
+  useEffect(() => {
+    fetch("/api/stats/booking_per_day")
+      .then((res) => res.json())
+      .then((data: APIResponse[]) => {
+        const currentDate = new Date();
+        const currentYear = currentDate.getFullYear();
+        const currentMonth = currentDate.getMonth();
+
+        const startDate = new Date(currentYear, currentMonth, 1);
+        const endDate = currentDate;
+
+        let handledData: UIDataElement[] = [];
+
+        data.forEach((item) => {
+          handledData.push({
+            time: new Date(item.day).toLocaleDateString(),
+            amount: item.count,
+          });
+        });
+
+        for (
+          let date = startDate;
+          date <= endDate;
+          date.setDate(date.getDate() + 1)
+        ) {
+          if (
+            !handledData.find((item) => item.time === date.toLocaleDateString())
+          ) {
+            handledData.push({
+              time: date.toLocaleDateString(),
+              amount: 0,
+            });
+          }
+        }
+
+        handledData.sort((a, b) => {
+          const dateA = new Date(a.time.split("/").reverse().join("/"));
+          const dateB = new Date(b.time.split("/").reverse().join("/"));
+
+          return dateA.getTime() - dateB.getTime(); // Compare dates
+        });
+
+        setData(handledData);
+      });
+  }, []);
+
   const theme = useTheme();
   return (
     <React.Fragment>
@@ -52,7 +101,7 @@ const Chart = () => {
                 ...theme.typography.body1,
               }}
             >
-              Sales ($)
+              Lượng đơn đặt xe
             </Label>
           </YAxis>
           <Line

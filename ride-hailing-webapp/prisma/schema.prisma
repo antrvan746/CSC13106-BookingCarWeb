@@ -68,7 +68,7 @@ model vehicle {
 enum RideStatus {
   BOOKED
   CANCELED
-  FINISED
+  FINISHED
 }
 
 enum PaymentType {
