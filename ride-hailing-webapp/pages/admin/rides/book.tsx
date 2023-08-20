@@ -55,7 +55,10 @@ const BookingRideView = () => {
   const ws = useRef<RideWs>(new RideWs({}));
 
   const [startPoint, setStart] = useState<mapboxgl.LngLat | null>(null);
+  const [startAddress, setStartAddr] = useState<string | null>(null);
   const [endPoint, setEnd] = useState<mapboxgl.LngLat | null>(null);
+  const [endAddress, setEndAddr] = useState<string | null>(null);
+
   const [bookingType, setBookingType] = useState("motorcycle");
 
   const [distance, setDistance] = useState("");
@@ -78,15 +81,17 @@ const BookingRideView = () => {
 
   const handleSubscribe = () => {
     setLoading(true);
-    ws.current.Connect({
-      user_id: "admin_user",
-      slon: 106.69380051915194,
-      slat: 10.78825445546148,
-      sadr: "LeVanTamPark",
-      elat: 10.775111871794604,
-      elon: 106.69234499244654,
-      eadr: "TaoDangPark",
-    });
+    if (startPoint && endPoint && startAddress && endAddress) {
+      ws.current.Connect({
+        user_id: "admin_user",
+        slon: startPoint.lng,
+        slat: startPoint.lat,
+        sadr: startAddress,
+        elat: endPoint.lng,
+        elon: startPoint.lat,
+        eadr: endAddress,
+      });
+    }
   };
 
   const routing = async (origin: LngLat, des: LngLat, typeVehicle: string) => {
@@ -241,13 +246,9 @@ const BookingRideView = () => {
   useEffect(() => {
     ws.current.client_listeners.onDriverFound = function (e) {
       setLoading(false);
-      // console.log( !e ? "Khong tim dc driver" : `Tim duoc driver ${e.driver_id}`
-      // );
-
       if (e) {
         setCompleteFinding(true);
       }
-
       setTimeout(() => {
         setOpen(false);
       }, 3000);
@@ -291,6 +292,7 @@ const BookingRideView = () => {
           <StyledDividedContainer>
             <BookingForm
               location={currentLocation.toArray()}
+              setStartAddress={(placeName) => setStartAddr(placeName)}
               setStartPlace={(pos) => {
                 setStart(pos);
                 mapRef.current?.panTo(pos);
@@ -303,6 +305,7 @@ const BookingRideView = () => {
                     .addTo(mapRef.current);
                 }
               }}
+              setEndAddress={(placeName) => setEndAddr(placeName)}
               setEndPlace={(pos) => {
                 setEnd(pos);
                 mapRef.current?.panTo(pos);
