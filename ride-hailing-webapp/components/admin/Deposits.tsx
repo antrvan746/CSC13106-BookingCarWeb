@@ -1,27 +1,35 @@
-import * as React from 'react';
-import Link from '@mui/material/Link';
-import Typography from '@mui/material/Typography';
-import Title from './Title';
+import Link from "@mui/material/Link";
+import Typography from "@mui/material/Typography";
+import Title from "./Title";
+import { useEffect, useState } from "react";
+import React from "react";
 
 function preventDefault(event: React.MouseEvent) {
   event.preventDefault();
 }
+const Deposits = () => {
+  const [balance, setBalance] = useState(0);
 
-export default function Deposits() {
+  useEffect(() => {
+    fetch("/api/stats/balance")
+      .then((res) => res.json())
+      .then((data) => setBalance(Number(data.balance)));
+  }, []);
+
   return (
     <React.Fragment>
-      <Title>Recent Deposits</Title>
+      <Title>Doanh thu</Title>
       <Typography component="p" variant="h4">
-        $3,024.00
+        {balance.toLocaleString("it-IT", {
+          style: "currency",
+          currency: "VND",
+        })}
       </Typography>
       <Typography color="text.secondary" sx={{ flex: 1 }}>
-        on 15 March, 2019
+        {new Date().toDateString()}
       </Typography>
-      <div>
-        <Link color="primary" href="#" onClick={preventDefault}>
-          View balance
-        </Link>
-      </div>
     </React.Fragment>
   );
-}
+};
+
+export default Deposits;

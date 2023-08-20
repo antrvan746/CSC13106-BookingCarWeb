@@ -25,7 +25,7 @@ export default async function handler(
             status: RideStatus.BOOKED,
           },
         });
-        res.status(200).json(balance._sum.fee);
+        res.status(200).json({ balance: balance._sum.fee });
       } catch (error) {
         res.status(500).json({ message: error });
       }
