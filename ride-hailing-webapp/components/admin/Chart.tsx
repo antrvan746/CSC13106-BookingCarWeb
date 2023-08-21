@@ -23,50 +23,57 @@ interface UIDataElement {
 const Chart = () => {
   const [data, setData] = useState<UIDataElement[]>([]);
 
-  useEffect(() => {
-    fetch("/api/stats/booking_per_day")
-      .then((res) => res.json())
-      .then((data: APIResponse[]) => {
-        const currentDate = new Date();
-        const currentYear = currentDate.getFullYear();
-        const currentMonth = currentDate.getMonth();
+  const fetchBookingsPerDay = async () => {
+    try {
+      const res = await fetch("/api/stats/bookings_per_day");
+      const data: APIResponse[] = await res.json();
 
-        const startDate = new Date(currentYear, currentMonth, 1);
-        const endDate = currentDate;
+      const currentDate = new Date();
+      const currentYear = currentDate.getFullYear();
+      const currentMonth = currentDate.getMonth();
 
-        let handledData: UIDataElement[] = [];
+      const startDate = new Date(currentYear, currentMonth, 1);
+      const endDate = currentDate;
 
-        data.forEach((item) => {
-          handledData.push({
-            time: new Date(item.day).toLocaleDateString(),
-            amount: item.count,
-          });
+      let handledData: UIDataElement[] = [];
+
+      data.forEach((item) => {
+        handledData.push({
+          time: new Date(item.day).toLocaleDateString(),
+          amount: item.count,
         });
-
-        for (
-          let date = startDate;
-          date <= endDate;
-          date.setDate(date.getDate() + 1)
-        ) {
-          if (
-            !handledData.find((item) => item.time === date.toLocaleDateString())
-          ) {
-            handledData.push({
-              time: date.toLocaleDateString(),
-              amount: 0,
-            });
-          }
-        }
-
-        handledData.sort((a, b) => {
-          const dateA = new Date(a.time.split("/").reverse().join("/"));
-          const dateB = new Date(b.time.split("/").reverse().join("/"));
-
-          return dateA.getTime() - dateB.getTime(); // Compare dates
-        });
-
-        setData(handledData);
       });
+
+      for (
+        let date = startDate;
+        date <= endDate;
+        date.setDate(date.getDate() + 1)
+      ) {
+        if (
+          !handledData.find((item) => item.time === date.toLocaleDateString())
+        ) {
+          handledData.push({
+            time: date.toLocaleDateString(),
+            amount: 0,
+          });
+        }
+      }
+
+      handledData.sort((a, b) => {
+        const dateA = new Date(a.time.split("/").reverse().join("/"));
+        const dateB = new Date(b.time.split("/").reverse().join("/"));
+
+        return dateA.getTime() - dateB.getTime(); // Compare dates
+      });
+
+      setData(handledData);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchBookingsPerDay();
   }, []);
 
   const theme = useTheme();
