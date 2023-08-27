@@ -75,6 +75,7 @@ const BookingRideView = () => {
 
   const handleClose = () => {
     setLoading(false);
+    ws.current.Close();
     setCompleteFinding(false);
     setOpen(false);
   };
