@@ -33,9 +33,9 @@ model user_saved_place {
 model driver {
   id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
 
-  phone  String  @db.VarChar(11)
-  email  String? @unique
-  name   String
+  phone String  @db.VarChar(11)
+  email String? @unique
+  name  String
 
   vehicles vehicle[] @relation("vehicle_belong_to")
   rides    ride[]    @relation("ride_driver")
@@ -47,10 +47,10 @@ enum StaffRole {
 }
 
 model staff {
-  id       String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email    String?   @unique
-  name     String
-  role     StaffRole
+  id    String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email String?   @unique
+  name  String
+  role  StaffRole
 }
 
 model vehicle {
@@ -109,4 +109,12 @@ model rating {
   driver_rating Float @default(5) // driver rate user
 
   ride ride @relation("rated_ride", fields: [ride_id], references: [id])
+}
+
+model pricing_factor {
+  id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  x_distance Float  @default(1)
+  x_estimated_time Float @default(1)
+  x_hot_places Float @default(1)
+  hot_places String[]
 }
