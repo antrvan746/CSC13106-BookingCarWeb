@@ -5,17 +5,16 @@ generator client {
 
 datasource db {
   provider   = "postgresql"
-  url        = env("DATABASE_URL")
+  url        = env("NEXT_PUBLIC_DATABASE_URL")
   extensions = [pgcrypto]
 }
 
 model user {
-  id     String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email  String? @unique
-  phone  String  @db.VarChar(11)
-  name   String
-  is_vip Boolean @default(false)
-
+  id           String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email        String?            @unique
+  phone        String             @db.VarChar(11)
+  name         String
+  is_vip       Boolean            @default(false)
   rides        ride[]             @relation("ride_client")
   saved_places user_saved_place[] @relation("saved_place_belong_to")
 }
@@ -26,24 +25,16 @@ model user_saved_place {
   saved_name      String
   google_place_id String
   place_name      String
-
-  user user @relation("saved_place_belong_to", fields: [user_id], references: [id])
+  user            user   @relation("saved_place_belong_to", fields: [user_id], references: [id])
 }
 
 model driver {
-  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-
-  phone String  @db.VarChar(11)
-  email String? @unique
-  name  String
-
-  vehicles vehicle[] @relation("vehicle_belong_to")
+  id       String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  phone    String    @db.VarChar(11)
+  name     String
+  email    String?   @unique
   rides    ride[]    @relation("ride_driver")
-}
-
-enum StaffRole {
-  ADMIN
-  EMPLOYEE
+  vehicles vehicle[] @relation("vehicle_belong_to")
 }
 
 model staff {
@@ -60,9 +51,49 @@ model vehicle {
   model        String
   color        String?
   type         String
+  ride         ride[]  @relation("ride_vehicle")
+  driver       driver  @relation("vehicle_belong_to", fields: [driver_id], references: [id])
+}
 
-  driver driver @relation("vehicle_belong_to", fields: [driver_id], references: [id])
-  ride   ride[] @relation("ride_vehicle")
+model ride {
+  id                    String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id               String      @db.Uuid
+  driver_id             String      @db.Uuid
+  vehicle_id            String      @db.Uuid
+  fee                   Decimal
+  payment_type          PaymentType
+  start_google_place_id String
+  start_place_name      String?
+  end_google_place_id   String
+  end_place_name        String?
+  book_time             DateTime    @default(now())
+  arrive_time           DateTime?
+  status                RideStatus
+  rating                rating?     @relation("rated_ride")
+  driver                driver      @relation("ride_driver", fields: [driver_id], references: [id])
+  client                user        @relation("ride_client", fields: [user_id], references: [id])
+  vehicle               vehicle     @relation("ride_vehicle", fields: [vehicle_id], references: [id])
+}
+
+model rating {
+  id            String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ride_id       String @unique @db.Uuid
+  user_rating   Float  @default(5)
+  driver_rating Float  @default(5)
+  ride          ride   @relation("rated_ride", fields: [ride_id], references: [id])
+}
+
+model pricing_factor {
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  x_distance       Float    @default(1)
+  x_estimated_time Float    @default(1)
+  x_hot_places     Float    @default(1)
+  hot_places       String[] @default([])
+}
+
+enum StaffRole {
+  ADMIN
+  EMPLOYEE
 }
 
 enum RideStatus {
@@ -75,46 +106,4 @@ enum PaymentType {
   CASH
   CARD
   E_WALLET
-}
-
-model ride {
-  id           String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  user_id      String      @db.Uuid
-  driver_id    String      @db.Uuid
-  vehicle_id   String      @db.Uuid
-  fee          Decimal
-  payment_type PaymentType
-
-  start_google_place_id String
-  start_place_name      String?
-  end_google_place_id   String
-  end_place_name        String?
-
-  book_time   DateTime  @default(now())
-  arrive_time DateTime?
-
-  status RideStatus
-
-  client  user    @relation("ride_client", fields: [user_id], references: [id])
-  driver  driver  @relation("ride_driver", fields: [driver_id], references: [id])
-  vehicle vehicle @relation("ride_vehicle", fields: [vehicle_id], references: [id])
-  rating  rating? @relation("rated_ride")
-}
-
-model rating {
-  id      String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  ride_id String @unique @db.Uuid
-
-  user_rating   Float @default(5) // user rate driver 
-  driver_rating Float @default(5) // driver rate user
-
-  ride ride @relation("rated_ride", fields: [ride_id], references: [id])
-}
-
-model pricing_factor {
-  id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  x_distance Float  @default(1)
-  x_estimated_time Float @default(1)
-  x_hot_places Float @default(1)
-  hot_places String[]
 }
