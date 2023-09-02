@@ -84,11 +84,12 @@ model rating {
 }
 
 model pricing_factor {
-  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  x_distance       Float    @default(1)
-  x_estimated_time Float    @default(1)
-  x_hot_places     Float    @default(1)
-  hot_places       String[] @default([])
+  x_distance       Float   @default(1)
+  x_estimated_time Float   @default(1)
+  weather          Weather @id
+  x_4seats         Float   @default(1)
+  x_7seats         Float   @default(1)
+  x_motorcycle     Float   @default(1)
 }
 
 enum StaffRole {
@@ -106,4 +107,10 @@ enum PaymentType {
   CASH
   CARD
   E_WALLET
+}
+
+enum Weather {
+  SUNNY
+  WINDY
+  RAINY
 }
