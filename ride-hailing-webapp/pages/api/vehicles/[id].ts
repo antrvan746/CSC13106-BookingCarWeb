@@ -21,9 +21,9 @@ export default async function handler(
   switch (req.method) {
     case "GET":
       try {
-        const { vehiclesId } = req.query;
+        const vehiclesId = req.query.id;
         const id = vehicleIdSchema.parse(vehiclesId);
-        const vehicle = await prisma.vehicle.findUnique({
+        const vehicle = await prisma.vehicle.findFirstOrThrow({
           where: {
             id: id,
           },
@@ -34,9 +34,8 @@ export default async function handler(
         }
 
         res.status(200).json(vehicle);
-      } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Something went wrong" });
+      } catch (message) {
+        res.status(500).json({ error: message });
       }
       break;
 
@@ -62,7 +61,6 @@ export default async function handler(
         });
         res.status(200).json(updatedVehicle);
       } catch (error) {
-        console.error(error);
         res.status(400).json({ error: "Invalid request payload" });
       }
       break;
@@ -86,9 +84,8 @@ export default async function handler(
         });
 
         res.status(200).json({ message: "Vehicle deleted successfully" });
-      } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Something went wrong" });
+      } catch (message) {
+        res.status(500).json({ error: message });
       }
       break;
 
