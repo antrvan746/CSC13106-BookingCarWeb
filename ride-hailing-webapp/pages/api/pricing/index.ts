@@ -4,17 +4,15 @@ import { z } from "zod";
 
 const prisma = new PrismaClient();
 
-const GetPricingRequest = z.object({
-  vehicle_type: z.string().optional(),
-  weather: z.enum(["SUNNY", "RAINNY", "WINDY"]).optional(),
-  distance: z.number(),
-  estimated_time: z.number(),
-});
+const VehicleType = z.string().optional();
+const WeatherType = z.enum(["SUNNY", "RAINNY", "WINDY"]).optional();
+const DistanceType = z.number();
+const EstimatedTimeType = z.number();
 
 const PostPricingRequest = z.object({
   weather: z.enum(["SUNNY", "RAINNY", "WINDY"]).optional(),
   x_distance: z.number(),
-  x_estimated_time: z.number()
+  x_estimated_time: z.number(),
 });
 
 export default async function handler(
@@ -24,12 +22,25 @@ export default async function handler(
   switch (req.method) {
     case "GET":
       try {
-        const pricingRequest = GetPricingRequest.parse(req.body);
+        let distance;
+        let estimatedTime;
+
+        if (
+          typeof req.query.distance == "string" &&
+          typeof req.query.estimated_time == "string"
+        ) {
+          distance = DistanceType.parse(parseFloat(req.query.distance));
+          estimatedTime = EstimatedTimeType.parse(
+            parseInt(req.query.estimated_time)
+          );
+        } else {
+          throw new Error("Error type of query");
+        }
 
         let weather;
 
-        switch (pricingRequest.weather) {
-          case "RAINNY":
+        switch (req.query.weather) {
+          case "RAINY":
             weather = Weather.RAINY;
             break;
           case "WINDY":
@@ -39,9 +50,10 @@ export default async function handler(
             weather = Weather.SUNNY;
         }
 
+
         const pricingFactor = await prisma.pricing_factor.findUniqueOrThrow({
           where: {
-            weather: Weather.SUNNY,
+            weather: weather,
           },
           select: {
             x_distance: true,
@@ -52,13 +64,16 @@ export default async function handler(
           },
         });
 
-        const vehicleType = pricingRequest.vehicle_type
-          ? pricingRequest.vehicle_type
+        const vehicleType = req.query.vehicle_type
+          ? req.query.vehicle_type
           : "motorcycle";
 
+        // Distance : KM
+        // Estimated_time: s
+
         let price =
-          pricingRequest.distance * pricingFactor.x_distance +
-          pricingRequest.estimated_time * pricingFactor.x_estimated_time;
+          distance * pricingFactor.x_distance +
+          estimatedTime * pricingFactor.x_estimated_time;
 
         switch (vehicleType) {
           case "4seats":
