@@ -3,7 +3,7 @@ import { prismaClient } from "../../../libs/prisma";
 import z from "zod";
 
 const driverSchema = z.object({
-  phone: z.string().max(11),
+  phone: z.string().max(12),
   email: z.string().email().optional(),
   name: z.string(),
   rating: z.number().default(5),
@@ -18,9 +18,8 @@ export default async function handler(
       try {
         const drivers = await prismaClient.driver.findMany();
         res.status(200).json(drivers);
-      } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Something went wrong" });
+      } catch (message) {
+        res.status(500).json({ error: message });
       }
       break;
     case "POST":
@@ -39,9 +38,9 @@ export default async function handler(
           },
         });
         res.status(201).json(driver);
-      } catch (error) {
-        console.error(error);
-        res.status(400).json({ error: "Invalid request payload" });
+      } catch (message) {
+        // res.status(400).json({ error: "Invalid request payload" });
+        res.status(400).json({error: message})
       }
       break;
 
