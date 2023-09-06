@@ -19,6 +19,7 @@ import {
 
 import RideWs from "../../../libs/ride-ws";
 import { CheckCircle } from "@mui/icons-material";
+import { useRouter } from "next/router";
 
 const MapboxAPIKey =
   process.env.MAPBOX_API_KEY ||
@@ -43,11 +44,9 @@ const StyledDividedContainer = styled.div`
   }
 `;
 
-const CAR_PRICE_PER_KM = 20000;
-const BIKE_PRICE_PER_KM = 10000;
-const LARGE_CAR_PRICE_PER_KM = 23000;
-
 const BookingRideView = () => {
+  const router = useRouter();
+
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const startMarkerRef = useRef<mapboxgl.Marker | null>(null);
   const endMarkerRef = useRef<mapboxgl.Marker | null>(null);
@@ -75,6 +74,7 @@ const BookingRideView = () => {
 
   const handleClose = () => {
     setLoading(false);
+    ws.current.Close();
     setCompleteFinding(false);
     setOpen(false);
   };
@@ -125,16 +125,16 @@ const BookingRideView = () => {
       const duration = route.legs[0].duration.text;
       setDuration(duration);
 
-      let price = route.legs[0].distance.value / 1000;
-      if (bookingType === "4seats") {
-        price *= CAR_PRICE_PER_KM;
-      } else if (bookingType === "motorcycle") {
-        price *= BIKE_PRICE_PER_KM;
-      } else if (bookingType === "7seats") {
-        price *= LARGE_CAR_PRICE_PER_KM;
-      }
-      console.log(price);
-      setPrice(Math.floor(price));
+      let data = await fetch(
+        `/api/pricing?distance=${
+          route.legs[0].distance.value / 1000
+        }&estimated_time=${
+          route.legs[0].duration.value
+        }&vehicle_type=${bookingType}`
+      );
+
+      let price = await data.json();
+      setPrice(Math.floor(price.price));
 
       const geometry_string = route.overview_polyline.points;
       const geoJSON = toGeoJSON(geometry_string);
@@ -251,6 +251,7 @@ const BookingRideView = () => {
       }
       setTimeout(() => {
         setOpen(false);
+        router.replace("/admin");
       }, 3000);
     };
 

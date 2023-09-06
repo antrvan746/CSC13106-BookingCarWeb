@@ -1,14 +1,7 @@
 import { PrismaClient, RideStatus } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
-import { z } from "zod";
 
 const prisma = new PrismaClient();
-
-const StaffCreateInput = z.object({
-  email: z.string().email(),
-  name: z.string().nonempty(),
-  role: z.enum(["ADMIN", "EMPLOYEE"]),
-});
 
 export default async function handler(
   req: NextApiRequest,

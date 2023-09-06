@@ -4,16 +4,22 @@ import Title from "./Title";
 import { useEffect, useState } from "react";
 import React from "react";
 
-function preventDefault(event: React.MouseEvent) {
-  event.preventDefault();
-}
 const Deposits = () => {
   const [balance, setBalance] = useState(0);
 
+  const fetchBalance = async () => {
+    try {
+      const res = await fetch("/api/stats/balance");
+      const data = await res.json();
+
+      setBalance(Number(data.balance));
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   useEffect(() => {
-    fetch("/api/stats/balance")
-      .then((res) => res.json())
-      .then((data) => setBalance(Number(data.balance)));
+    fetchBalance();
   }, []);
 
   return (
