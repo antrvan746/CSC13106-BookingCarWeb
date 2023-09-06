@@ -34,12 +34,7 @@ model user_saved_place {
 
 model driver {
   id       String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-<<<<<<< HEAD
   phone    String    @db.VarChar(12)
-=======
-
-  phone    String    @db.VarChar(20)
->>>>>>> ab70d7703f9e2d13522f461c160204ace1ba799a
   name     String
   rating   Float     @default(5) @db.Real
   email    String?   @unique
