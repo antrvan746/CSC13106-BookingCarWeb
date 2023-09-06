@@ -10,21 +10,29 @@ const UserCreateRequest = z.object({
   name: z.string().nonempty(),
 });
 
+const UserGetRequest = z.object({
+  email: z.string().email().optional(),
+  phone:z.string().optional(),
+  skip: z.number().default(0),
+  take: z.number().default(10)
+})
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   switch (req.method) {
     case "GET":
+
       try {
-        const NumberQueryType = z.number().optional();
-
-        let skip = NumberQueryType.parse(req.query.skip);
-        let take = NumberQueryType.parse(req.query.take);
-
+        const {skip,take,email,phone} = UserGetRequest.parse(req.query)
         const users = await prisma.user.findMany({
           skip: skip,
           take: take,
+          where:{
+            phone: phone,
+            email: email
+          }
         });
         res.status(200).json(users);
       } catch (error) {
@@ -34,6 +42,16 @@ export default async function handler(
     case "POST":
       try {
         const user = UserCreateRequest.parse(req.body);
+
+        const exist = await prisma.user.findFirst({
+          where:{
+            OR:[{phone:user.phone}]
+          }
+        })
+        if (exist !== null){
+          return res.status(200).json(exist);
+        }
+
         const createdUser = await prisma.user.create({
           data: {
             email: user.email,
