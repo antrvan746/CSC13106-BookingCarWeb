@@ -1,8 +1,9 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
+import { prismaClient as prisma } from "../../../libs/prisma";
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient();
 
 const UserUpdateRequest = z.object({
   email: z.string().email().optional(),

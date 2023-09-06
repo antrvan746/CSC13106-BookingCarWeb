@@ -1,8 +1,9 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { Prisma, PrismaClient } from "@prisma/client";
 import { z, ZodType } from "zod";
+import { prismaClient as prisma } from "../../../libs/prisma";
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient();
 
 const UserCreateRequest = z.object({
   email: z.string().email().optional(),
