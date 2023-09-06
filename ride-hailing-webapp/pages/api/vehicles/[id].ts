@@ -5,6 +5,7 @@ import z from "zod";
 const prisma = new PrismaClient();
 
 const vehicleIdSchema = z.string().uuid();
+const driverIdSchema = z.string().uuid();
 
 const vehicleSchema = z.object({
   driver_id: z.string().uuid().optional(),
@@ -21,11 +22,11 @@ export default async function handler(
   switch (req.method) {
     case "GET":
       try {
-        const vehiclesId = req.query.id;
-        const id = vehicleIdSchema.parse(vehiclesId);
+        const driverId = req.query.id;
+        const id = driverIdSchema.parse(driverId);
         const vehicle = await prisma.vehicle.findFirstOrThrow({
           where: {
-            id: id,
+            driver_id: id,
           },
         });
 
@@ -35,7 +36,7 @@ export default async function handler(
 
         res.status(200).json(vehicle);
       } catch (message) {
-        res.status(500).json({ error: message });
+        res.status(500).json({ error: "Failed to get Vehicle:", message });
       }
       break;
 

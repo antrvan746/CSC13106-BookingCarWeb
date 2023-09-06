@@ -6,14 +6,14 @@ import { Message } from "@mui/icons-material";
 const prisma = new PrismaClient();
 
 const driverSchema = z.object({
-  phone: z.string().max(11).optional(),
+  phone: z.string().max(12).optional(),
   email: z.string().email().optional(),
   name: z.string().optional(),
   rating: z.number().optional().default(5),
 });
 
 const driverIdSchema = z.string().uuid();
-const driverPhoneSchema = z.string().max(11);
+const driverPhoneSchema = z.string().max(12);
 
 export default async function handler(
   req: NextApiRequest,
@@ -58,16 +58,17 @@ export default async function handler(
 
         res.status(200).json(driver);
       } catch (message) {
-        res.status(500).json({ error: message });
+        res.status(500).json({ error: "Failed to get Driver:", message });
       }
       break;
 
+    // TODO: Fix API bug
     case "PUT":
       try {
         const updatedData = driverSchema.parse(req.body);
-        const { driverId } = req.query;
+        const driverId = req.query.id;
         const id = driverIdSchema.parse(driverId);
-        const existingDriver = await prisma.driver.findUnique({
+        const existingDriver = await prisma.driver.findFirstOrThrow({
           where: { id },
         });
 
@@ -81,8 +82,8 @@ export default async function handler(
         });
 
         res.status(200).json(updatedDriver);
-      } catch (error) {
-        res.status(400).json({ error: "Invalid request payload" });
+      } catch (message) {
+        res.status(400).json({ error: "Invalid request payload", message});
       }
       break;
 

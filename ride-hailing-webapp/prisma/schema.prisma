@@ -30,7 +30,7 @@ model user_saved_place {
 
 model driver {
   id       String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  phone    String    @db.VarChar(11)
+  phone    String    @db.VarChar(12)
   name     String
   email    String?   @unique
   rides    ride[]    @relation("ride_driver")

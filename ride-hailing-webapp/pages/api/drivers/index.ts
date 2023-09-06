@@ -3,7 +3,7 @@ import { prismaClient } from "../../../libs/prisma";
 import z from "zod";
 
 const driverSchema = z.object({
-  phone: z.string().max(11),
+  phone: z.string().max(12),
   email: z.string().email().optional(),
   name: z.string(),
   rating: z.number().default(5),
@@ -38,8 +38,9 @@ export default async function handler(
           },
         });
         res.status(201).json(driver);
-      } catch (error) {
-        res.status(400).json({ error: "Invalid request payload" });
+      } catch (message) {
+        // res.status(400).json({ error: "Invalid request payload" });
+        res.status(400).json({error: message})
       }
       break;
 
