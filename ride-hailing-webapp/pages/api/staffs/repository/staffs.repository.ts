@@ -1,10 +1,11 @@
 import { PrismaClient, staff } from "@prisma/client";
+import { prismaClient } from "../../../../libs/prisma";
 
 class StaffRepository {
   private prisma: PrismaClient;
 
   constructor() {
-    this.prisma = new PrismaClient();
+    this.prisma = prismaClient;
   }
 
   async getAllStaff(skip: number, take: number): Promise<staff[]> {

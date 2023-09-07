@@ -1,10 +1,11 @@
 import { PrismaClient, driver } from "@prisma/client";
+import { prismaClient } from "../../../../libs/prisma";
 
 class DriverRepository {
   private prisma: PrismaClient;
 
   constructor() {
-    this.prisma = new PrismaClient();
+    this.prisma = prismaClient;
   }
 
   async getAllDrivers(): Promise<driver[]> {

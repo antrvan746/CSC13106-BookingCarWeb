@@ -6,6 +6,7 @@ import {
   RideGetQuery,
   RidePutBody,
 } from "../../../types/api/rides/RideZodSchema";
+import RideRepository from "./repository/rides.repository";
 
 export const config = {
   api: {
@@ -13,16 +14,7 @@ export const config = {
   },
 };
 
-async function getRide(id: string): Promise<ride | null> {
-  try {
-    const ride = await prismaClient.ride.findFirst({
-      where: { id: id },
-    });
-    return ride;
-  } catch (e) {
-    return null;
-  }
-}
+const rideRepository = new RideRepository();
 
 const handler: NextApiHandler = async function (req, res) {
   if (req.method == "GET") {
@@ -41,7 +33,7 @@ const GET: NextApiHandler = async function (req, res) {
     res.status(404).json({ error: "Invalid ride id" });
     return;
   }
-  const ride = await getRide(query.data.rideId);
+  const ride = await rideRepository.getRideById(query.data.rideId);
   if (!ride) {
     res.status(404).json({ error: "Ride not found" });
     return;
@@ -66,11 +58,8 @@ const PUT: NextApiHandler = async function (req, res) {
   }
 
   try {
-    const result = await prismaClient.ride.update({
-      where: { id: body.data.rideId },
-      data: { ...body.data },
-    });
-    res.status(200).json({ data: result });
+    const newRide = rideRepository.updateRide(query.data.rideId,body.data);
+    res.status(200).json({ data: newRide  });
     return;
   } catch (e: any) {
     res.status(500).json({ error: e.message || "Query error" });

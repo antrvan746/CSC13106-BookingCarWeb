@@ -1,10 +1,11 @@
 import { PrismaClient, vehicle } from "@prisma/client";
+import { prismaClient } from "../../../../libs/prisma";
 
 class VehicleRepository {
   private prisma: PrismaClient;
 
   constructor() {
-    this.prisma = new PrismaClient();
+    this.prisma = prismaClient;
   }
 
   async getAllVehicles(): Promise<vehicle[]> {

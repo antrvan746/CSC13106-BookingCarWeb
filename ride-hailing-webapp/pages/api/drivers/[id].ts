@@ -22,9 +22,16 @@ export default async function handler(
   switch (req.method) {
     case "GET":
       try {
-        const driverPhone = req.query.id;
-        const phone = driverPhoneSchema.parse(driverPhone);
-        const driver = await driverRepository.findByPhone(phone);
+        const id = driverPhoneSchema.parse(req.query.id);
+        if(req.query.phone){
+          const phone = z.string().parse(req.query.phone);
+          const driver = await driverRepository.findByPhone(phone);
+          if(driver){
+            return res.status(200).json([driver]);
+          }
+        }
+        
+        const driver = await driverRepository.findById(id);
 
         if (!driver) {
           return res.status(404).json({ error: "Driver not found" });
