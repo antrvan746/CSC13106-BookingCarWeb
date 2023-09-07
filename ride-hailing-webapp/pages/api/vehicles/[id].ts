@@ -68,7 +68,7 @@ export default async function handler(
 
     case "DELETE":
       try {
-        const { vehiclesId } = req.query;
+        const vehiclesId  = req.query.id;
         const id = vehicleIdSchema.parse(vehiclesId);
         const existingVehicle = await prisma.vehicle.findUnique({
           where: { id: id },
