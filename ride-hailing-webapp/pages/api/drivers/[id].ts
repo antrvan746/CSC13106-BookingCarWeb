@@ -45,14 +45,16 @@ export default async function handler(
           id: req.query.id
         }, driverPostSchema,
         driverRepository.updateDriver,
-        (res, data, err) => {
+        async (res, data, err) => {
           if (err) {
-            if (err instanceof ZodError) {
-              return res.status(400).json({ error: "Invalid request payload", ...err });
-            }
             console.log(err);
+            return err instanceof ZodError ?
+              res.status(400).json({ error: "Invalid request payload" }) :
+              res.status(500).json({ error: "something wen wrong" })
           }
-          return data ? res.status(200).json(data) : res.status(404).json({ error: "Driver not found" });
+          return data ?
+            res.status(200).json(await data) :
+            res.status(404).json({ error: "Driver not found" });
         })
       break;
 
