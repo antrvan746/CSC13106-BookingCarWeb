@@ -10,16 +10,10 @@ class UserRepository {
   async getUsers(
     skip: number,
     take: number,
-    email?: string,
-    phone?: string
   ): Promise<user[]> {
     return this.prisma.user.findMany({
       skip: skip,
       take: take,
-      where: {
-        phone: phone,
-        email: email,
-      },
     });
   }
 

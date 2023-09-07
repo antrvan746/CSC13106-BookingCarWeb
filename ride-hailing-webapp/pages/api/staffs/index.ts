@@ -1,14 +1,19 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { PrismaClient } from "@prisma/client";
 import { z } from "zod";
+import StaffRepository from "./repository/staffs.repository";
 
-const prisma = new PrismaClient();
-
-const StaffCreateInput = z.object({
+const StaffCreateRequest = z.object({
   email: z.string().email(),
   name: z.string().nonempty(),
   role: z.enum(["ADMIN", "EMPLOYEE"]),
 });
+
+const StaffGetRequest = z.object({
+  skip: z.number().default(0),
+  take: z.number().default(10),
+});
+
+const staffRepository = new StaffRepository;
 
 export default async function handler(
   req: NextApiRequest,
@@ -17,30 +22,18 @@ export default async function handler(
   switch (req.method) {
     case "GET":
       try {
-        const NumberQueryType = z.number().optional();
-
-        let skip = NumberQueryType.parse(req.query.skip);
-        let take = NumberQueryType.parse(req.query.take);
-
-        const staffs = await prisma.staff.findMany({
-          skip: skip,
-          take: take,
-        });
-        res.status(200).json(staffs);
+        const { skip, take } = StaffGetRequest.parse(req.query);
+        const staffList = await staffRepository.getAllStaff(skip, take);
+        res.status(200).json(staffList);
       } catch (error) {
         res.status(500).json({ message: error });
       }
       break;
+
     case "POST":
       try {
-        let staff = StaffCreateInput.parse(req.body);
-        const createdStaff = await prisma.staff.create({
-          data: {
-            email: staff.email,
-            role: staff.role,
-            name: staff.name,
-          },
-        });
+        const staff = StaffCreateRequest.parse(req.body);
+        const createdStaff = await staffRepository.createStaff(staff);
         res.status(200).json(createdStaff);
       } catch (error) {
         res.status(500).json({ message: error });
