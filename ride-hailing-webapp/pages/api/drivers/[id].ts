@@ -1,6 +1,5 @@
 import { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
 import z from "zod";
-import { Message } from "@mui/icons-material";
 import DriverRepository from "./repository/drivers.repository";
 
 const driverRepository = new DriverRepository();
@@ -13,7 +12,7 @@ const driverSchema = z.object({
 });
 
 const driverIdSchema = z.string().uuid();
-const driverPhoneSchema = z.string().max(12);
+const driverPhoneSchema = z.string().max(40);
 
 export default async function handler(
   req: NextApiRequest,
@@ -22,22 +21,23 @@ export default async function handler(
   switch (req.method) {
     case "GET":
       try {
-        const id = driverPhoneSchema.parse(req.query.id);
-        if(req.query.phone){
-          const phone = z.string().parse(req.query.phone);
+        const param = req.query.id;
+        const phone = driverPhoneSchema.parse(param);
+        if (phone) {
           const driver = await driverRepository.findByPhone(phone);
-          if(driver){
-            return res.status(200).json([driver]);
+          if (driver) {
+            return res.status(200).json(driver);
           }
         }
         
+        const id = driverIdSchema.parse(param);
         const driver = await driverRepository.findById(id);
 
         if (!driver) {
           return res.status(404).json({ error: "Driver not found" });
         }
 
-        res.status(200).json(driver);
+        return res.status(200).json(driver);
       } catch (message) {
         res.status(500).json({ error: "Failed to get Driver:", message });
       }
