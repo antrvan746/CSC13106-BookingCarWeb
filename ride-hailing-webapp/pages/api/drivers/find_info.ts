@@ -14,13 +14,17 @@ interface ErrorResponse{error:string[]}
 const handler:NextApiHandler<ErrorResponse> =  async function (req:NextApiRequest,res:NextApiResponse) {
   const body = findInfoSchema.safeParse(req.query);
   if(body.success === false){
+    console.log("Schema error: ",body.error.message);
     return res.status(400).json({error: body.error.errors.map(v => v.message)})
   }
 
-  const info = await prismaClient.driver.findUnique({
+  console.log(body.data);
+
+  const info = await prismaClient.driver.findFirst({
     where:{id:body.data.driver_id}
   });
   if(info == null){
+    console.log("Driver id not found", body.data.driver_id)
     return res.status(404).json({error: ["Driver id not found"]});
   }
 
@@ -28,6 +32,7 @@ const handler:NextApiHandler<ErrorResponse> =  async function (req:NextApiReques
     where:{driver_id:body.data.driver_id}
   });
   if(vehicle == null){
+    console.log("Vehicle not found");
     return res.status(404).json({error: ["Vehicle not found"]});
   }
 

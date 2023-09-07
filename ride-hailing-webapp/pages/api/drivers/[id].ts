@@ -44,11 +44,14 @@ export default async function handler(
     case "GET":
       try {
         const driverPhone = req.query.id;
-        console.log(driverPhone);
+        const driverId = z.string().safeParse(req.query.driver_id);
+
         const phone = driverPhoneSchema.parse(driverPhone);
         const driver = await prisma.driver.findFirstOrThrow({
           where: {
-            phone: phone,
+            OR:[{phone: phone},{
+              ...( driverId.success ? { id:driverId.data } : {} )
+            }]
           },
         });
 
