@@ -49,7 +49,7 @@ class DriverRepository {
     });
   }
 
-  async updateDriver(data: z.infer<typeof driverPostSchema>): Promise<driver | null> {
+  async updateDriver(data: z.infer<typeof driverPostSchema>) {
     return this.prisma.driver.update({
       where: { id: data.id },
       data,
