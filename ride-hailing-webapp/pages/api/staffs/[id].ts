@@ -1,14 +1,14 @@
-import { Prisma, PrismaClient } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
-
-const prisma = new PrismaClient();
+import StaffRepository from "./repository/staffs.repository";
 
 const StaffUpdateRequest = z.object({
   email: z.string().email().optional(),
   name: z.string().optional(),
   role: z.enum(["ADMIN", "EMPLOYEE"]).optional(),
 });
+
+const staffRepository = new StaffRepository();
 
 export default async function handler(
   req: NextApiRequest,
@@ -18,11 +18,10 @@ export default async function handler(
     case "GET":
       const staffId = z.string().uuid().parse(req.query.id);
       try {
-        const staff = await prisma.staff.findFirstOrThrow({
-          where: {
-            id: staffId,
-          },
-        });
+        const staff = await staffRepository.getStaffById(staffId);
+        if (!staff) {
+          return res.status(404).json({ message: "Staff not found" });
+        }
         res.status(200).json(staff);
       } catch (error) {
         res.status(500).json({ message: error });
@@ -32,15 +31,10 @@ export default async function handler(
       try {
         const staffId = z.string().uuid().parse(req.query.id);
         const staff = StaffUpdateRequest.parse(req.body);
-        const updatedStaff = await prisma.staff.update({
-          where: {
-            id: staffId,
-          },
-          data: {
-            role: staff.role,
-            email: staff.email,
-            name: staff.name,
-          },
+        const updatedStaff = await staffRepository.updateStaff(staffId, {
+          role: staff.role,
+          email: staff.email,
+          name: staff.name,
         });
         res.status(200).json(updatedStaff);
       } catch (error) {
@@ -50,15 +44,12 @@ export default async function handler(
     case "DELETE":
       try {
         const staffId = z.string().uuid().parse(req.query.id);
-        const deletedStaff = await prisma.staff.delete({
-          where: {
-            id: staffId,
-          },
-        });
-        res.status(200).json({ deletedStaff });
+        await staffRepository.deleteStaff(staffId);
+        res.status(200).json({ message: "Staff deleted successfully" });
       } catch (error) {
         res.status(500).json({ message: error });
       }
+      break;
     default:
       res.status(400).json({ message: "Invalid request method" });
       break;

@@ -7,6 +7,7 @@ import {
   RidePostBody,
   RidePutBody,
 } from "../../../types/api/rides/RideZodSchema";
+import RideRepository from "./repository/rides.repository";
 
 interface ErrorRespone {
   error: string;
@@ -18,6 +19,7 @@ interface RidesGetRespone {
 }
 
 const query_limit = 41;
+const rideRepository = new RideRepository();
 
 const handler: NextApiHandler = function (req, res) {
   if (req.method == "GET") {
@@ -52,21 +54,8 @@ const GET: NextApiHandler<RidesGetRespone | ErrorRespone> = async function (
     return;
   }
 
-  const userIdQuery = !query.data.userId ? {} : { user_id: query.data.userId };
-  const driverIdQuery = !query.data.driverId
-    ? {}
-    : { driver_id: query.data.driverId };
-
   try {
-    const queryResult = await prismaClient.ride.findMany({
-      where: {
-        ...userIdQuery,
-        ...driverIdQuery,
-      },
-      skip: query.data.page * query_limit,
-      take: query_limit,
-    });
-
+    const queryResult = await rideRepository.getRides(query.data,query_limit);
     res.status(200).json({
       data: queryResult,
       limit_per_page: query_limit,
@@ -90,12 +79,7 @@ const POST: NextApiHandler<ErrorRespone | { data: ride }> = async function name(
   }
 
   try {
-    const result = await prismaClient.ride.create({
-      data: {
-        ...body.data,
-        status: "BOOKED",
-      },
-    });
+    const result = await rideRepository.createRide(body.data);
     res.status(201).json({ data: result });
     return;
   } catch (e: any) {
@@ -114,12 +98,7 @@ const PUT: NextApiHandler<ErrorRespone | { data: ride }> = async function name(
   }
 
   try {
-    const result = await prismaClient.ride.update({
-      where: { id: body.data.rideId },
-      data: {
-        ...body.data,
-      },
-    });
+    const result = await rideRepository.updateRide(body.data.rideId,body.data);
     res.status(200).json({ data: result });
     return;
   } catch (e: any) {

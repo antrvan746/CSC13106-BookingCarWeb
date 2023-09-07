@@ -14,7 +14,7 @@ model user {
   email        String?            @unique
 
 
-  phone        String             @db.VarChar(20)
+  phone        String             @db.VarChar(12)
   name         String
   is_vip       Boolean            @default(false)
   rating       Float              @default(5) @db.Real
@@ -112,7 +112,7 @@ enum StaffRole {
 enum RideStatus {
   BOOKED
   CANCELED
-  FINISED
+  FINISHED
 }
 
 enum PaymentType {

@@ -1,11 +1,8 @@
 import { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
-import { PrismaClient } from "@prisma/client";
 import z from "zod";
+import VehicleRepository from "./repository/vehicles.repository";
 
-const prisma = new PrismaClient();
-
-const vehicleIdSchema = z.string().uuid();
-const driverIdSchema = z.string().uuid();
+const vehicleRepository = new VehicleRepository();
 
 const vehicleSchema = z.object({
   driver_id: z.string().uuid().optional(),
@@ -15,6 +12,9 @@ const vehicleSchema = z.object({
   type: z.string().optional(),
 });
 
+const driverIdSchema = z.string().uuid();
+const vehicleIdSchema = z.string().uuid();
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -23,12 +23,8 @@ export default async function handler(
     case "GET":
       try {
         const driverId = req.query.id;
-        const id = driverIdSchema.parse(driverId);
-        const vehicle = await prisma.vehicle.findFirstOrThrow({
-          where: {
-            driver_id: id,
-          },
-        });
+        const vehicleId = driverIdSchema.parse(driverId);
+        const vehicle = await vehicleRepository.findVehicleById(vehicleId);
 
         if (!vehicle) {
           return res.status(404).json({ error: "Vehicle not found" });
@@ -40,50 +36,34 @@ export default async function handler(
       }
       break;
 
-    case "PUT":
-      try {
-        const updatedData = vehicleSchema.parse(req.body);
-        const { vehiclesId } = req.query;
-        console.log("Vehicle id is: ", vehiclesId);
-        console.log("Updated data is: ", updatedData);
-
-        const id = vehicleIdSchema.parse(vehiclesId);
-        const existingVehicle = await prisma.vehicle.findUnique({
-          where: { id },
-        });
-
-        if (!existingVehicle) {
-          return res.status(404).json({ error: "Vehicle not found" });
+      case "PUT":
+        try {
+          const updatedData = vehicleSchema.parse(req.body);
+          const driverId = req.query.id; 
+          const id = driverIdSchema.parse(driverId)
+          const vehicle = await vehicleRepository.findVehicleByDriverId(id);
+      
+          if (!vehicle) {
+            return res.status(404).json({ error: "Vehicle not found" });
+          }
+      
+          const updatedVehicle = await vehicleRepository.updateVehicle(
+            vehicle.id, 
+            updatedData
+          );
+      
+          res.status(200).json(updatedVehicle);
+        } catch (error) {
+          console.error(error);
+          res.status(400).json({ error: "Invalid request payload" });
         }
-
-        const updatedVehicle = await prisma.vehicle.update({
-          where: { id },
-          data: updatedData,
-        });
-        res.status(200).json(updatedVehicle);
-      } catch (error) {
-        res.status(400).json({ error: "Invalid request payload" });
-      }
-      break;
+        break;
 
     case "DELETE":
       try {
-        const { vehiclesId } = req.query;
-        const id = vehicleIdSchema.parse(vehiclesId);
-        const existingVehicle = await prisma.vehicle.findUnique({
-          where: { id: id },
-        });
-
-        if (!existingVehicle) {
-          return res.status(404).json({ error: "Vehicle not found" });
-        }
-
-        await prisma.vehicle.delete({
-          where: {
-            id: id,
-          },
-        });
-
+        const vehicleId = req.query.id;
+        const id = vehicleIdSchema.parse(vehicleId);
+        await vehicleRepository.deleteVehicle(id);
         res.status(200).json({ message: "Vehicle deleted successfully" });
       } catch (message) {
         res.status(500).json({ error: message });

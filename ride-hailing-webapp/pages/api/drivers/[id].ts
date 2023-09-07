@@ -1,9 +1,9 @@
 import { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
-import { PrismaClient } from "@prisma/client";
 import z from "zod";
 import { Message } from "@mui/icons-material";
+import DriverRepository from "./repository/drivers.repository";
 
-const prisma = new PrismaClient();
+const driverRepository = new DriverRepository();
 
 const driverSchema = z.object({
   phone: z.string().max(12).optional(),
@@ -20,37 +20,18 @@ export default async function handler(
   res: NextApiResponse
 ) {
   switch (req.method) {
-    // case "GET":
-    //   try {
-    //     const driverId = req.query.id;
-    //     const id = driverIdSchema.parse(driverId);
-    //     const driver = await prisma.driver.findFirstOrThrow({
-    //       where: {
-    //         id: id,
-    //       },
-    //     });
-
-    //     if (!driver) {
-    //       return res.status(404).json({ error: "Driver not found" });
-    //     }
-
-    //     res.status(200).json(driver);
-    //   } catch (message) {
-    //     res.status(500).json({ error: message });
-    //     // res.status(500).json({ error: "Something went wrong" });
-    //   }
-    //   break;
-
     case "GET":
       try {
-        const driverPhone = req.query.id;
-        console.log(driverPhone);
-        const phone = driverPhoneSchema.parse(driverPhone);
-        const driver = await prisma.driver.findFirstOrThrow({
-          where: {
-            phone: phone,
-          },
-        });
+        const id = driverPhoneSchema.parse(req.query.id);
+        if(req.query.phone){
+          const phone = z.string().parse(req.query.phone);
+          const driver = await driverRepository.findByPhone(phone);
+          if(driver){
+            return res.status(200).json([driver]);
+          }
+        }
+        
+        const driver = await driverRepository.findById(id);
 
         if (!driver) {
           return res.status(404).json({ error: "Driver not found" });
@@ -62,50 +43,42 @@ export default async function handler(
       }
       break;
 
-    // TODO: Fix API bug
     case "PUT":
       try {
         const updatedData = driverSchema.parse(req.body);
         const driverId = req.query.id;
         const id = driverIdSchema.parse(driverId);
-        const existingDriver = await prisma.driver.findFirstOrThrow({
-          where: { id },
-        });
+        const existingDriver = await driverRepository.findById(id);
 
         if (!existingDriver) {
           return res.status(404).json({ error: "Driver not found" });
         }
 
-        const updatedDriver = await prisma.driver.update({
-          where: { id },
-          data: updatedData,
-        });
+        const updatedDriver = await driverRepository.updateDriver(id, updatedData);
 
         res.status(200).json(updatedDriver);
       } catch (message) {
-        res.status(400).json({ error: "Invalid request payload", message});
+        console.log(message);
+        res.status(400).json({ error: "Invalid request payload", message });
       }
       break;
 
     case "DELETE":
       try {
-        const { driverId } = req.query;
+        const driverId = req.query.id;
         const id = driverIdSchema.parse(driverId);
 
-        const existingDriver = await prisma.driver.findUnique({
-          where: { id: id },
-        });
-
+        const existingDriver = await driverRepository.findById(id);
+  
         if (!existingDriver) {
           return res.status(404).json({ error: "Driver not found" });
         }
-
-        await prisma.driver.delete({
-          where: { id: id },
-        });
-
+    
+        await driverRepository.deleteDriver(id);
+    
         res.status(200).json({ message: "Driver deleted successfully" });
       } catch (message) {
+        console.log(message);
         res.status(500).json({ error: message });
       }
       break;

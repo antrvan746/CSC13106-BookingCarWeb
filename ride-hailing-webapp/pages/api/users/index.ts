@@ -1,8 +1,8 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { Prisma, PrismaClient } from "@prisma/client";
-import { z, ZodType } from "zod";
+import { z } from "zod";
+import UserRepository from "./repository/users.repository";
 
-const prisma = new PrismaClient();
+const userRepository = new UserRepository();
 
 const UserCreateRequest = z.object({
   email: z.string().email().optional(),
@@ -11,11 +11,9 @@ const UserCreateRequest = z.object({
 });
 
 const UserGetRequest = z.object({
-  email: z.string().email().optional(),
-  phone:z.string().optional(),
   skip: z.number().default(0),
-  take: z.number().default(10)
-})
+  take: z.number().default(10),
+});
 
 export default async function handler(
   req: NextApiRequest,
@@ -23,45 +21,29 @@ export default async function handler(
 ) {
   switch (req.method) {
     case "GET":
-
       try {
-        const {skip,take,email,phone} = UserGetRequest.parse(req.query)
-        const users = await prisma.user.findMany({
-          skip: skip,
-          take: take,
-          where:{
-            phone: phone,
-            email: email
-          }
-        });
+        const { skip, take} = UserGetRequest.parse(req.query);
+        const users = await userRepository.getUsers(skip, take);
         res.status(200).json(users);
       } catch (error) {
         res.status(500).json({ message: error });
       }
       break;
+    
     case "POST":
       try {
         const user = UserCreateRequest.parse(req.body);
-
-        const exist = await prisma.user.findFirst({
-          where:{
-            OR:[{phone:user.phone}]
-          }
-        })
-        if (exist !== null){
-          return res.status(200).json(exist);
+      
+        const exist = await userRepository.findExistUser(user.phone);
+        if (exist !== null) {
+          return res.status(409).json({ error: "User already exists", exist });
         }
-
-        const createdUser = await prisma.user.create({
-          data: {
-            email: user.email,
-            phone: user.phone,
-            name: user.name,
-          },
-        });
+      
+        const createdUser = await userRepository.createUser(user);
         res.status(200).json(createdUser);
-      } catch (error) {
-        res.status(500).json({ message: error });
+      } catch (message) {
+        console.log(message);
+        res.status(500).json({ error: message });
       }
       break;
     default:
