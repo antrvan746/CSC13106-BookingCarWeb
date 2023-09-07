@@ -1,5 +1,7 @@
 import { PrismaClient, driver } from "@prisma/client";
 import { prismaClient } from "../../../../libs/prisma";
+import { z } from "zod";
+import { driverIdSchema, driverPhoneSchema, driverPostSchema } from "../../../../types/api/DriverZodSchema";
 
 class DriverRepository {
   private prisma: PrismaClient;
@@ -29,27 +31,27 @@ class DriverRepository {
       },
     });
   }
-  
 
-  async findById(id: string): Promise<driver | null> {
+
+  async findById(id: z.infer<typeof driverIdSchema>): Promise<driver | null> {
     return this.prisma.driver.findUnique({
       where: {
-        id: id,
+        id,
       },
     });
   }
 
-  async findByPhone(phone: string): Promise<driver | null> {
+  async findByPhone(phone: z.infer<typeof driverPhoneSchema>): Promise<driver | null> {
     return this.prisma.driver.findFirst({
       where: {
-        phone: phone,
+        phone,
       },
     });
   }
 
-  async updateDriver(id: string, data: Partial<driver>): Promise<driver | null> {
+  async updateDriver(data: z.infer<typeof driverPostSchema>): Promise<driver | null> {
     return this.prisma.driver.update({
-      where: { id },
+      where: { id: data.id },
       data,
     });
   }

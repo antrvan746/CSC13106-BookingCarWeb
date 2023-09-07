@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { prismaClient } from "../../../../libs/prisma";
 import { z } from "zod";
-import { RideGetQuery, RidePostBody, RidePutBody } from "../../../../types/api/rides/RideZodSchema";
+import { RideGetQuery, RidePostBody, RidePutBody } from "../../../../types/api/RideZodSchema";
 
 class RideRepository {
   private prisma: PrismaClient

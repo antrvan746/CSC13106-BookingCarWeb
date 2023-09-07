@@ -2,7 +2,7 @@ import { NextApiHandler } from "next";
 import { ride } from "@prisma/client"
 import { prismaClient } from "../../../libs/prisma";
 import { z } from "zod";
-import { RatingGetQuery, RatingPostBody } from "../../../types/api/ratings/RatingZodSchema";
+import { RatingGetQuery, RatingPostBody } from "../../../types/api/RatingZodSchema";
 
 const query_limit = 41;
 
