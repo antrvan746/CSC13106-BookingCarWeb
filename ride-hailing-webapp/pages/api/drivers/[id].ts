@@ -1,18 +1,13 @@
 import { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
-import z from "zod";
+import z, { ZodError } from "zod";
+import { Message } from "@mui/icons-material";
 import DriverRepository from "./repository/drivers.repository";
+import { driverIdSchema, driverPhoneSchema, driverPostSchema } from "../../../types/api/DriverZodSchema";
+import RestApiHandler from "../../../libs/RestApiHandle.strategy";
 
 const driverRepository = new DriverRepository();
 
-const driverSchema = z.object({
-  phone: z.string().max(12).optional(),
-  email: z.string().email().optional(),
-  name: z.string().optional(),
-  rating: z.number().optional().default(5),
-});
 
-const driverIdSchema = z.string().uuid();
-const driverPhoneSchema = z.string().max(40);
 
 export default async function handler(
   req: NextApiRequest,
@@ -21,16 +16,16 @@ export default async function handler(
   switch (req.method) {
     case "GET":
       try {
-        const param = req.query.id;
-        if (typeof req.query.phone === "string") {
-          const phone = decodeURIComponent(req.query.phone)
+        const id = driverIdSchema.parse(req.query.id);
+        if (req.query.phone) {
+
+          const phone = driverPhoneSchema.parse(req.query.phone);
           const driver = await driverRepository.findByPhone(phone);
           if (driver) {
             return res.status(200).json(driver);
           }
         }
-        
-        const id = driverIdSchema.parse(param);
+
         const driver = await driverRepository.findById(id);
 
         if (!driver) {
@@ -44,23 +39,21 @@ export default async function handler(
       break;
 
     case "PUT":
-      try {
-        const updatedData = driverSchema.parse(req.body);
-        const driverId = req.query.id;
-        const id = driverIdSchema.parse(driverId);
-        const existingDriver = await driverRepository.findById(id);
-
-        if (!existingDriver) {
-          return res.status(404).json({ error: "Driver not found" });
-        }
-
-        const updatedDriver = await driverRepository.updateDriver(id, updatedData);
-
-        res.status(200).json(updatedDriver);
-      } catch (message) {
-        console.log(message);
-        res.status(400).json({ error: "Invalid request payload", message });
-      }
+      RestApiHandler(res,
+        {
+          ...req.body,
+          id: req.query.id
+        }, driverPostSchema,
+        driverRepository.updateDriver,
+        (res, data, err) => {
+          if (err) {
+            if (err instanceof ZodError) {
+              return res.status(400).json({ error: "Invalid request payload", ...err });
+            }
+            console.log(err);
+          }
+          return data ? res.status(200).json(data) : res.status(404).json({ error: "Driver not found" });
+        })
       break;
 
     case "DELETE":
@@ -69,13 +62,13 @@ export default async function handler(
         const id = driverIdSchema.parse(driverId);
 
         const existingDriver = await driverRepository.findById(id);
-  
+
         if (!existingDriver) {
           return res.status(404).json({ error: "Driver not found" });
         }
-    
+
         await driverRepository.deleteDriver(id);
-    
+
         res.status(200).json({ message: "Driver deleted successfully" });
       } catch (message) {
         console.log(message);

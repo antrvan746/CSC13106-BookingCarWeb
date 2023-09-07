@@ -5,7 +5,7 @@ import { z } from "zod";
 import {
   RideGetQuery,
   RidePutBody,
-} from "../../../types/api/rides/RideZodSchema";
+} from "../../../types/api/RideZodSchema";
 import RideRepository from "./repository/rides.repository";
 
 export const config = {
@@ -58,8 +58,8 @@ const PUT: NextApiHandler = async function (req, res) {
   }
 
   try {
-    const newRide = rideRepository.updateRide(query.data.rideId,body.data);
-    res.status(200).json({ data: newRide  });
+    const newRide = rideRepository.updateRide(query.data.rideId, body.data);
+    res.status(200).json({ data: newRide });
     return;
   } catch (e: any) {
     res.status(500).json({ error: e.message || "Query error" });

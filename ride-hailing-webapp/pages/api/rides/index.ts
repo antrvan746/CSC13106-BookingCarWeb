@@ -6,7 +6,7 @@ import {
   RideGetQuery,
   RidePostBody,
   RidePutBody,
-} from "../../../types/api/rides/RideZodSchema";
+} from "../../../types/api/RideZodSchema";
 import RideRepository from "./repository/rides.repository";
 
 interface ErrorRespone {

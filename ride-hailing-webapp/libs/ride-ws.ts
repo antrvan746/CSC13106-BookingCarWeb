@@ -89,12 +89,6 @@ class RideWs {
         this.Close();
         this.client_listeners?.onDriverFound?.(null);
         break;
-      // case this.StatusMsg.ClientCancel:
-      //   this.Close();
-      //   break
-      // case this.StatusMsg.DriverCancel:
-      //   this.Close();
-      //   break
       case this.StatusMsg.Message:
         console.log("Driver msg: ", e.data);
         break;
