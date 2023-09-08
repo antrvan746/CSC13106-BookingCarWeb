@@ -1,53 +1,51 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { z } from "zod";
+import { ZodError, z } from "zod";
 import UserRepository from "./repository/users.repository";
+import { UserCreateRequest, UserGetRequest } from "../../../types/api/UserZodSchema";
+import RestApiHandler from "../../../libs/RestApiHandle.strategy";
 
 const userRepository = new UserRepository();
 
-const UserCreateRequest = z.object({
-  email: z.string().email().optional(),
-  phone: z.string().nonempty(),
-  name: z.string().nonempty(),
-});
 
-const UserGetRequest = z.object({
-  skip: z.number().default(0),
-  take: z.number().default(10),
-});
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const defaultReturn = async function <T extends any>(data: T, err?: Error) {
+    if (err || !data) {
+      console.log(err);
+      return err instanceof ZodError ?
+        res.status(400).json({ error: "Invalid request payload" }) :
+        res.status(500).json({ error: "Something went wrong" })
+    }
+    const result = await data;
+    return result ?
+      res.status(200).json(result) :
+      res.status(404).json({ error: "Driver not found" });
+  }
+
   switch (req.method) {
     case "GET":
       try {
-        const { skip, take} = UserGetRequest.parse(req.query);
-        const users = await userRepository.getUsers(skip, take);
-        res.status(200).json(users);
+        RestApiHandler(req.query, UserGetRequest, userRepository.getUsers, defaultReturn)
       } catch (error) {
-        res.status(500).json({ message: error });
+        return res.status(500).json({ message: error });
       }
       break;
-    
+
     case "POST":
       try {
-        const user = UserCreateRequest.parse(req.body);
-      
-        const exist = await userRepository.findExistUser(user.phone);
-        if (exist !== null) {
-          return res.status(409).json({ error: "User already exists", exist });
-        }
-      
-        const createdUser = await userRepository.createUser(user);
-        res.status(200).json(createdUser);
+        RestApiHandler(req.body, UserCreateRequest, async (data) => {
+          const exist = await userRepository.findExistUser(data);
+          return exist ? exist : await userRepository.createUser(data)
+        }, defaultReturn)
+
       } catch (message) {
         console.log(message);
-        res.status(500).json({ error: message });
+        return res.status(500).json({ error: message });
       }
       break;
     default:
-      res.status(400).json({ message: "Invalid request method" });
+      return res.status(400).json({ message: "Invalid request method" });
       break;
   }
+
 }

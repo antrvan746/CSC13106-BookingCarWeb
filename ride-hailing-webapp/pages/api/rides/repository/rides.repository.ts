@@ -4,13 +4,13 @@ import { z } from "zod";
 import { RideGetQuery, RidePostBody, RidePutBody } from "../../../../types/api/RideZodSchema";
 
 class RideRepository {
-  private prisma: PrismaClient
+  // private prisma: PrismaClient
   constructor() {
-    this.prisma = prismaClient;
+    // this.prisma = prismaClient;
   }
 
   async getRideById(id: string) {
-    return this.prisma.ride.findUnique({ where: { id } });
+    return await prismaClient.ride.findUnique({ where: { id } });
   }
 
   async updateRide(id: string, data: z.infer<typeof RidePutBody>) {

@@ -3,7 +3,7 @@ import { ZodRawShape, z } from "zod";
 import drivers from "../pages/admin/drivers";
 import { NextApiRequest, NextApiResponse } from "next";
 
-type ZodSchemas<T extends ZodRawShape> = z.ZodEffects<z.ZodObject<T>> | z.ZodObject<T>
+type ZodSchemas<T extends ZodRawShape> = z.ZodEffects<z.ZodObject<T>> | z.ZodObject<T>;
 
 type QueryablePrismaType = user | driver | vehicle | ride;
 
@@ -20,14 +20,14 @@ function CallRepoFunc<R extends any, P extends any[]>(func: AnyFunction<R, P>, p
   return func(...params);
 }
 
-export default function RestApiHandler<Z extends ZodRawShape, R extends any>(res: NextApiResponse,
+export default function RestApiHandler<Z extends ZodRawShape, R extends any>(
   obj: any, schema: ZodSchemas<Z>,
   query_func: AnyFunction<R, [z.infer<typeof schema>]>,
-  response: (res: NextApiResponse, data: R | null, err?: Error) => void) {
+  response: (data: R | null, err?: Error) => void) {
   try {
-    response(res, query_func(schema.parse(obj)));
+    return response(query_func(schema.parse(obj)));
   } catch (e) {
-    response(res, null, e as Error);
+    return response(null, e as Error);
   }
 }
 
