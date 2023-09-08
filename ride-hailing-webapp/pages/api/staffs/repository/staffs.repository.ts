@@ -2,34 +2,30 @@ import { PrismaClient, staff } from "@prisma/client";
 import { prismaClient } from "../../../../libs/prisma";
 
 class StaffRepository {
-  private prisma: PrismaClient;
+  // private prisma: PrismaClient;
 
   constructor() {
-    this.prisma = prismaClient;
+    // this.prisma = prismaClient;
   }
 
-  async getAllStaff(skip: number, take: number): Promise<staff[]> {
-    return this.prisma.staff.findMany({
+  async getAllStaff(skip: number, take: number) {
+    return await prismaClient.staff.findMany({
       skip,
       take,
     });
   }
 
-  async getStaffById(id: string): Promise<staff | null> {
-    return this.prisma.staff.findFirst({
+  async getStaffById(id: string) {
+    return await prismaClient.staff.findFirst({
       where: {
         id,
       },
     });
   }
 
-  async createStaff(data: {
-    email?: string;
-    name: string;
-    role: "ADMIN" | "EMPLOYEE";
-  }): Promise<staff> {
+  async createStaff(data: { email?: string; name: string; role: "ADMIN" | "EMPLOYEE"; }) {
     const { email, name, role } = data;
-    return this.prisma.staff.create({
+    return await prismaClient.staff.create({
       data: {
         email: email || "",
         name,
@@ -39,7 +35,7 @@ class StaffRepository {
   }
 
   async updateStaff(id: string, data: Partial<staff>): Promise<staff | null> {
-    return this.prisma.staff.update({
+    return await prismaClient.staff.update({
       where: {
         id,
       },
@@ -47,8 +43,8 @@ class StaffRepository {
     });
   }
 
-  async deleteStaff(id: string): Promise<void> {
-    await this.prisma.staff.delete({
+  async deleteStaff(id: string) {
+    return await prismaClient.staff.delete({
       where: {
         id,
       },

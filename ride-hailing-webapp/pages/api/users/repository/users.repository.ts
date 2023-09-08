@@ -1,46 +1,43 @@
 import { PrismaClient, user } from "@prisma/client";
 import { prismaClient } from "../../../../libs/prisma";
+import { z } from "zod";
+import { idParamsSchema } from "../../../../types/api/RestApiCommon";
+import { UserCreateRequest, UserGetRequest, UserPutRequest } from "../../../../types/api/UserZodSchema";
+import { driverPhoneSchema } from "../../../../types/api/DriverZodSchema";
 
 class UserRepository {
-  private prisma: PrismaClient;
+  // private prisma: PrismaClient;
 
   constructor() {
-    this.prisma = prismaClient;
+    // this.prisma = prismaClient;
   }
 
-  async getUsers(
-    skip: number,
-    take: number,
-  ): Promise<user[]> {
-    return this.prisma.user.findMany({
+  async getUsers({ skip, take }: z.infer<typeof UserGetRequest>): Promise<user[]> {
+    return prismaClient.user.findMany({
       skip: skip,
       take: take,
     });
   }
 
-  async getUserById(id: string): Promise<user | null> {
-    return this.prisma.user.findFirst({
+  async getUserById({ id }: z.infer<typeof idParamsSchema>): Promise<user | null> {
+    return prismaClient.user.findFirst({
       where: {
         id,
       },
     });
   }
 
-  async findExistUser(phone: string): Promise<user | null> {
-    return this.prisma.user.findFirst({
+  async findExistUser({ phone }: z.infer<typeof driverPhoneSchema>): Promise<user | null> {
+    return prismaClient.user.findFirst({
       where: {
         phone: phone,
       },
     });
   }
 
-  async createUser(data: {
-    email?: string;
-    phone: string;
-    name: string;
-  }): Promise<user> {
+  async createUser(data: z.infer<typeof UserCreateRequest>): Promise<user> {
     const { email, phone, name } = data;
-    return this.prisma.user.create({
+    return prismaClient.user.create({
       data: {
         email: email || "",
         phone: phone,
@@ -49,17 +46,17 @@ class UserRepository {
     });
   }
 
-  async updateUser(id: string, data: Partial<user>): Promise<user | null> {
-    return this.prisma.user.update({
+  async updateUser(data: z.infer<typeof UserPutRequest>): Promise<user | null> {
+    return prismaClient.user.update({
       where: {
-        id,
+        id: data.id,
       },
       data,
     });
   }
 
-  async deleteUser(id: string): Promise<void> {
-    await this.prisma.user.delete({
+  async deleteUser({ id }: z.infer<typeof idParamsSchema>): Promise<void> {
+    await prismaClient.user.delete({
       where: {
         id,
       },

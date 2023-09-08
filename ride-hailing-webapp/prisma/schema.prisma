@@ -12,13 +12,10 @@ datasource db {
 model user {
   id           String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   email        String?            @unique
-
-
   phone        String             @db.VarChar(20)
   name         String
   is_vip       Boolean            @default(false)
   rating       Float              @default(5) @db.Real
-
   rides        ride[]             @relation("ride_client")
   saved_places user_saved_place[] @relation("saved_place_belong_to")
 }
@@ -45,7 +42,6 @@ model driver {
 model staff {
   id    String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   email String?   @unique
-
   role  StaffRole
   name  String
 }
@@ -55,17 +51,14 @@ model vehicle {
   plate_number String  @db.VarChar(10)
   model        String
   color        String?
-
   type         String?
   driver_id    String  @db.Uuid
-
   ride         ride[]  @relation("ride_vehicle")
   driver       driver  @relation("vehicle_belong_to", fields: [driver_id], references: [id])
 }
 
 model ride {
   id                    String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-
   fee                   Decimal
   payment_type          PaymentType
   start_google_place_id String
@@ -75,17 +68,14 @@ model ride {
   book_time             DateTime    @default(now())
   arrive_time           DateTime?
   status                RideStatus
-
   user_id               String      @db.Uuid
   driver_id             String      @db.Uuid
   vehicle_id            String      @db.Uuid
-
   rating                rating?     @relation("rated_ride")
   driver                driver      @relation("ride_driver", fields: [driver_id], references: [id])
   client                user        @relation("ride_client", fields: [user_id], references: [id])
   vehicle               vehicle     @relation("ride_vehicle", fields: [vehicle_id], references: [id])
 }
-
 
 model pricing_factor {
   x_distance       Float   @default(1)
@@ -112,7 +102,7 @@ enum StaffRole {
 enum RideStatus {
   BOOKED
   CANCELED
-  FINISHED
+  FINISED
 }
 
 enum PaymentType {
@@ -126,4 +116,3 @@ enum Weather {
   WINDY
   RAINY
 }
-
