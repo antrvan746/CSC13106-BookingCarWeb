@@ -55,7 +55,7 @@ const GET: NextApiHandler<RidesGetRespone | ErrorRespone> = async function (
   }
 
   try {
-    const queryResult = await rideRepository.getRides(query.data,query_limit);
+    const queryResult = await rideRepository.getRides(query.data, query_limit);
     res.status(200).json({
       data: queryResult,
       limit_per_page: query_limit,
@@ -66,7 +66,7 @@ const GET: NextApiHandler<RidesGetRespone | ErrorRespone> = async function (
   }
 };
 
-const POST: NextApiHandler<ErrorRespone | { data: ride }> = async function name(
+const POST: NextApiHandler<ErrorRespone | ride> = async function name(
   req,
   res
 ) {
@@ -80,7 +80,7 @@ const POST: NextApiHandler<ErrorRespone | { data: ride }> = async function name(
 
   try {
     const result = await rideRepository.createRide(body.data);
-    res.status(201).json({ data: result });
+    res.status(201).json(result);
     return;
   } catch (e: any) {
     return res.status(500).json({ error: e.message || "some error occured" });
@@ -98,7 +98,7 @@ const PUT: NextApiHandler<ErrorRespone | { data: ride }> = async function name(
   }
 
   try {
-    const result = await rideRepository.updateRide(body.data.rideId,body.data);
+    const result = await rideRepository.updateRide(body.data.rideId, body.data);
     res.status(200).json({ data: result });
     return;
   } catch (e: any) {

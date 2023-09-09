@@ -17,5 +17,6 @@ const UserCreateRequest = z.object({
 const UserGetRequest = z.object({
   skip: z.number().default(0),
   take: z.number().default(10),
+  phone:z.string().optional()
 });
 export { UserPutRequest, UserCreateRequest, UserGetRequest }

@@ -42,7 +42,18 @@ class RideRepository {
   async createRide(data: z.infer<typeof RidePostBody>) {
     const result = await prismaClient.ride.create({
       data: {
-        ...data,
+        user_id: data.user_id,
+        start_lat: data.slat,
+        start_lon: data.slon,
+        start_name: data.sadr,
+
+        end_lat: data.elat,
+        end_lon: data.elon,
+        end_name: data.eadr,
+
+        payment_type: data.payment_type,
+
+        fee: data.price,
         status: "BOOKED",
       },
     });

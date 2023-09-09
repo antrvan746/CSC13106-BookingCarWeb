@@ -12,32 +12,39 @@ class UserRepository {
     // this.prisma = prismaClient;
   }
 
-  async getUsers({ skip, take }: z.infer<typeof UserGetRequest>): Promise<user[]> {
-    return prismaClient.user.findMany({
+  async getUsers({ skip, take, phone }: z.infer<typeof UserGetRequest>) {
+    if (!!phone) {
+      const user = await prismaClient.user.findFirst({
+        where:{phone}
+      })
+      return user ? [user] : [];
+    }
+
+    return await prismaClient.user.findMany({
       skip: skip,
       take: take,
     });
   }
 
-  async getUserById({ id }: z.infer<typeof idParamsSchema>): Promise<user | null> {
-    return prismaClient.user.findFirst({
+  async getUserById({ id }: z.infer<typeof idParamsSchema>) {
+    return await prismaClient.user.findFirst({
       where: {
         id,
       },
     });
   }
 
-  async findExistUser({ phone }: z.infer<typeof driverPhoneSchema>): Promise<user | null> {
-    return prismaClient.user.findFirst({
+  async findExistUser({ phone }: z.infer<typeof driverPhoneSchema>) {
+    return await prismaClient.user.findFirst({
       where: {
         phone: phone,
       },
     });
   }
 
-  async createUser(data: z.infer<typeof UserCreateRequest>): Promise<user> {
+  async createUser(data: z.infer<typeof UserCreateRequest>) {
     const { email, phone, name } = data;
-    return prismaClient.user.create({
+    return await prismaClient.user.create({
       data: {
         email: email || "",
         phone: phone,
@@ -46,8 +53,8 @@ class UserRepository {
     });
   }
 
-  async updateUser(data: z.infer<typeof UserPutRequest>): Promise<user | null> {
-    return prismaClient.user.update({
+  async updateUser(data: z.infer<typeof UserPutRequest>) {
+    return await prismaClient.user.update({
       where: {
         id: data.id,
       },
@@ -55,8 +62,8 @@ class UserRepository {
     });
   }
 
-  async deleteUser({ id }: z.infer<typeof idParamsSchema>): Promise<void> {
-    await prismaClient.user.delete({
+  async deleteUser({ id }: z.infer<typeof idParamsSchema>) {
+    return await prismaClient.user.delete({
       where: {
         id,
       },

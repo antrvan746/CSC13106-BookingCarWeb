@@ -1,5 +1,16 @@
 import { z } from "zod";
 
+const TripStatus = [
+  "WAITING_DRIVER",
+  "DRIVER_AT_PICKUP",
+  "TRIP_IS_GOING",
+  "DRIVER_AT_DROP",
+  "CANT_FIND_DRIVER",
+  "DRIVER_CANCELED",
+  "CLIENT_CANCELED",
+] as const;
+
+
 const RideGetQuery = z
   .object({
     rideId: z.string().optional(),
@@ -14,32 +25,31 @@ const RideGetQuery = z
 
 const RidePostBody = z.object({
   user_id: z.string(),
-  driver_id: z.string(),
-  vehicle_id: z.string(),
-  fee: z.number(),
+  price: z.number(),
   payment_type: z.union([
     z.literal("CASH"),
     z.literal("CARD"),
     z.literal("E_WALLET"),
-  ]),
-  start_google_place_id: z.string(),
-  start_place_name: z.string().optional(),
-  end_google_place_id: z.string(),
-  end_place_name: z.string().optional(),
-  book_time: z.coerce.date(),
+  ]).default("CASH"),
+  slon: z.number(),
+  slat: z.number(),
+  sadr: z.string(),
+
+  elon: z.number(),
+  elat: z.number(),
+  eadr: z.string()
 });
 
 const RidePutBody = z.object({
   rideId: z.string(),
-  fee: z.number().optional(),
-  start_google_place_id: z.string().optional(),
-  start_place_name: z.string().optional(),
-  end_google_place_id: z.string().optional(),
-  end_place_name: z.string().optional(),
-  arrive_time: z.coerce.date().optional(),
-  status: z
-    .union([z.literal("BOOKED"), z.literal("CANCELED"), z.literal("FINISED")])
-    .optional(),
+
+  driver_id: z.string().optional(),
+  vehicle_id: z.string().optional(),
+  status: z.union([
+    z.literal("BOOKED"),
+    z.literal("FINDING_DRIVER"),
+    ...TripStatus.map(v => z.literal(v))
+  ]).default("WAITING_DRIVER"),
 });
 
 export { RideGetQuery, RidePostBody, RidePutBody };
