@@ -84,6 +84,8 @@ const BookingRideView = () => {
     if (startPoint && endPoint && startAddress && endAddress) {
       ws.current.Connect({
         user_id: "admin_user",
+        user_name: "kkk",
+        user_phone: "0987654321",
         slon: startPoint.lng,
         slat: startPoint.lat,
         sadr: startAddress,
@@ -244,9 +246,11 @@ const BookingRideView = () => {
   }, [currentLocation]);
 
   useEffect(() => {
+    ws.current = new RideWs({});
     ws.current.client_listeners.onDriverFound = function (e) {
       setLoading(false);
       if (e) {
+        console.log("Driver founded");
         setCompleteFinding(true);
       }
       setTimeout(() => {

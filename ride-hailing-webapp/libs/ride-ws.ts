@@ -1,37 +1,38 @@
 interface SocketListener {
-  onOpen: (() => void),
-  onMessage: ((e: MessageEvent<any>) => void),
-  onError: ((e: Event) => void),
-  onClose: ((e: Event) => void)
+  onOpen: () => void;
+  onMessage: (e: MessageEvent<any>) => void;
+  onError: (e: Event) => void;
+  onClose: (e: Event) => void;
 }
 
 interface DriverInfo {
-  driver_id: string
+  driver_id: string;
 }
 
 export interface RindeRequestInfo {
-  "slon": number,
-  "slat": number,
-  "sadr": string,
+  slon: number;
+  slat: number;
+  sadr: string;
 
-  "elon": number,
-  "elat": number,
-  "eadr": string,
+  elon: number;
+  elat: number;
+  eadr: string;
 
-  "user_id": string
+  user_id: string;
+  user_name: string;
+  user_phone: string;
 }
 
 interface RideWsConstrucProps {
-  onOpen?: SocketListener["onOpen"]
-  onMessage?: SocketListener["onMessage"]
-  onError?: SocketListener["onError"]
-  onClose?: SocketListener["onClose"],
-  onDriverFound?: (info: DriverInfo | null) => void,
-
+  onOpen?: SocketListener["onOpen"];
+  onMessage?: SocketListener["onMessage"];
+  onError?: SocketListener["onError"];
+  onClose?: SocketListener["onClose"];
+  onDriverFound?: (info: DriverInfo | null) => void;
 }
 
 class RideWs {
-  private ws: WebSocket | undefined
+  private ws: WebSocket | undefined;
   readonly StatusMsg = {
     DriverFound: "DRF߷",
     NoDriver: "NDR߷",
@@ -39,8 +40,8 @@ class RideWs {
     ClientCancel: "CCX߷",
     TripId: "TID߷",
     Message: "MSG߷",
-  }
-  public client_listeners: RideWsConstrucProps
+  };
+  public client_listeners: RideWsConstrucProps;
 
   constructor(listeners: RideWsConstrucProps) {
     this.client_listeners = listeners;
@@ -54,13 +55,18 @@ class RideWs {
   public Connect(info: RindeRequestInfo) {
     if (this.ws) {
       console.log("Already socket ");
-      return
+      return;
     }
 
-    const queries = Object.entries(info).map(([k, v]) => `${k}=${v}`).join("&");
+    const queries = Object.entries(info)
+      .map(([k, v]) => `${k}=${v}`)
+      .join("&");
 
-    console.log("Creating websocket")
-    this.ws = new WebSocket(`ws://localhost:3080/admin/client/w3gv7?${queries}`, "ws");
+    console.log("Creating websocket");
+    this.ws = new WebSocket(
+      encodeURI(`ws://localhost:3080/admin/client/w3gv7?${queries}`)
+    );
+    this.ws.binaryType = "arraybuffer";
     //this.ws = new WebSocket(url,"ws");
     this.ws.onopen = this._onWsOpen;
     this.ws.onmessage = this._onWsMessage;
@@ -71,16 +77,16 @@ class RideWs {
   private _onWsOpen() {
     console.log(this.client_listeners);
     console.log("Web socket open");
-    this.client_listeners?.onOpen?.()
+    this.client_listeners?.onOpen?.();
   }
 
   private _onWsMessage(e: MessageEvent<any>) {
     if (!e.data || typeof e.data !== "string") {
-      return
+      return;
     }
-    const msg = e.data as string
+    const msg = e.data as string;
     console.log("Web socket message: ", e.data);
-    const cmd = msg.length <= 4 ? msg : msg.substring(0, 4)
+    const cmd = msg.length <= 4 ? msg : msg.substring(0, 4);
     switch (cmd) {
       case this.StatusMsg.NoDriver:
         this.Close();
@@ -97,32 +103,31 @@ class RideWs {
         break;
       case this.StatusMsg.DriverFound:
         try {
-          const driver = JSON.parse(msg.substring(4))
+          const driver = JSON.parse(msg.substring(4));
           this.client_listeners?.onDriverFound?.(driver);
         } catch (e) {
-          console.log(e)
+          console.log(e);
         }
-        break
+        break;
       default:
-        console.log("Unknow ws cmd:",cmd,msg)
+        console.log("Unknow ws cmd:", cmd, msg);
     }
-
   }
 
   private _onWsError(e: Event) {
     console.log("Web socket error: ", e);
-    this.client_listeners?.onError?.(e)
+    this.client_listeners?.onError?.(e);
   }
 
-  private _onWsClose(e: any ) {
-    if(e.reason){
+  private _onWsClose(e: any) {
+    if (e.reason) {
       this._onWsMessage({
-        data: e.reason
-      } as any)
+        data: e.reason,
+      } as any);
     }
     //console.log(`Web socket closed. Code: ${e.code}. Reason: ${e.reason}`);
-    console.log("Web socket closed",e)
-    this.client_listeners.onClose?.(e)
+    console.log("Web socket closed", e);
+    this.client_listeners.onClose?.(e);
     this.Close();
   }
 
@@ -136,11 +141,12 @@ class RideWs {
   }
 
   public Send(data: string | ArrayBuffer | ArrayBufferView | Blob) {
-    try { this.ws?.send(data) } catch (e) {
+    try {
+      this.ws?.send(data);
+    } catch (e) {
       console.log("Web socket send error: ", e);
     }
   }
-
 }
 
 export default RideWs;
