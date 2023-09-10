@@ -18,7 +18,9 @@ export interface RindeRequestInfo {
   "elat": number,
   "eadr": string,
 
-  "user_id": string
+  "user_id": string,
+  "user_name":string,
+  "user_phone":string
 }
 
 interface RideWsConstrucProps {
