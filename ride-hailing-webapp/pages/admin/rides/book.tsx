@@ -83,8 +83,6 @@ const BookingRideView = () => {
     setLoading(true);
     if (startPoint && endPoint && startAddress && endAddress) {
       ws.current.Connect({
-        user_name:"HoangLam",
-        user_phone:"123456",
         user_id: "admin_user",
         user_name: "kkk",
         user_phone: "0987654321",
