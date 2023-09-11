@@ -14,7 +14,7 @@ model user {
   email        String?            @unique
 
 
-  phone        String             @db.VarChar(12)
+  phone        String             @db.VarChar(20)
   name         String
   is_vip       Boolean            @default(false)
   rating       Float              @default(5) @db.Real
@@ -34,7 +34,7 @@ model user_saved_place {
 
 model driver {
   id       String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  phone    String    @db.VarChar(12)
+  phone    String    @db.VarChar(20)
   name     String
   rating   Float     @default(5) @db.Real
   email    String?   @unique

@@ -7,6 +7,7 @@ import withAuth from "../../_withAuth";
 import mapboxgl, { LngLat } from "mapbox-gl";
 import { toGeoJSON } from "@mapbox/polyline";
 import extent from "turf-extent";
+import { default as goongSdk } from "@goongmaps/goong-sdk"
 import {
   Button,
   CircularProgress,
@@ -17,7 +18,7 @@ import {
   DialogTitle,
 } from "@mui/material";
 
-import RideWs from "../../../libs/ride-ws";
+import {rideWs as RideWs} from "../../../libs/ride-ws";
 import { CheckCircle } from "@mui/icons-material";
 import { useRouter } from "next/router";
 
@@ -51,8 +52,6 @@ const BookingRideView = () => {
   const startMarkerRef = useRef<mapboxgl.Marker | null>(null);
   const endMarkerRef = useRef<mapboxgl.Marker | null>(null);
 
-  const ws = useRef<RideWs>(new RideWs({}));
-
   const [startPoint, setStart] = useState<mapboxgl.LngLat | null>(null);
   const [startAddress, setStartAddr] = useState<string | null>(null);
   const [endPoint, setEnd] = useState<mapboxgl.LngLat | null>(null);
@@ -74,7 +73,7 @@ const BookingRideView = () => {
 
   const handleClose = () => {
     setLoading(false);
-    ws.current.Close();
+    RideWs.Close();
     setCompleteFinding(false);
     setOpen(false);
   };
@@ -82,9 +81,9 @@ const BookingRideView = () => {
   const handleSubscribe = () => {
     setLoading(true);
     if (startPoint && endPoint && startAddress && endAddress) {
-      ws.current.Connect({
-        user_name:"HoangLam",
-        user_phone:"123456",
+      RideWs.Connect({
+        user_name: "HoangLam",
+        user_phone: "123456",
         user_id: "admin_user",
         slon: startPoint.lng,
         slat: startPoint.lat,
@@ -128,10 +127,8 @@ const BookingRideView = () => {
       setDuration(duration);
 
       let data = await fetch(
-        `/api/pricing?distance=${
-          route.legs[0].distance.value / 1000
-        }&estimated_time=${
-          route.legs[0].duration.value
+        `/api/pricing?distance=${route.legs[0].distance.value / 1000
+        }&estimated_time=${route.legs[0].duration.value
         }&vehicle_type=${bookingType}`
       );
 
@@ -246,7 +243,7 @@ const BookingRideView = () => {
   }, [currentLocation]);
 
   useEffect(() => {
-    ws.current.client_listeners.onDriverFound = function (e) {
+    RideWs.client_listeners.onDriverFound = function (e) {
       setLoading(false);
       if (e) {
         setCompleteFinding(true);
@@ -258,7 +255,7 @@ const BookingRideView = () => {
     };
 
     return () => {
-      ws.current.client_listeners.onDriverFound = undefined;
+      RideWs.client_listeners.onDriverFound = undefined;
     };
   }, []);
 
@@ -271,8 +268,8 @@ const BookingRideView = () => {
           href="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css"
           rel="stylesheet"
         />
-        <script src="https://unpkg.com/@goongmaps/goong-sdk/umd/goong-sdk.min.js" />
-        <script src="https://cdn.jsdelivr.net/npm/@goongmaps/goong-js@1.0.9/dist/goong-js.js" />
+        {/* <script src="https://unpkg.com/@goongmaps/goong-sdk/umd/goong-sdk.min.js" />
+        <script src="https://cdn.jsdelivr.net/npm/@goongmaps/goong-js@1.0.9/dist/goong-js.js" /> */}
       </Head>
       <StyledPageContainer>
         <AdminHeader />

@@ -19,8 +19,8 @@ export interface RindeRequestInfo {
   "eadr": string,
 
   "user_id": string,
-  "user_name":string,
-  "user_phone":string
+  "user_name": string,
+  "user_phone": string
 }
 
 interface RideWsConstrucProps {
@@ -62,7 +62,8 @@ class RideWs {
     const queries = Object.entries(info).map(([k, v]) => `${k}=${v}`).join("&");
 
     console.log("Creating websocket")
-    this.ws = new WebSocket(`ws://localhost:3080/admin/client/w3gv7?${queries}`, "ws");
+    this.ws = new WebSocket(`ws://localhost:3080/admin/client/w3gv7?${queries}`);
+    this.ws.binaryType = "arraybuffer"
     //this.ws = new WebSocket(url,"ws");
     this.ws.onopen = this._onWsOpen;
     this.ws.onmessage = this._onWsMessage;
@@ -106,7 +107,7 @@ class RideWs {
         }
         break
       default:
-        console.log("Unknow ws cmd:",cmd,msg)
+        console.log("Unknow ws cmd:", cmd, msg)
     }
 
   }
@@ -116,14 +117,14 @@ class RideWs {
     this.client_listeners?.onError?.(e)
   }
 
-  private _onWsClose(e: any ) {
-    if(e.reason){
+  private _onWsClose(e: any) {
+    if (e.reason) {
       this._onWsMessage({
         data: e.reason
       } as any)
     }
     //console.log(`Web socket closed. Code: ${e.code}. Reason: ${e.reason}`);
-    console.log("Web socket closed",e)
+    console.log("Web socket closed", e)
     this.client_listeners.onClose?.(e)
     this.Close();
   }
@@ -144,5 +145,9 @@ class RideWs {
   }
 
 }
-
-export default RideWs;
+const globalRideWS = globalThis as unknown as {
+  RideWS: RideWs | undefined
+}
+export const rideWs = globalRideWS.RideWS ?? new RideWs({})
+globalRideWS.RideWS = rideWs 
+// export default RideWs;

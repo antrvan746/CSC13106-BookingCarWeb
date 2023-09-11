@@ -12,7 +12,6 @@ import {
 } from "@mui/material";
 import React, { useState } from "react";
 import styled from "styled-components";
-import { StaffRole } from "@prisma/client";
 import { useRouter } from "next/router";
 import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
 import FirebaseApp from "../../config/firebase";
@@ -39,7 +38,7 @@ interface SignUpFormData {
 const SignUpForm = () => {
   const router = useRouter();
 
-  const [staffRole, setStaffRole] = useState(StaffRole.EMPLOYEE.toString());
+  const [staffRole, setStaffRole] = useState("EMPLOYEE");
 
   const handleChangeStaffRole = (event: SelectChangeEvent) => {
     setStaffRole(event.target.value);
@@ -215,11 +214,11 @@ const SignUpForm = () => {
                   displayEmpty
                   inputProps={{ "aria-label": "Without label" }}
                 >
-                  <MenuItem value={StaffRole.EMPLOYEE.toString()}>
+                  <MenuItem value={"EMPLOYEE"}>
                     {" "}
                     Employee{" "}
                   </MenuItem>
-                  <MenuItem value={StaffRole.ADMIN.toString()}>
+                  <MenuItem value={"ADMIN"}>
                     {" "}
                     Admin{" "}
                   </MenuItem>
