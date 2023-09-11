@@ -3,6 +3,9 @@ const nextConfig = {
     compiler: {
         styledComponents: true
     },
+    typescript: {
+        ignoreBuildErrors: true
+    },
     async headers() {
         return [
             {

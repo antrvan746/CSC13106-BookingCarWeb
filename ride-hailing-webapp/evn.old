@@ -1,0 +1,4 @@
+DATABASE_URL="postgresql://postgresql:postgresql@localhost:5432/ride_hailing_db" #T ko bik truyền docker env :)
+#"postgresql://postgres:postgres@localhost:5432/ride_hailing_db"
+#postgresql://postgres:lamlance123@#@localhost:3064/ride_hailing_db
+#postgresql://postgres:lamlance123@#@localhost:3064/ride_hailing_db

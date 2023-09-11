@@ -7,6 +7,7 @@ import withAuth from "../../_withAuth";
 import mapboxgl, { LngLat } from "mapbox-gl";
 import { toGeoJSON } from "@mapbox/polyline";
 import extent from "turf-extent";
+import { default as goongSdk } from "@goongmaps/goong-sdk"
 import {
   Button,
   CircularProgress,
@@ -17,7 +18,7 @@ import {
   DialogTitle,
 } from "@mui/material";
 
-import RideWs from "../../../libs/ride-ws";
+import {rideWs as RideWs} from "../../../libs/ride-ws";
 import { CheckCircle } from "@mui/icons-material";
 import { useRouter } from "next/router";
 import sendSMS from "../../../libs/sms-service";
@@ -78,7 +79,7 @@ const BookingRideView = () => {
 
   const handleClose = () => {
     setLoading(false);
-    ws.current.Close();
+    RideWs.Close();
     setCompleteFinding(false);
     setOpen(false);
   };
@@ -132,10 +133,8 @@ const BookingRideView = () => {
       setDuration(duration);
 
       let data = await fetch(
-        `/api/pricing?distance=${
-          route.legs[0].distance.value / 1000
-        }&estimated_time=${
-          route.legs[0].duration.value
+        `/api/pricing?distance=${route.legs[0].distance.value / 1000
+        }&estimated_time=${route.legs[0].duration.value
         }&vehicle_type=${bookingType}`
       );
 
@@ -267,7 +266,7 @@ const BookingRideView = () => {
     };
 
     return () => {
-      ws.current.client_listeners.onDriverFound = undefined;
+      RideWs.client_listeners.onDriverFound = undefined;
     };
   }, []);
 
@@ -280,8 +279,8 @@ const BookingRideView = () => {
           href="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css"
           rel="stylesheet"
         />
-        <script src="https://unpkg.com/@goongmaps/goong-sdk/umd/goong-sdk.min.js" />
-        <script src="https://cdn.jsdelivr.net/npm/@goongmaps/goong-js@1.0.9/dist/goong-js.js" />
+        {/* <script src="https://unpkg.com/@goongmaps/goong-sdk/umd/goong-sdk.min.js" />
+        <script src="https://cdn.jsdelivr.net/npm/@goongmaps/goong-js@1.0.9/dist/goong-js.js" /> */}
       </Head>
       <StyledPageContainer>
         <AdminHeader />

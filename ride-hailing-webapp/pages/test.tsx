@@ -18,7 +18,7 @@ import {
   LinearProgress,
   TextField,
 } from "@mui/material";
-import RideWs from "../libs/ride-ws";
+import { rideWs as RideWs } from "../libs/ride-ws";
 import { CheckCircle } from "@mui/icons-material";
 
 const StyledPageContainer = styled.div``;
@@ -46,7 +46,6 @@ const About: NextPage = () => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [completeFinding, setCompleteFinding] = useState(false);
-  const ws = useRef<RideWs>(new RideWs({}));
   const handleClose = () => {
     setLoading(false);
     setTimeout(() => {
@@ -56,7 +55,7 @@ const About: NextPage = () => {
   };
 
   useEffect(() => {
-    ws.current.client_listeners.onDriverFound = function (e) {
+    RideWs.client_listeners.onDriverFound = function (e) {
       setLoading(false);
       console.log(
         !e ? "Khong tim dc driver" : `Tim duoc driver ${e.driver_id}`
@@ -68,7 +67,7 @@ const About: NextPage = () => {
     };
 
     return () => {
-      ws.current.client_listeners.onDriverFound = undefined;
+      RideWs.client_listeners.onDriverFound = undefined;
     };
   }, []);
 

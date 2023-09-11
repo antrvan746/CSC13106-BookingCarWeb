@@ -88,8 +88,9 @@ interface UserViewProps {
 const UserView: React.FC<UserViewProps> = (props) => {
   const { name, phone, email, rating, rides } = props;
 
-  const listRides = rides.map((item) => (
+  const listRides = rides.map((item, i) => (
     <RideHistoryView
+      key={`Rides${i}`}
       vehicleType={item.vehicleType}
       startPlaceName={item.startPlaceName}
       endPlaceName={item.endPlaceName}

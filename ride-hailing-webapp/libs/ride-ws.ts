@@ -62,11 +62,9 @@ class RideWs {
       .map(([k, v]) => `${k}=${v}`)
       .join("&");
 
-    console.log("Creating websocket");
-    this.ws = new WebSocket(
-      encodeURI(`ws://localhost:3080/admin/client/w3gv7?${queries}`)
-    );
-    this.ws.binaryType = "arraybuffer";
+    console.log("Creating websocket")
+    this.ws = new WebSocket(`ws://localhost:3080/admin/client/w3gv7?${queries}`);
+    this.ws.binaryType = "arraybuffer"
     //this.ws = new WebSocket(url,"ws");
     this.ws.onopen = this._onWsOpen;
     this.ws.onmessage = this._onWsMessage;
@@ -110,7 +108,7 @@ class RideWs {
         }
         break;
       default:
-        console.log("Unknow ws cmd:", cmd, msg);
+        console.log("Unknow ws cmd:", cmd, msg)
     }
   }
 
@@ -126,8 +124,8 @@ class RideWs {
       } as any);
     }
     //console.log(`Web socket closed. Code: ${e.code}. Reason: ${e.reason}`);
-    console.log("Web socket closed", e);
-    this.client_listeners.onClose?.(e);
+    console.log("Web socket closed", e)
+    this.client_listeners.onClose?.(e)
     this.Close();
   }
 
@@ -148,5 +146,9 @@ class RideWs {
     }
   }
 }
-
-export default RideWs;
+const globalRideWS = globalThis as unknown as {
+  RideWS: RideWs | undefined
+}
+export const rideWs = globalRideWS.RideWS ?? new RideWs({})
+globalRideWS.RideWS = rideWs 
+// export default RideWs;

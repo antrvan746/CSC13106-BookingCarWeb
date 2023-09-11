@@ -1,0 +1,10 @@
+insert into staff (email, name, role) values ('ecritchley0@wiley.com', 'Emmott Critchley', 'EMPLOYEE');
+insert into staff (email, name, role) values ('cbalden1@wikispaces.com', 'Carena Balden', 'EMPLOYEE');
+insert into staff (email, name, role) values ('cbresnahan2@dion.ne.jp', 'Cordy Bresnahan', 'EMPLOYEE');
+insert into staff (email, name, role) values ('lshelsher3@com.com', 'Lusa Shelsher', 'EMPLOYEE');
+insert into staff (email, name, role) values ('cellins4@google.nl', 'Conny Ellins', 'EMPLOYEE');
+insert into staff (email, name, role) values ('kcrollman5@independent.co.uk', 'Korry Crollman', 'EMPLOYEE');
+insert into staff (email, name, role) values ('rgetch6@sohu.com', 'Ronnica Getch', 'ADMIN');
+insert into staff (email, name, role) values ('fpinnere7@usgs.gov', 'Fernando Pinnere', 'EMPLOYEE');
+insert into staff (email, name, role) values ('gcotesford8@pbs.org', 'Geri Cotesford', 'EMPLOYEE');
+insert into staff (email, name, role) values ('nshawyers9@youtu.be', 'Nick Shawyers', 'EMPLOYEE');

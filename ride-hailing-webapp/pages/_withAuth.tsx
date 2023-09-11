@@ -8,11 +8,10 @@ import LoadingPage from "./loading";
 const app = FirebaseApp;
 const auth = getAuth();
 
-const withAuth = (WrappedComponent: React.ComponentType<any>) => {
-  return (props: any) => {
+function withAuth(WrappedComponent: React.ComponentType<any>) {
+  return function AuthPage(props: any){
     const [user, loading, _error] = useAuthState(auth);
     const router = useRouter();
-
     useEffect(() => {
       if (!loading && !user) {
         router.replace("/admin/login");
@@ -21,7 +20,7 @@ const withAuth = (WrappedComponent: React.ComponentType<any>) => {
 
     if (loading || !user) {
       return <LoadingPage />;
-    } 
+    }
     else return <WrappedComponent {...props} />;
   };
 };
