@@ -20,6 +20,7 @@ import {
 import RideWs from "../../../libs/ride-ws";
 import { CheckCircle } from "@mui/icons-material";
 import { useRouter } from "next/router";
+import sendSMS from "../../../libs/sms-service";
 
 const MapboxAPIKey =
   process.env.MAPBOX_API_KEY ||
@@ -53,6 +54,9 @@ const BookingRideView = () => {
 
   const ws = useRef<RideWs>(new RideWs({}));
 
+  const [userName, setUserName] = useState<string>("");
+  const [userPhone, setPhone] = useState<string>("");
+
   const [startPoint, setStart] = useState<mapboxgl.LngLat | null>(null);
   const [startAddress, setStartAddr] = useState<string | null>(null);
   const [endPoint, setEnd] = useState<mapboxgl.LngLat | null>(null);
@@ -84,8 +88,8 @@ const BookingRideView = () => {
     if (startPoint && endPoint && startAddress && endAddress) {
       ws.current.Connect({
         user_id: "admin_user",
-        user_name: "kkk",
-        user_phone: "0987654321",
+        user_name: userName,
+        user_phone: userPhone,
         slon: startPoint.lng,
         slat: startPoint.lat,
         sadr: startAddress,
@@ -250,13 +254,16 @@ const BookingRideView = () => {
     ws.current.client_listeners.onDriverFound = function (e) {
       setLoading(false);
       if (e) {
-        console.log("Driver founded");
         setCompleteFinding(true);
+        if (userPhone) {
+          const phone = "+84" + userPhone.substring(1, userPhone.length);
+          sendSMS(userPhone);
+        }
       }
       setTimeout(() => {
         setOpen(false);
         router.replace("/admin");
-      }, 3000);
+      }, 2000);
     };
 
     return () => {
@@ -297,6 +304,8 @@ const BookingRideView = () => {
           <StyledDividedContainer>
             <BookingForm
               location={currentLocation.toArray()}
+              setUsername={(userName) => setUserName(userName)}
+              setPhone={(phone) => setPhone(phone)}
               setStartAddress={(placeName) => setStartAddr(placeName)}
               setStartPlace={(pos) => {
                 setStart(pos);
