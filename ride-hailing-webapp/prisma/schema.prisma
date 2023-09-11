@@ -18,17 +18,16 @@ model user {
   name         String
   is_vip       Boolean            @default(false)
   rating       Float              @default(5) @db.Real
-
   rides        ride[]             @relation("ride_client")
   saved_places user_saved_place[] @relation("saved_place_belong_to")
 }
 
 model user_saved_place {
   id              String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id         String @db.Uuid
   saved_name      String
   google_place_id String
   place_name      String
-  user_id         String @db.Uuid
   user            user   @relation("saved_place_belong_to", fields: [user_id], references: [id])
 }
 
@@ -36,8 +35,8 @@ model driver {
   id       String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   phone    String    @db.VarChar(20)
   name     String
-  rating   Float     @default(5) @db.Real
   email    String?   @unique
+  rating   Float     @default(5) @db.Real
   rides    ride[]    @relation("ride_driver")
   vehicles vehicle[] @relation("vehicle_belong_to")
 }
@@ -45,27 +44,26 @@ model driver {
 model staff {
   id    String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   email String?   @unique
-
-  role  StaffRole
   name  String
+  role  StaffRole
 }
 
 model vehicle {
   id           String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  driver_id    String  @db.Uuid
   plate_number String  @db.VarChar(10)
   model        String
   color        String?
-
   type         String?
-  driver_id    String  @db.Uuid
-
   ride         ride[]  @relation("ride_vehicle")
   driver       driver  @relation("vehicle_belong_to", fields: [driver_id], references: [id])
 }
 
 model ride {
   id                    String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-
+  user_id               String      @db.Uuid
+  driver_id             String      @db.Uuid
+  vehicle_id            String      @db.Uuid
   fee                   Decimal
   payment_type          PaymentType
   start_google_place_id String
@@ -75,17 +73,11 @@ model ride {
   book_time             DateTime    @default(now())
   arrive_time           DateTime?
   status                RideStatus
-
-  user_id               String      @db.Uuid
-  driver_id             String      @db.Uuid
-  vehicle_id            String      @db.Uuid
-
   rating                rating?     @relation("rated_ride")
   driver                driver      @relation("ride_driver", fields: [driver_id], references: [id])
   client                user        @relation("ride_client", fields: [user_id], references: [id])
   vehicle               vehicle     @relation("ride_vehicle", fields: [vehicle_id], references: [id])
 }
-
 
 model pricing_factor {
   x_distance       Float   @default(1)
@@ -99,8 +91,8 @@ model pricing_factor {
 model rating {
   id            String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   ride_id       String @unique @db.Uuid
-  driver_rating Float  @default(5)
   user_rating   Float  @default(5)
+  driver_rating Float  @default(5)
   ride          ride   @relation("rated_ride", fields: [ride_id], references: [id])
 }
 
@@ -126,4 +118,3 @@ enum Weather {
   WINDY
   RAINY
 }
-

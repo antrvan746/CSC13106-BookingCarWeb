@@ -21,6 +21,7 @@ import {
 import {rideWs as RideWs} from "../../../libs/ride-ws";
 import { CheckCircle } from "@mui/icons-material";
 import { useRouter } from "next/router";
+import sendSMS from "../../../libs/sms-service";
 
 const MapboxAPIKey =
   process.env.MAPBOX_API_KEY ||
@@ -52,6 +53,11 @@ const BookingRideView = () => {
   const startMarkerRef = useRef<mapboxgl.Marker | null>(null);
   const endMarkerRef = useRef<mapboxgl.Marker | null>(null);
 
+  const ws = useRef<RideWs>(new RideWs({}));
+
+  const [userName, setUserName] = useState<string>("");
+  const [userPhone, setPhone] = useState<string>("");
+
   const [startPoint, setStart] = useState<mapboxgl.LngLat | null>(null);
   const [startAddress, setStartAddr] = useState<string | null>(null);
   const [endPoint, setEnd] = useState<mapboxgl.LngLat | null>(null);
@@ -81,10 +87,10 @@ const BookingRideView = () => {
   const handleSubscribe = () => {
     setLoading(true);
     if (startPoint && endPoint && startAddress && endAddress) {
-      RideWs.Connect({
-        user_name: "HoangLam",
-        user_phone: "123456",
+      ws.current.Connect({
         user_id: "admin_user",
+        user_name: userName,
+        user_phone: userPhone,
         slon: startPoint.lng,
         slat: startPoint.lat,
         sadr: startAddress,
@@ -243,15 +249,20 @@ const BookingRideView = () => {
   }, [currentLocation]);
 
   useEffect(() => {
-    RideWs.client_listeners.onDriverFound = function (e) {
+    ws.current = new RideWs({});
+    ws.current.client_listeners.onDriverFound = function (e) {
       setLoading(false);
       if (e) {
         setCompleteFinding(true);
+        if (userPhone) {
+          const phone = "+84" + userPhone.substring(1, userPhone.length);
+          sendSMS(userPhone);
+        }
       }
       setTimeout(() => {
         setOpen(false);
         router.replace("/admin");
-      }, 3000);
+      }, 2000);
     };
 
     return () => {
@@ -292,6 +303,8 @@ const BookingRideView = () => {
           <StyledDividedContainer>
             <BookingForm
               location={currentLocation.toArray()}
+              setUsername={(userName) => setUserName(userName)}
+              setPhone={(phone) => setPhone(phone)}
               setStartAddress={(placeName) => setStartAddr(placeName)}
               setStartPlace={(pos) => {
                 setStart(pos);
