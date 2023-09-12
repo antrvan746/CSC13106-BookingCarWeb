@@ -2,7 +2,13 @@ import { PrismaClient } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
 
 const prisma = new PrismaClient();
-
+// select: {
+//   id: true,
+//   start_place_name: true,
+//   end_place_name: true,
+//   fee: true,
+//   payment_type: true,
+//   book_time: true,
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -13,8 +19,8 @@ export default async function handler(
         const recentRides = await prisma.ride.findMany({
           select: {
             id: true,
-            start_place_name: true,
-            end_place_name: true,
+            start_name: true,
+            end_name: true,
             fee: true,
             payment_type: true,
             book_time: true,
@@ -24,7 +30,12 @@ export default async function handler(
           },
           take: 5,
         });
-        res.status(200).json(recentRides);
+        const data = recentRides.map(v => ({
+          ...v,
+          start_place_name: v.start_name,
+          end_place_name: v.end_name,
+        }))
+        res.status(200).json(data);
       } catch (err) {
         res.status(500).json({ message: err });
       }

@@ -22,8 +22,8 @@ export default async function handler(
     case "GET":
       try {
         const param = req.query.id;
-        const phone = driverPhoneSchema.parse(param);
-        if (phone) {
+        if (typeof req.query.phone === "string") {
+          const phone = decodeURIComponent(req.query.phone)
           const driver = await driverRepository.findByPhone(phone);
           if (driver) {
             return res.status(200).json(driver);
