@@ -15,7 +15,13 @@ const driverPostSchema = z.object({
 });
 
 const driverPhoneSchema = z.object({
-  phone: z.string().max(12)
+  phone: z.preprocess(a => {
+    if (typeof a == "string") {
+      return a;
+    } else {
+      return `${a}`;
+    }
+  },z.string())
 });
 
-export { driverPutSchema,driverPostSchema, driverPhoneSchema }
+export { driverPutSchema, driverPostSchema, driverPhoneSchema }

@@ -92,6 +92,7 @@ const BookingRideView = () => {
         elat: endPoint.lng,
         elon: startPoint.lat,
         eadr: endAddress,
+        price: price
       });
     }
   };

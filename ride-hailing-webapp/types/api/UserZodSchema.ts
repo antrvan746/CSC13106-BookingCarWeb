@@ -29,6 +29,12 @@ const UserGetRequest = z.object({
       return parseInt(z.string().parse(a))
     }
   }, z.number()).default(10),
-  phone: z.string().optional()
+  phone: z.preprocess(a => {
+    if (typeof a != "string") {
+      return `${a}`;
+    } else {
+      return a;
+    }
+  }, z.string()).optional()
 });
 export { UserPutRequest, UserCreateRequest, UserGetRequest }

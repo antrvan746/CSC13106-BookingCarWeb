@@ -305,7 +305,7 @@ CREATE UNIQUE INDEX staff_email_key ON public.staff USING btree (email);
 -- Name: user_email_key; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX user_email_key ON public."user" USING btree (email);
+-- CREATE UNIQUE INDEX user_email_key ON public."user" USING btree (email);
 
 
 --

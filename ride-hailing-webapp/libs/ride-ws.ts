@@ -20,7 +20,8 @@ export interface RindeRequestInfo {
 
   "user_id": string,
   "user_name": string,
-  "user_phone": string
+  "user_phone": string,
+  "price":number
 }
 
 interface RideWsConstrucProps {
