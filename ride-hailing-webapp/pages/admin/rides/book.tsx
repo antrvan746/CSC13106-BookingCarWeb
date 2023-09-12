@@ -7,7 +7,8 @@ import withAuth from "../../_withAuth";
 import mapboxgl, { LngLat } from "mapbox-gl";
 import { toGeoJSON } from "@mapbox/polyline";
 import extent from "turf-extent";
-import { default as goongSdk } from "@goongmaps/goong-sdk"
+import { default as goongDirection } from "@goongmaps/goong-sdk/services/directions"
+
 import {
   Button,
   CircularProgress,
@@ -84,7 +85,7 @@ const BookingRideView = () => {
       RideWs.Connect({
         user_name: "HoangLam",
         user_phone: "123456",
-        user_id: "admin_user",
+        user_id: "40e6215d-b5c6-4896-987c-f30f3678f608",
         slon: startPoint.lng,
         slat: startPoint.lat,
         sadr: startAddress,
@@ -105,12 +106,12 @@ const BookingRideView = () => {
         firstSymbolId = layers[i].id;
       }
     }
-    const goongClient = goongSdk({
+    const goongDirections = await require('@goongmaps/goong-sdk/services/directions');
+    const directionService  = goongDirections({
       accessToken: GoongApiKey,
     });
     try {
-      const response = await goongClient.directions
-        .getDirections({
+      const response = await directionService.getDirections({
           origin: `${origin.lat},${origin.lng}`,
           destination: `${des.lat},${des.lng}`,
           vehicle: typeVehicle,
@@ -255,7 +256,7 @@ const BookingRideView = () => {
     };
 
     return () => {
-      RideWs.client_listeners.onDriverFound = undefined;
+      // RideWs.client_listeners.onDriverFound = undefined;
     };
   }, []);
 

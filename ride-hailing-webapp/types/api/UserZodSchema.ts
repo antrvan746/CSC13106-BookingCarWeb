@@ -15,8 +15,20 @@ const UserCreateRequest = z.object({
 });
 
 const UserGetRequest = z.object({
-  skip: z.number().default(0),
-  take: z.number().default(10),
-  phone:z.string().optional()
+  skip: z.preprocess(a => {
+    if (typeof a === "number") {
+      return a;
+    } else {
+      return parseInt(z.string().parse(a))
+    }
+  }, z.number()).default(0),
+  take: z.preprocess(a => {
+    if (typeof a === "number") {
+      return a;
+    } else {
+      return parseInt(z.string().parse(a))
+    }
+  }, z.number()).default(10),
+  phone: z.string().optional()
 });
 export { UserPutRequest, UserCreateRequest, UserGetRequest }

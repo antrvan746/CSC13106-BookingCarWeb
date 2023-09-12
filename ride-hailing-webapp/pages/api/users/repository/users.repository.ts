@@ -14,8 +14,9 @@ class UserRepository {
 
   async getUsers({ skip, take, phone }: z.infer<typeof UserGetRequest>) {
     if (!!phone) {
+      console.log("Find user by phone: ", phone)
       const user = await prismaClient.user.findFirst({
-        where:{phone}
+        where: { phone }
       })
       return user ? [user] : [];
     }

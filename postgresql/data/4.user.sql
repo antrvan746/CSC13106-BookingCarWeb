@@ -1,3 +1,5 @@
+insert into "user" (id,email, phone, name, is_vip) values ('40e6215d-b5c6-4896-987c-f30f3678f608','admin@admin.io', '4707292060', 'ADMIN', false);
+
 insert into "user" (email, phone, name, is_vip) values ('cwhetland0@github.io', '4707642060', 'Cori Whetland', false);
 insert into "user" (email, phone, name, is_vip) values ('lkobisch1@google.es', '7909325700', 'Leonanie Kobisch', true);
 insert into "user" (email, phone, name, is_vip) values ('bgiraths2@state.tx.us', '1332346307', 'Barnett Giraths', true);
