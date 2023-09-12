@@ -1,0 +1,49 @@
+version: '3'
+
+services:
+  ride-matching-server:
+    build:
+      context: ./ride-matching-server
+    ports:
+      - "3080:3080"
+    depends_on:
+      - redis
+
+  postgres:
+    build:
+      context: ./postgresql
+    container_name: postgres
+    hostname: postgres
+    ports:
+      - 5432:5432
+    # environment:
+    #   POSTGRES_USER: postgres
+    #   POSTGRES_PASSWORD: postgres
+    #   POSTGRES_DB: ride_hailing_db
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  redis:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - "6785:6785"
+    volumes: 
+      - cache:/data
+
+  ride-hailing-webapp:
+    build:
+      context: ./ride-hailing-webapp
+    command: sh -c "npm run dev"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/ride_hailing_db
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+
+volumes:
+  postgres-data:
+  cache:
+    driver: local

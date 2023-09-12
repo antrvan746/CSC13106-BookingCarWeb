@@ -113,7 +113,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ isLoggedIn = true }) => {
             backgroundColor: "#1e1e1e",
             height: "300vh",
             position: "absolute",
-            zIndex: 1,
+            zIndex: 10,
           }}
           onClick={() => setOpen(false)}
         >
